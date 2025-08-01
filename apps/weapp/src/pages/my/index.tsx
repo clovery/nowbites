@@ -1,12 +1,24 @@
 import { Component } from 'react'
 import { View, Text, ScrollView, Button, Input, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
+import { apiService, LoginResponse } from '../../utils/api'
 import './index.scss'
 
+interface UserInfo {
+  openid?: string;
+  nickName?: string;
+  avatarUrl?: string;
+  gender?: number;
+  country?: string;
+  province?: string;
+  city?: string;
+  language?: string;
+}
+
 interface State {
-  userInfo: Taro.UserInfo | null
+  userInfo: UserInfo | null
   isLogin: boolean
-  showLoginModal: boolean
+  isLoading: boolean
 }
 
 export default class MyPage extends Component<{}, State> {
@@ -16,7 +28,7 @@ export default class MyPage extends Component<{}, State> {
     this.state = {
       userInfo: null,
       isLogin: false,
-      showLoginModal: false
+      isLoading: false
     }
   }
 
@@ -24,114 +36,67 @@ export default class MyPage extends Component<{}, State> {
     this.checkLoginStatus()
   }
 
-  checkLoginStatus = () => {
-    // 检查本地存储中是否有用户信息
+  checkLoginStatus = async () => {
+    // 检查本地存储中是否有用户信息和token
     const userInfo = Taro.getStorageSync('userInfo')
-    if (userInfo) {
-      this.setState({ 
-        userInfo,
-        isLogin: true
-      })
+    const token = Taro.getStorageSync('token')
+    
+    if (userInfo && token) {
+      // 验证token是否有效
+      const isValid = await apiService.verifyToken()
+      if (isValid) {
+        this.setState({ 
+          userInfo,
+          isLogin: true
+        })
+      } else {
+        // token无效，清除本地存储
+        Taro.removeStorageSync('userInfo')
+        Taro.removeStorageSync('token')
+      }
     }
   }
 
-  handleLogin = () => {
-    // 显示登录模态框，让用户点击授权按钮
-    this.setState({
-      showLoginModal: true
-    });
-  }
+  handleGetUserInfo = async () => {
+    this.setState({ isLoading: true })
+    
+    try {
+      // 第一步：先获取用户信息（必须由点击直接触发）
+      const userProfileRes = await Taro.getUserProfile({
+        desc: '用于完善会员资料'
+      })
+      const userInfo = userProfileRes.userInfo
 
-  handleCloseLoginModal = () => {
-    this.setState({
-      showLoginModal: false
-    });
-  }
-
-  handleGetUserInfo = () => {
-    // 使用getUserProfile替代getUserInfo
-    Taro.login({
-      success: (loginRes) => {
-        if (loginRes.code) {
-          // 获取用户信息
-          Taro.getUserProfile({
-            desc: '用于完善会员资料', // 声明获取用户个人信息后的用途
-            success: (userRes) => {
-              const userInfo = userRes.userInfo
-              console.log('userInfo', userInfo)
-              
-              // 将code和用户信息一起发送到后端，用于获取openid和session_key
-              Taro.request({
-                url: 'http://localhost:3100/api/auth/wechat-login',
-                method: 'POST',
-                data: {
-                  code: loginRes.code,
-                  userInfo: userInfo
-                },
-                success: (res) => {
-                  // 保存后端返回的token和用户信息
-                  const { token, userInfo: serverUserInfo } = res.data
-                  Taro.setStorageSync('token', token)
-                  
-                  // 合并本地用户信息和服务器返回的用户信息
-                  const combinedUserInfo = {
-                    ...userInfo,
-                    openid: serverUserInfo.openid
-                  }
-                  
-                  this.setState({ 
-                    userInfo: combinedUserInfo,
-                    isLogin: true,
-                    showLoginModal: false
-                  })
-                  Taro.setStorageSync('userInfo', combinedUserInfo)
-                  
-                  Taro.showToast({
-                    title: '登录成功',
-                    icon: 'success'
-                  })
-                },
-                fail: (err) => {
-                  console.error('登录请求失败:', err)
-                  
-                  // 如果API服务器未启动或连接失败，使用本地存储作为备选方案
-                  this.setState({ 
-                    userInfo,
-                    isLogin: true,
-                    showLoginModal: false
-                  })
-                  Taro.setStorageSync('userInfo', userInfo)
-                  
-                  Taro.showToast({
-                    title: '登录成功（本地模式）',
-                    icon: 'success'
-                  })
-                }
-              })
-            },
-            fail: (err) => {
-              Taro.showToast({
-                title: '获取用户信息失败',
-                icon: 'none'
-              })
-              console.log('获取用户信息失败', err)
-            }
-          })
-        } else {
-          Taro.showToast({
-            title: '登录失败: ' + loginRes.errMsg,
-            icon: 'none'
-          })
-        }
-      },
-      fail: (err) => {
-        Taro.showToast({
-          title: '微信登录失败',
-          icon: 'none'
-        })
-        console.error('微信登录失败:', err)
+      // 第二步：获取微信登录code
+      const loginRes = await Taro.login()
+      if (!loginRes.code) {
+        throw new Error('获取微信登录code失败')
       }
-    })
+
+      // 第三步：发送到后端API
+      const loginResponse = await apiService.wechatLogin({
+        code: loginRes.code,
+        userInfo: userInfo
+      })
+
+      Taro.setStorageSync('token', loginResponse.token)
+      Taro.setStorageSync('userInfo', loginResponse.userInfo)
+
+      this.setState({
+        userInfo: loginResponse.userInfo,
+        isLogin: true,
+        isLoading: false
+      })
+
+      Taro.showToast({ title: '登录成功', icon: 'success' })
+
+    } catch (error: any) {
+      this.setState({ isLoading: false })
+      Taro.showToast({
+        title: error.message || '登录失败: ' + apiService.baseUrl +  ' ' + error.errMsg,
+        icon: 'none'
+      })
+    }
   }
 
   handleLogout = () => {
@@ -140,7 +105,10 @@ export default class MyPage extends Component<{}, State> {
       content: '确定要退出登录吗？',
       success: (res) => {
         if (res.confirm) {
+          // 清除本地存储
           Taro.removeStorageSync('userInfo')
+          Taro.removeStorageSync('token')
+          
           this.setState({
             userInfo: null,
             isLogin: false
@@ -163,9 +131,7 @@ export default class MyPage extends Component<{}, State> {
         confirmText: '去登录',
         success: (res) => {
           if (res.confirm) {
-            this.setState({
-              showLoginModal: true
-            })
+            this.handleGetUserInfo()
           }
         }
       })
@@ -178,88 +144,86 @@ export default class MyPage extends Component<{}, State> {
   }
 
   render() {
-    const { userInfo, isLogin, showLoginModal } = this.state
+    const { userInfo, isLogin, isLoading } = this.state
 
     return (
       <View className='my-page'>
-        <View className='user-card'>
+        {/* Profile Header Section */}
+        <View className='profile-header'>
           {isLogin ? (
-            <View className='user-info'>
+            <View className='user-profile'>
               <Image 
-                className='avatar' 
+                className='profile-avatar' 
                 src={userInfo?.avatarUrl || '/assets/default-avatar.png'}
               />
-              <View className='user-details'>
-                <Text className='nickname'>{userInfo?.nickName || '用户'}</Text>
-                <Text className='user-id'>ID: {userInfo?.nickName}123</Text>
+              <View className='profile-info'>
+                <Text className='profile-name'>{userInfo?.nickName || '用户'}</Text>
+                <Text className='profile-id'>微信号: {userInfo?.openid?.substring(0, 8) || 'unknown'}</Text>
+                <View className='status-buttons'>
+                  <View className='status-btn'>+ 状态</View>
+                  <View className='status-btn-circle'></View>
+                </View>
               </View>
-              <Button className='logout-btn' onClick={this.handleLogout}>
-                退出登录
-              </Button>
+              <View className='qr-code-icon'>📱</View>
+              <View className='nav-arrow'>›</View>
             </View>
           ) : (
-            <View className='login-prompt'>
+            <View className='login-profile'>
               <View className='default-avatar'>👤</View>
-              <Text className='login-text'>登录获取更多功能</Text>
+              <View className='profile-info'>
+                <Text className='profile-name'>未登录</Text>
+                <Text className='profile-id'>点击登录获取更多功能</Text>
+              </View>
               <Button 
                 className='login-btn' 
                 onClick={this.handleGetUserInfo}
+                disabled={isLoading}
               >
-                微信登录
+                {isLoading ? '登录中...' : '登录'}
               </Button>
             </View>
           )}
         </View>
 
-        <View className='feature-section'>
-          <View className='section-title'>我的功能</View>
+        {/* Functional List */}
+        <View className='function-list'>
+          <View className='function-item' onClick={this.navigateToRecipeUpload}>
+            <View className='function-icon service-icon'>💬</View>
+            <Text className='function-text'>上传菜谱</Text>
+            <View className='arrow'>›</View>
+          </View>
           
-          <View className='feature-grid'>
-            <View className='feature-item' onClick={this.navigateToRecipeUpload}>
-              <View className='feature-icon'>📝</View>
-              <Text className='feature-name'>上传菜谱</Text>
-            </View>
-            
-            <View className='feature-item'>
-              <View className='feature-icon'>❤️</View>
-              <Text className='feature-name'>我的收藏</Text>
-            </View>
-            
-            <View className='feature-item'>
-              <View className='feature-icon'>🍽️</View>
-              <Text className='feature-name'>我的菜谱</Text>
-            </View>
-            
-            <View className='feature-item'>
-              <View className='feature-icon'>📅</View>
-              <Text className='feature-name'>我的计划</Text>
-            </View>
+          <View className='function-item'>
+            <View className='function-icon favorites-icon'>📦</View>
+            <Text className='function-text'>我的收藏</Text>
+            <View className='arrow'>›</View>
+          </View>
+          
+          <View className='function-item'>
+            <View className='function-icon moments-icon'>🏔️</View>
+            <Text className='function-text'>我的菜谱</Text>
+            <View className='arrow'>›</View>
+          </View>
+          
+          <View className='function-item'>
+            <View className='function-icon cards-icon'>💳</View>
+            <Text className='function-text'>我的计划</Text>
+            <View className='arrow'>›</View>
+          </View>
+          
+          <View className='function-item'>
+            <View className='function-icon stickers-icon'>😊</View>
+            <Text className='function-text'>设置</Text>
+            <View className='arrow'>›</View>
           </View>
         </View>
 
-        {showLoginModal && (
-          <View className='login-modal'>
-            <View className='modal-content'>
-              <View className='modal-header'>
-                <Text className='modal-title'>微信登录</Text>
-                <Text 
-                  className='modal-close'
-                  onClick={() => this.setState({ showLoginModal: false })}
-                >
-                  ×
-                </Text>
-              </View>
-              
-              <View className='modal-body'>
-                <Text className='modal-message'>授权获取您的公开信息（昵称、头像等）</Text>
-                <Button 
-                  className='auth-btn' 
-                  onClick={this.handleGetUserInfo}
-                >
-                  确认授权
-                </Button>
-              </View>
-            </View>
+        {/* Logout Section */}
+        {isLogin && (
+          <View className='logout-section'>
+            <Button className='logout-button' onClick={this.handleLogout}>
+              退出登录
+            </Button>
           </View>
         )}
       </View>

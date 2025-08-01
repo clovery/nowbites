@@ -61,6 +61,9 @@ async function registerPlugins() {
 
 // 注册路由
 async function registerRoutes() {
+  server.get('/', (req, res) => {
+    res.send('NowBites API');
+  });
   server.register(authRoutes, { prefix: '/api/auth' });
 }
 

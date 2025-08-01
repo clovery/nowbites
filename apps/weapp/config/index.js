@@ -8,7 +8,7 @@ const config = {
     828: 1.81 / 2
   },
   sourceRoot: 'src',
-  outputRoot: 'dist',
+  outputRoot: '../../out/weapp',
   plugins: [
     '@tarojs/plugin-framework-react'
   ],

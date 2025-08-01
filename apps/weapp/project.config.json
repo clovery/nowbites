@@ -1,5 +1,5 @@
 {
-  "miniprogramRoot": "dist/",
+  "miniprogramRoot": "../../nowbites-weapp/",
   "projectname": "nowbites-mini-program",
   "description": "今食刻 - 菜谱管理小程序",
   "appid": "touristappid",
