@@ -61,32 +61,52 @@ export default class MyPage extends Component<{}, State> {
               console.log('userInfo', userInfo)
               
               // 将code和用户信息一起发送到后端，用于获取openid和session_key
-              // 注意：实际项目中应该将code发送到自己的后端服务器，由后端向微信服务器请求openid和session_key
-              // 这里仅做演示，实际项目中需要替换为真实的API地址
-              // Taro.request({
-              //   url: 'https://your-api.com/auth/wx-login',
-              //   method: 'POST',
-              //   data: {
-              //     code: loginRes.code,
-              //     userInfo: userInfo
-              //   },
-              //   success: (res) => {
-              //     // 保存后端返回的用户信息和登录态
-              //     Taro.setStorageSync('token', res.data.token)
-              //   }
-              // })
-              
-              // 由于没有实际的后端API，这里仍然使用本地存储保存用户信息
-              this.setState({ 
-                userInfo,
-                isLogin: true,
-                showLoginModal: false
-              })
-              Taro.setStorageSync('userInfo', userInfo)
-              
-              Taro.showToast({
-                title: '登录成功',
-                icon: 'success'
+              Taro.request({
+                url: 'http://localhost:3100/api/auth/wechat-login',
+                method: 'POST',
+                data: {
+                  code: loginRes.code,
+                  userInfo: userInfo
+                },
+                success: (res) => {
+                  // 保存后端返回的token和用户信息
+                  const { token, userInfo: serverUserInfo } = res.data
+                  Taro.setStorageSync('token', token)
+                  
+                  // 合并本地用户信息和服务器返回的用户信息
+                  const combinedUserInfo = {
+                    ...userInfo,
+                    openid: serverUserInfo.openid
+                  }
+                  
+                  this.setState({ 
+                    userInfo: combinedUserInfo,
+                    isLogin: true,
+                    showLoginModal: false
+                  })
+                  Taro.setStorageSync('userInfo', combinedUserInfo)
+                  
+                  Taro.showToast({
+                    title: '登录成功',
+                    icon: 'success'
+                  })
+                },
+                fail: (err) => {
+                  console.error('登录请求失败:', err)
+                  
+                  // 如果API服务器未启动或连接失败，使用本地存储作为备选方案
+                  this.setState({ 
+                    userInfo,
+                    isLogin: true,
+                    showLoginModal: false
+                  })
+                  Taro.setStorageSync('userInfo', userInfo)
+                  
+                  Taro.showToast({
+                    title: '登录成功（本地模式）',
+                    icon: 'success'
+                  })
+                }
               })
             },
             fail: (err) => {

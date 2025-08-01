@@ -5,7 +5,8 @@
       "es6",
       "es2017",
       "es2018",
-      "es2019"
+      "es2019",
+      "dom"
     ],
     "allowJs": true,
     "skipLibCheck": true,
