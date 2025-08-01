@@ -1,0 +1,85 @@
+.index {
+  padding: 40rpx 32rpx;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 80rpx;
+  padding-top: 60rpx;
+}
+
+.title {
+  display: block;
+  font-size: 72rpx;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 16rpx;
+}
+
+.subtitle {
+  display: block;
+  font-size: 32rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24rpx;
+  margin-bottom: 60rpx;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 24rpx;
+  padding: 40rpx 24rpx;
+  text-align: center;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.feature-card:active {
+  transform: scale(0.95);
+}
+
+.feature-icon {
+  font-size: 64rpx;
+  margin-bottom: 16rpx;
+}
+
+.feature-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.feature-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.4;
+}
+
+.quick-actions {
+  text-align: center;
+  padding-top: 40rpx;
+}
+
+.btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  border: none;
+  border-radius: 50rpx;
+  padding: 32rpx 64rpx;
+  font-size: 36rpx;
+  font-weight: bold;
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 107, 0.3);
+}
+
+.btn::after {
+  border: none;
+}
