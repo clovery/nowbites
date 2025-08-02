@@ -1,18 +1,8 @@
 import { Component } from 'react'
 import { View, Text, ScrollView, Input, Button } from '@tarojs/components'
 import Taro from '@tarojs/taro'
+import { apiService, Recipe } from '../../utils/api'
 import './index.scss'
-
-interface Recipe {
-  id: string
-  title: string
-  description: string
-  ingredients: string[]
-  steps: string[]
-  cookTime: string
-  difficulty: string
-  tags: string[]
-}
 
 interface State {
   recipes: Recipe[]
@@ -20,6 +10,8 @@ interface State {
   filteredRecipes: Recipe[]
   planId?: string // 如果从计划页面跳转过来，会有计划ID
   addedRecipeIds: string[] // 已添加到计划的菜谱ID列表
+  loading: boolean
+  error: string | null
 }
 
 export default class RecipeList extends Component<{}, State> {
@@ -30,7 +22,9 @@ export default class RecipeList extends Component<{}, State> {
       recipes: [],
       searchText: '',
       filteredRecipes: [],
-      addedRecipeIds: []
+      addedRecipeIds: [],
+      loading: false,
+      error: null
     }
   }
 
@@ -56,13 +50,33 @@ export default class RecipeList extends Component<{}, State> {
     }
   }
 
-  loadRecipes = () => {
-    // 从本地存储加载菜谱
-    const recipes = Taro.getStorageSync('recipes') || []
-    this.setState({
-      recipes,
-      filteredRecipes: recipes
-    })
+  loadRecipes = async () => {
+    try {
+      this.setState({ loading: true, error: null })
+      
+      const response = await apiService.getRecipes({
+        page: 1,
+        limit: 50 // 获取前50个菜谱
+      })
+      
+      this.setState({
+        recipes: response.recipes,
+        filteredRecipes: response.recipes,
+        loading: false
+      })
+    } catch (error) {
+      console.error('加载菜谱失败:', error)
+      this.setState({
+        error: '加载菜谱失败，请稍后重试',
+        loading: false
+      })
+      
+      Taro.showToast({
+        title: '加载菜谱失败',
+        icon: 'none',
+        duration: 2000
+      })
+    }
   }
 
   onSearchChange = (e: any) => {
@@ -70,8 +84,8 @@ export default class RecipeList extends Component<{}, State> {
     const { recipes } = this.state
     const filteredRecipes = recipes.filter(recipe => 
       recipe.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      recipe.description.toLowerCase().includes(searchText.toLowerCase()) ||
-      recipe.tags.some(tag => tag.toLowerCase().includes(searchText.toLowerCase()))
+      (recipe.description && recipe.description.toLowerCase().includes(searchText.toLowerCase())) ||
+      (recipe.tags && recipe.tags.some(tag => tag.toLowerCase().includes(searchText.toLowerCase())))
     )
     
     this.setState({
@@ -113,7 +127,7 @@ export default class RecipeList extends Component<{}, State> {
     const newMeal = {
       id: recipe.id,
       title: recipe.title,
-      cookTime: recipe.cookTime,
+      cookTime: recipe.cookingTime ? `${recipe.cookingTime}分钟` : '未知',
       completed: false,
       planId: planId
     }
@@ -154,7 +168,30 @@ export default class RecipeList extends Component<{}, State> {
   }
 
   render() {
-    const { filteredRecipes, searchText, planId, addedRecipeIds } = this.state
+    const { filteredRecipes, searchText, planId, addedRecipeIds, loading, error } = this.state
+
+    if (loading) {
+      return (
+        <View className='recipe-list'>
+          <View className='loading-state'>
+            <Text className='loading-text'>加载中...</Text>
+          </View>
+        </View>
+      )
+    }
+
+    if (error) {
+      return (
+        <View className='recipe-list'>
+          <View className='error-state'>
+            <Text className='error-text'>{error}</Text>
+            <Button className='retry-btn' onClick={this.loadRecipes}>
+              重试
+            </Button>
+          </View>
+        </View>
+      )
+    }
 
     return (
       <View className='recipe-list'>
@@ -189,14 +226,16 @@ export default class RecipeList extends Component<{}, State> {
                   <View className='recipe-header'>
                     <Text className='recipe-title'>{recipe.title}</Text>
                     <View className='recipe-meta'>
-                      <Text className='cook-time'>⏱ {recipe.cookTime}</Text>
-                      <Text className='difficulty'>🔥 {recipe.difficulty}</Text>
+                      <Text className='cook-time'>⏱ {recipe.cookingTime ? `${recipe.cookingTime}分钟` : '未知'}</Text>
+                      <Text className='difficulty'>🔥 {recipe.difficulty || '未知'}</Text>
                     </View>
                   </View>
                   
-                  <Text className='recipe-description'>{recipe.description}</Text>
+                  {recipe.description && (
+                    <Text className='recipe-description'>{recipe.description}</Text>
+                  )}
                   
-                  {recipe.tags.length > 0 && (
+                  {recipe.tags && recipe.tags.length > 0 && (
                     <View className='recipe-tags'>
                       {recipe.tags.map((tag, index) => (
                         <Text key={index} className='tag'>#{tag}</Text>

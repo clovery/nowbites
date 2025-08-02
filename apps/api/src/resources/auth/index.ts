@@ -23,16 +23,57 @@ export const wechatLogin = async (request: FastifyRequest<{ Body: WechatLoginReq
         return reply.code(400).send({ error: `WeChat login failed: ${errmsg}` });
       }
       
+      // 查找或创建用户
+      let user = await request.server.prisma.user.findUnique({
+        where: { openid }
+      });
+
+      if (!user) {
+        // 创建新用户
+        user = await request.server.prisma.user.create({
+          data: {
+            openid,
+            nickName: userInfo?.nickName,
+            avatarUrl: userInfo?.avatarUrl,
+            gender: userInfo?.gender,
+            country: userInfo?.country,
+            province: userInfo?.province,
+            city: userInfo?.city,
+            language: userInfo?.language
+          }
+        });
+      } else {
+        // 更新现有用户信息
+        user = await request.server.prisma.user.update({
+          where: { openid },
+          data: {
+            nickName: userInfo?.nickName,
+            avatarUrl: userInfo?.avatarUrl,
+            gender: userInfo?.gender,
+            country: userInfo?.country,
+            province: userInfo?.province,
+            city: userInfo?.city,
+            language: userInfo?.language
+          }
+        });
+      }
+      
       // 创建用户信息对象
       const userInfoData: UserInfo = {
         openid,
-        ...userInfo
+        nickName: user.nickName || undefined,
+        avatarUrl: user.avatarUrl || undefined,
+        gender: user.gender || undefined,
+        country: user.country || undefined,
+        province: user.province || undefined,
+        city: user.city || undefined,
+        language: user.language || undefined
       };
       
       // 生成JWT令牌
       const token = await reply.jwtSign({
         openid,
-        nickName: userInfo?.nickName
+        nickName: user.nickName
       }, {
         expiresIn: process.env.JWT_EXPIRES_IN || '7d'
       });

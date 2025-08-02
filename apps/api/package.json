@@ -4,12 +4,17 @@
   "description": "NowBites API Server",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "tsx src/scripts/dev.ts",
+    "dev": "tsx src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit",
-    "prod": "npm run build && npx pm2 start ecosystem.config.js --env production"
+    "pm2:start": "npx pm2 start ecosystem.config.js --env production",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@fastify/cors": "^9.0.0",
@@ -17,11 +22,13 @@
     "@fastify/jwt": "^8.0.0",
     "@fastify/swagger": "^8.14.0",
     "@fastify/swagger-ui": "^2.1.0",
+    "@prisma/client": "^6.13.0",
     "axios": "^1.6.7",
     "dotenv": "^16.4.5",
     "fastify": "^4.26.2",
     "fastify-plugin": "^4.5.1",
     "pino-pretty": "^10.3.1",
+    "prisma": "^6.13.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

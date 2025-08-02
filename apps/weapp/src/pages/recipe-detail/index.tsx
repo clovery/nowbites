@@ -1,24 +1,13 @@
 import { Component } from 'react'
 import { View, Text, ScrollView, Button } from '@tarojs/components'
 import Taro from '@tarojs/taro'
+import { apiService, Recipe } from '../../utils/api'
 import './index.scss'
-
-interface Recipe {
-  id: string
-  title: string
-  description: string
-  ingredients: string[]
-  steps: string[]
-  cookTime: string
-  difficulty: string
-  tags: string[]
-  servings?: string
-  prepTime?: string
-}
 
 interface State {
   recipe: Recipe | null
   loading: boolean
+  error: string | null
 }
 
 export default class RecipeDetail extends Component<{}, State> {
@@ -27,7 +16,8 @@ export default class RecipeDetail extends Component<{}, State> {
     super(props)
     this.state = {
       recipe: null,
-      loading: true
+      loading: true,
+      error: null
     }
   }
 
@@ -45,18 +35,30 @@ export default class RecipeDetail extends Component<{}, State> {
     }
   }
 
-  loadRecipe = (id: string) => {
-    const recipes = Taro.getStorageSync('recipes') || []
-    const recipe = recipes.find((r: any) => r.id === id)
-    
-    this.setState({
-      recipe,
-      loading: false
-    })
-    
-    if (recipe) {
+  loadRecipe = async (id: string) => {
+    try {
+      this.setState({ loading: true, error: null })
+      
+      const recipe = await apiService.getRecipe(id)
+      
+      this.setState({
+        recipe,
+        loading: false
+      })
+      
       Taro.setNavigationBarTitle({
         title: recipe.title
+      })
+    } catch (error) {
+      console.error('Failed to load recipe:', error)
+      this.setState({
+        loading: false,
+        error: '加载菜谱失败'
+      })
+      
+      Taro.showToast({
+        title: '加载失败',
+        icon: 'error'
       })
     }
   }
@@ -138,7 +140,7 @@ export default class RecipeDetail extends Component<{}, State> {
     mealPlans[dateStr].push({
       id: recipe.id,
       title: recipe.title,
-      cookTime: recipe.cookTime
+      cookTime: recipe.cookingTime
     })
     
     Taro.setStorageSync('mealPlans', mealPlans)
@@ -161,7 +163,7 @@ export default class RecipeDetail extends Component<{}, State> {
   }
 
   render() {
-    const { recipe, loading } = this.state
+    const { recipe, loading, error } = this.state
 
     if (loading) {
       return (
@@ -171,10 +173,10 @@ export default class RecipeDetail extends Component<{}, State> {
       )
     }
 
-    if (!recipe) {
+    if (error || !recipe) {
       return (
         <View className='error'>
-          <Text>菜谱不存在</Text>
+          <Text>{error || '菜谱不存在'}</Text>
         </View>
       )
     }
@@ -189,7 +191,7 @@ export default class RecipeDetail extends Component<{}, State> {
             <View className='meta-info'>
               <View className='meta-item'>
                 <Text className='meta-label'>⏱ 烹饪时间</Text>
-                <Text className='meta-value'>{recipe.cookTime}</Text>
+                <Text className='meta-value'>{recipe.cookingTime}分钟</Text>
               </View>
               <View className='meta-item'>
                 <Text className='meta-label'>🔥 难度</Text>
@@ -198,12 +200,12 @@ export default class RecipeDetail extends Component<{}, State> {
               {recipe.servings && (
                 <View className='meta-item'>
                   <Text className='meta-label'>👥 份量</Text>
-                  <Text className='meta-value'>{recipe.servings}</Text>
+                  <Text className='meta-value'>{recipe.servings}人份</Text>
                 </View>
               )}
             </View>
             
-            {recipe.tags.length > 0 && (
+            {recipe.tags && recipe.tags.length > 0 && (
               <View className='tags'>
                 {recipe.tags.map((tag, index) => (
                   <Text key={index} className='tag'>#{tag}</Text>
@@ -217,7 +219,9 @@ export default class RecipeDetail extends Component<{}, State> {
             <View className='ingredients'>
               {recipe.ingredients.map((ingredient, index) => (
                 <View key={index} className='ingredient-item'>
-                  <Text className='ingredient-text'>{ingredient}</Text>
+                  <Text className='ingredient-text'>
+                    {ingredient.name} {ingredient.amount}{ingredient.unit}
+                  </Text>
                 </View>
               ))}
             </View>
@@ -229,11 +233,30 @@ export default class RecipeDetail extends Component<{}, State> {
               {recipe.steps.map((step, index) => (
                 <View key={index} className='step-item'>
                   <View className='step-number'>{index + 1}</View>
-                  <Text className='step-text'>{step}</Text>
+                  <View className='step-content'>
+                    <Text className='step-title'>{step.title}</Text>
+                    <Text className='step-time'>⏱ {step.time}分钟</Text>
+                    {step.content.map((content: string, contentIndex: number) => (
+                      <Text key={contentIndex} className='step-text'>• {content}</Text>
+                    ))}
+                  </View>
                 </View>
               ))}
             </View>
           </View>
+
+          {recipe.tips && recipe.tips.length > 0 && (
+            <View className='section'>
+              <Text className='section-title'>💡 小贴士</Text>
+              <View className='tips'>
+                {recipe.tips.map((tip, index) => (
+                  <View key={index} className='tip-item'>
+                    <Text className='tip-text'>• {tip}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
         </ScrollView>
 
         <View className='actions'>

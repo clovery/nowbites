@@ -6,6 +6,9 @@
 
 - 微信小程序登录认证
 - JWT令牌生成与验证
+- PostgreSQL数据库集成
+- Prisma ORM
+- 食谱管理CRUD操作
 - API文档（Swagger）
 - CORS支持
 
@@ -14,6 +17,7 @@
 ### 前置条件
 
 - Node.js (v18+)
+- PostgreSQL (v12+)
 - pnpm
 
 ### 安装依赖
@@ -34,6 +38,7 @@ cp .env.example .env
 
 - `WECHAT_APPID`: 微信小程序的AppID
 - `WECHAT_SECRET`: 微信小程序的AppSecret
+- `DATABASE_URL`: PostgreSQL数据库连接URL
 
 ### 启动开发服务器
 
@@ -47,9 +52,27 @@ pnpm dev
 
 服务器将在 http://localhost:3100 上运行，API文档可在 http://localhost:3100/documentation 访问。
 
+### 数据库设置
+
+详细的数据库设置指南请参考 [DATABASE_SETUP.md](./DATABASE_SETUP.md)
+
+快速设置：
+```bash
+# 生成Prisma客户端
+pnpm db:generate
+
+# 推送数据库架构（开发环境）
+pnpm db:push
+
+# 填充示例数据
+pnpm db:seed
+```
+
 ## API端点
 
-### 微信小程序登录
+### 认证
+
+#### 微信小程序登录
 
 ```
 POST /api/auth/wechat-login
@@ -90,7 +113,7 @@ POST /api/auth/wechat-login
 }
 ```
 
-### 验证令牌
+#### 验证令牌
 
 ```
 GET /api/auth/verify
@@ -112,6 +135,78 @@ Authorization: Bearer <token>
   },
   "message": "Valid token"
 }
+```
+
+### 食谱管理
+
+#### 获取所有食谱
+
+```
+GET /api/recipes
+```
+
+查询参数：
+- `page`: 页码（默认：1）
+- `limit`: 每页数量（默认：10）
+- `search`: 搜索关键词
+- `tags`: 标签过滤（逗号分隔）
+- `difficulty`: 难度过滤（easy/medium/hard）
+- `userId`: 用户ID过滤
+
+#### 获取食谱详情
+
+```
+GET /api/recipes/:id
+```
+
+#### 创建食谱（需要认证）
+
+```
+POST /api/recipes
+```
+
+请求头：
+```
+Authorization: Bearer <token>
+```
+
+请求体：
+```json
+{
+  "title": "食谱标题",
+  "description": "食谱描述",
+  "ingredients": [
+    {"name": "食材名称", "amount": "用量", "unit": "单位"}
+  ],
+  "instructions": [
+    "步骤1",
+    "步骤2"
+  ],
+  "cookingTime": 30,
+  "servings": 4,
+  "difficulty": "medium",
+  "imageUrl": "图片URL",
+  "tags": ["标签1", "标签2"],
+  "isPublic": true
+}
+```
+
+#### 更新食谱（需要认证）
+
+```
+PUT /api/recipes/:id
+```
+
+#### 删除食谱（需要认证）
+
+```
+DELETE /api/recipes/:id
+```
+
+#### 获取用户食谱（需要认证）
+
+```
+GET /api/recipes/my
 ```
 
 ## 生产环境部署

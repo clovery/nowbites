@@ -59,64 +59,65 @@ export default class RecipeUpload extends Component<{}, State> {
     })
     
     // 设置示例markdown
-    const exampleMarkdown = `# 红烧肉
+    const exampleMarkdown = `# 隋卞做带鱼
 
-经典的红烧肉做法，肥而不腻，入口即化。
+## 🧂 食材准备
 
-**烹饪时间：** 1小时  
-**难度：** 中等  
-**份量：** 4人份  
-**标签：** 家常菜,肉类,下饭菜
+### 主料  
+- 带鱼 500g（新鲜或冻带鱼，不能有臭味）  
 
-## 食材
+### 辅料  
+- 花雕酒 25g  
+- 食用油 130g  
+- 蒜 30g  
+- 姜 30g  
+- 花椒 10g  
+- 干辣椒段 150g  
+- 葱花 30g  
+- 花生米 80g  
+- 淀粉 5g  
 
-- 五花肉 500g
-- 生抽 3勺
-- 老抽 1勺
-- 冰糖 30g
-- 料酒 2勺
-- 葱 2根
-- 姜 3片
-- 八角 2个
-
-## 制作步骤
-
-1. 五花肉洗净切块，冷水下锅焯水去腥
-2. 热锅下油，放入冰糖炒糖色
-3. 下入肉块翻炒上色
-4. 加入生抽、老抽、料酒调色调味
-5. 加入热水没过肉块，放入葱姜八角
-6. 大火烧开转小火炖煮45分钟
-7. 最后大火收汁即可
+### 调味汁  
+- 酱油 50g  
+- 米醋 50g  
+- 白糖 80g  
+- 味精 1g  
+- 料酒 10g  
 
 ---
 
-# 番茄鸡蛋面
+## 👨‍🍳 烹饪步骤
 
-简单快手的番茄鸡蛋面，营养丰富。
+### 🥢 第一步：处理带鱼（00:18）
+- 带鱼洗净后打上花刀。
+- 用清水冲去一部分腥味。
+- 加入花雕酒腌制去腥。
+- 用厨房纸将表面水分吸干，备用。
 
-**烹饪时间：** 15分钟  
-**难度：** 简单  
-**份量：** 1人份  
-**标签：** 快手菜,面条,营养
+### 🔥 第二步：煎带鱼（00:55）
+- 热锅加油（六七成热），放入带鱼煎至表面定型、颜色微黄。
+- 大约在 1:38 翻面，煎至 1:55 颜色加深。
+- 将带鱼推至锅的一边，并将锅稍微倾斜，腾出空间炒香料。
 
-## 食材
+### 🌶️ 第三步：炒香料（02:48）
+- 倾斜锅后，在空的一边加入蒜炒至微黄。
+- 加入花椒炒香。
+- 加入姜片与干辣椒段，继续炒至辣椒变色出香味。
 
-- 挂面 100g
-- 鸡蛋 2个
-- 番茄 2个
-- 葱花 适量
-- 盐 适量
-- 糖 1勺
+### 🧪 第四步：调汁翻炒
+- 将锅放平，与带鱼一起翻炒均匀。
+- 将调好的汁（兑入淀粉）搅拌均匀后倒入锅中。
+- 快速翻炒，使带鱼均匀裹上酱汁。
 
-## 制作步骤
+### 🌿 第五步：收尾出锅
+- 倒入葱花与花生米。
+- 再次翻炒均匀，即可出锅装盘。
 
-1. 番茄去皮切块，鸡蛋打散
-2. 热锅炒鸡蛋盛起备用
-3. 锅内放油炒番茄出汁
-4. 加入适量水烧开
-5. 下入面条煮熟
-6. 加入炒蛋调味即可`
+---
+
+## ✅ 小贴士
+- 带鱼下锅前一定要擦干水分，防止溅油。
+- 调味汁建议提前调好，加入淀粉时搅拌均匀避免结块。`
     
     this.setState({ markdownText: exampleMarkdown })
   }
@@ -148,6 +149,8 @@ export default class RecipeUpload extends Component<{}, State> {
       
       let currentSection = ''
       let stepCounter = 0
+      let inIngredientsSection = false
+      let inStepsSection = false
       
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i]
@@ -158,15 +161,47 @@ export default class RecipeUpload extends Component<{}, State> {
           continue
         }
         
-        // 二级标题
+        // 二级标题 - 支持带emoji的格式
         if (line.startsWith('## ')) {
-          currentSection = line.substring(3).trim()
+          const sectionTitle = line.substring(3).trim()
+          // 移除emoji和空格，获取纯文本
+          const cleanTitle = sectionTitle.replace(/^[^\u4e00-\u9fa5a-zA-Z]*/, '').trim()
+          
+          if (cleanTitle.includes('食材') || cleanTitle.includes('准备')) {
+            currentSection = '食材'
+            inIngredientsSection = true
+            inStepsSection = false
+          } else if (cleanTitle.includes('步骤') || cleanTitle.includes('烹饪')) {
+            currentSection = '制作步骤'
+            inIngredientsSection = false
+            inStepsSection = true
+          } else if (cleanTitle.includes('贴士') || cleanTitle.includes('提示')) {
+            currentSection = '小贴士'
+            inIngredientsSection = false
+            inStepsSection = false
+          }
           stepCounter = 0
           continue
         }
         
+        // 三级标题 - 支持带emoji的格式
+        if (line.startsWith('### ')) {
+          const subsectionTitle = line.substring(4).trim()
+          const cleanSubtitle = subsectionTitle.replace(/^[^\u4e00-\u9fa5a-zA-Z]*/, '').trim()
+          
+          if (inIngredientsSection) {
+            // 食材子分类（主料、辅料、调味汁等）
+            currentSection = '食材'
+          } else if (inStepsSection) {
+            // 步骤子分类
+            currentSection = '制作步骤'
+            stepCounter = 0
+          }
+          continue
+        }
+        
         // 描述（第一个非标题行）
-        if (!recipe.description && !line.startsWith('#') && !line.startsWith('**') && line.length > 0) {
+        if (!recipe.description && !line.startsWith('#') && !line.startsWith('**') && !line.startsWith('-') && line.length > 0) {
           recipe.description = line
           continue
         }
@@ -183,14 +218,39 @@ export default class RecipeUpload extends Component<{}, State> {
           recipe.tags = tagsStr.split(',').map(t => t.trim()).filter(t => t)
         }
         
-        // 食材
-        if (currentSection === '食材' && line.startsWith('- ')) {
-          recipe.ingredients.push(line.substring(2).trim())
+        // 食材 - 支持带emoji的格式
+        if (inIngredientsSection && line.startsWith('- ')) {
+          const ingredient = line.substring(2).trim()
+          // 移除可能的emoji前缀
+          const cleanIngredient = ingredient.replace(/^[^\u4e00-\u9fa5a-zA-Z0-9]*/, '').trim()
+          if (cleanIngredient) {
+            recipe.ingredients.push(cleanIngredient)
+          }
         }
         
-        // 步骤
-        if (currentSection === '制作步骤' && /^\d+\./.test(line)) {
-          recipe.steps.push(line.replace(/^\d+\.\s*/, '').trim())
+        // 步骤 - 支持带emoji和时间戳的格式
+        if (inStepsSection) {
+          // 匹配带emoji的步骤标题
+          if (line.match(/^###\s*[^\u4e00-\u9fa5a-zA-Z]*\s*第.*步/)) {
+            stepCounter++
+            continue
+          }
+          
+          // 匹配带时间戳的步骤
+          if (line.match(/^###\s*[^\u4e00-\u9fa5a-zA-Z]*\s*.*\(\d{1,2}:\d{2}\)/)) {
+            stepCounter++
+            continue
+          }
+          
+          // 普通步骤
+          if (line.startsWith('- ') && stepCounter > 0) {
+            const step = line.substring(2).trim()
+            // 移除可能的emoji前缀
+            const cleanStep = step.replace(/^[^\u4e00-\u9fa5a-zA-Z0-9]*/, '').trim()
+            if (cleanStep) {
+              recipe.steps.push(cleanStep)
+            }
+          }
         }
       }
       
@@ -319,7 +379,7 @@ export default class RecipeUpload extends Component<{}, State> {
           
           <Textarea
             className='markdown-input'
-            placeholder='请输入Markdown格式的菜谱内容...\n\n示例格式：\n# 菜谱名称\n菜谱描述\n**烹饪时间：** 30分钟\n**难度：** 简单\n## 食材\n- 食材1\n- 食材2\n## 制作步骤\n1. 步骤1\n2. 步骤2'
+            placeholder='请输入Markdown格式的菜谱内容...\n\n支持格式：\n# 菜谱名称\n## 🧂 食材准备\n### 主料\n- 食材1\n### 辅料\n- 食材2\n## 👨‍🍳 烹饪步骤\n### 🥢 第一步：处理食材（00:18）\n- 步骤描述\n### 🔥 第二步：烹饪（00:55）\n- 步骤描述\n## ✅ 小贴士\n- 提示内容'
             value={markdownText}
             onInput={this.onTextareaChange}
             maxlength={-1}

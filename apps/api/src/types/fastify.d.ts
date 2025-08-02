@@ -1,5 +1,4 @@
-import { FastifyRequest } from 'fastify';
-import { UserInfo } from '../models/user.js';
+import { FastifyRequest, FastifyReply } from 'fastify';
 
 declare module 'fastify' {
   interface FastifyRequest {
