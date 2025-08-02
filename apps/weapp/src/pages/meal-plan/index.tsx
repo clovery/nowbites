@@ -189,7 +189,7 @@ export default class MealPlan extends Component<{}, State> {
 
   viewRecipeDetail = (mealId: string) => {
     Taro.navigateTo({
-      url: `/pages/recipe-detail/index?id=${mealId}`
+      url: `/pages/recipes/detail/index?id=${mealId}`
     })
   }
 

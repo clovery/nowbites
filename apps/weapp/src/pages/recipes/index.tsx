@@ -96,7 +96,7 @@ export default class RecipeList extends Component<{}, State> {
 
   navigateToDetail = (recipe: Recipe) => {
     Taro.navigateTo({
-      url: `/pages/recipe-detail/index?id=${recipe.id}`
+      url: `/pages/recipes/detail/index?id=${recipe.id}`
     })
   }
 

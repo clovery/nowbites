@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { View, Text, ScrollView, Button } from '@tarojs/components'
 import Taro from '@tarojs/taro'
-import { apiService, Recipe } from '../../utils/api'
+import { apiService, Recipe } from '../../../utils/api'
 import './index.scss'
 
 interface State {

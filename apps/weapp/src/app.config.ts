@@ -1,9 +1,9 @@
 export default defineAppConfig({
   pages: [
+    'pages/recipes/index',
     'pages/index/index',
     'pages/kitchen/index',
-    'pages/recipe-list/index',
-    'pages/recipe-detail/index',
+    'pages/recipes/detail/index',
     'pages/recipe-upload/index',
     'pages/meal-plan/index',
     'pages/plan-create/index',
@@ -28,7 +28,7 @@ export default defineAppConfig({
         text: '厨房'
       },
       {
-        pagePath: 'pages/recipe-list/index',
+        pagePath: 'pages/recipes/index',
         iconPath: 'assets/tab-bar/recipe.png',
         selectedIconPath: 'assets/tab-bar/recipe-active.png',
         text: '浏览'
