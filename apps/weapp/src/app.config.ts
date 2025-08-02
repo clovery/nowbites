@@ -1,10 +1,12 @@
 export default defineAppConfig({
   pages: [
     'pages/index/index',
+    'pages/kitchen/index',
     'pages/recipe-list/index',
     'pages/recipe-detail/index',
     'pages/recipe-upload/index',
     'pages/meal-plan/index',
+    'pages/plan-create/index',
     'pages/my/index'
   ],
   window: {
@@ -20,16 +22,22 @@ export default defineAppConfig({
     borderStyle: 'black',
     list: [
       {
-        pagePath: 'pages/index/index',
-        iconPath: 'assets/tab-bar/home.png',
-        selectedIconPath: 'assets/tab-bar/home-active.png',
-        text: '首页'
+        pagePath: 'pages/kitchen/index',
+        iconPath: 'assets/tab-bar/group.png',
+        selectedIconPath: 'assets/tab-bar/group-active.png',
+        text: '厨房'
       },
       {
         pagePath: 'pages/recipe-list/index',
         iconPath: 'assets/tab-bar/recipe.png',
         selectedIconPath: 'assets/tab-bar/recipe-active.png',
-        text: '菜谱'
+        text: '浏览'
+      },
+      {
+        pagePath: 'pages/index/index',
+        iconPath: 'assets/tab-bar/plus.png',
+        selectedIconPath: 'assets/tab-bar/plus-active.png',
+        text: '发布'
       },
       {
         pagePath: 'pages/meal-plan/index',

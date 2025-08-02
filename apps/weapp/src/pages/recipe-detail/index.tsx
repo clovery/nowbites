@@ -23,7 +23,7 @@ interface State {
 
 export default class RecipeDetail extends Component<{}, State> {
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.state = {
       recipe: null,
@@ -32,13 +32,22 @@ export default class RecipeDetail extends Component<{}, State> {
   }
 
   componentDidMount() {
-    const { id } = this.$router.params
-    this.loadRecipe(id)
+    const params = Taro.getCurrentInstance().router?.params
+    const id = params?.id
+    if (id) {
+      this.loadRecipe(id)
+    } else {
+      Taro.showToast({
+        title: '参数错误',
+        icon: 'error'
+      })
+      Taro.navigateBack()
+    }
   }
 
   loadRecipe = (id: string) => {
     const recipes = Taro.getStorageSync('recipes') || []
-    const recipe = recipes.find(r => r.id === id)
+    const recipe = recipes.find((r: any) => r.id === id)
     
     this.setState({
       recipe,
@@ -106,12 +115,18 @@ export default class RecipeDetail extends Component<{}, State> {
     const dateStr = date.toISOString().split('T')[0]
     const mealPlans = Taro.getStorageSync('mealPlans') || {}
     
+    console.log('添加菜谱到计划:', {
+      recipe: recipe.title,
+      date: dateStr,
+      existingPlans: mealPlans
+    })
+    
     if (!mealPlans[dateStr]) {
       mealPlans[dateStr] = []
     }
     
     // 检查是否已经添加过
-    const exists = mealPlans[dateStr].some(plan => plan.id === recipe.id)
+    const exists = mealPlans[dateStr].some((plan: any) => plan.id === recipe.id)
     if (exists) {
       Taro.showToast({
         title: '该菜谱已在计划中',
@@ -128,6 +143,8 @@ export default class RecipeDetail extends Component<{}, State> {
     
     Taro.setStorageSync('mealPlans', mealPlans)
     
+    console.log('保存后的用餐计划:', mealPlans)
+    
     Taro.showToast({
       title: '已添加到用餐计划',
       icon: 'success'
@@ -139,8 +156,7 @@ export default class RecipeDetail extends Component<{}, State> {
     if (!recipe) return
 
     Taro.showShareMenu({
-      withShareTicket: true,
-      menus: ['shareAppMessage', 'shareTimeline']
+      withShareTicket: true
     })
   }
 

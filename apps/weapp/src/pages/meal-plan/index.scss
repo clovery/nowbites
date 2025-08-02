@@ -149,7 +149,6 @@
 }
 
 .meal-list {
-  height: calc(100vh - 400rpx);
 }
 
 .meal-item {
@@ -264,4 +263,144 @@
 
 .add-more-btn::after {
   border: none;
+}
+
+/* 计划列表样式 */
+.plans-section {
+  margin: 32rpx;
+  background: white;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.plans-header {
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  padding: 24rpx 32rpx;
+}
+
+.plans-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: white;
+}
+
+.plans-list {
+  max-height: 400rpx;
+}
+
+.plan-item {
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.plan-item:last-child {
+  border-bottom: none;
+}
+
+.plan-item:active {
+  background: #f8f9fa;
+}
+
+.plan-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.plan-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.plan-description {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.4;
+}
+
+.plan-date {
+  font-size: 22rpx;
+  color: #999;
+}
+
+/* 新的计划显示样式 */
+.plans-list {
+  max-height: calc(100vh - 400rpx);
+}
+
+.plan-section {
+  background: white;
+  border-radius: 24rpx;
+  margin-bottom: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.plan-info {
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.plan-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.plan-description {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+  display: block;
+  line-height: 1.4;
+}
+
+.plan-stats {
+  font-size: 24rpx;
+  color: #2e7d32;
+  background: #e8f5e8;
+  padding: 12rpx 20rpx;
+  border-radius: 16rpx;
+  display: inline-block;
+}
+
+.empty-meals {
+  padding: 40rpx;
+  text-align: center;
+}
+
+.empty-meals-text {
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 24rpx;
+  display: block;
+}
+
+.add-meal-btn {
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  color: white;
+  border: none;
+  border-radius: 50rpx;
+  padding: 16rpx 32rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.add-meal-btn::after {
+  border: none;
+}
+
+.add-meal-section {
+  padding: 24rpx 32rpx;
+  border-top: 1rpx solid #f0f0f0;
+  text-align: center;
+}
+
+.meal-list {
+  padding: 0 32rpx 32rpx;
 }

@@ -72,6 +72,11 @@
   transform: scale(0.98);
 }
 
+.recipe-card.added {
+  opacity: 0.6;
+  background: #f8f9fa;
+}
+
 .recipe-header {
   display: flex;
   justify-content: space-between;
@@ -123,4 +128,46 @@
   padding: 8rpx 16rpx;
   border-radius: 20rpx;
   font-size: 24rpx;
+}
+
+.add-to-plan-btn {
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f0f0f0;
+  text-align: center;
+}
+
+.add-btn-text {
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  color: white;
+  padding: 12rpx 24rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.add-btn-text.added {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.done-section {
+  padding: 32rpx;
+  text-align: center;
+}
+
+.done-btn {
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  color: white;
+  border: none;
+  border-radius: 50rpx;
+  padding: 24rpx 48rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  width: 100%;
+}
+
+.done-btn::after {
+  border: none;
 }
