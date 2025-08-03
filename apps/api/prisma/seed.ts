@@ -164,8 +164,8 @@ async function main() {
       title: '麻婆豆腐',
       coverImage: 'https://example.com/mapo-tofu.jpg',
       ingredients: [
-        { name: '嫩豆腐', amount: '400g', unit: '克', type: 'main' },
-        { name: '猪肉末', amount: '200g', unit: '克', type: 'main' },
+        { name: '嫩豆腐', amount: '400', unit: '克', type: 'main' },
+        { name: '猪肉末', amount: '200', unit: '克', type: 'main' },
         { name: '豆瓣酱', amount: '2', unit: '勺', type: 'sauce' },
         { name: '花椒', amount: '1', unit: '勺', type: 'sauce' },
         { name: '辣椒', amount: '适量', unit: '', type: 'auxiliary' },
@@ -328,27 +328,27 @@ async function main() {
       "ingredients": [
         {
           "name": "黑豆",
-          "amount": "10g",
+          "amount": "10",
           "unit": "g"
         },
         {
           "name": "黑芝麻",
-          "amount": "5g",
+          "amount": "5",
           "unit": "g"
         },
         {
           "name": "花生",
-          "amount": "10g",
+          "amount": "10",
           "unit": "g"
         },
         {
           "name": "红枣",
-          "amount": "2颗",
+          "amount": "2",
           "unit": "颗"
         },
         {
           "name": "清水",
-          "amount": "300ml",
+          "amount": "300",
           "unit": "ml"
         }
       ],

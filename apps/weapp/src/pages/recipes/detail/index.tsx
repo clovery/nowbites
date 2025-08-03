@@ -140,7 +140,7 @@ export default class RecipeDetail extends Component<{}, State> {
     mealPlans[dateStr].push({
       id: recipe.id,
       title: recipe.title,
-      cookTime: recipe.cookingTime
+      cookTime: recipe.cookingTime || 0
     })
     
     Taro.setStorageSync('mealPlans', mealPlans)
@@ -160,6 +160,60 @@ export default class RecipeDetail extends Component<{}, State> {
     Taro.showShareMenu({
       withShareTicket: true
     })
+  }
+
+  // 处理食材显示
+  renderIngredient = (ingredient: any) => {
+    if (typeof ingredient === 'string') {
+      return ingredient
+    }
+    
+    if (ingredient && typeof ingredient === 'object') {
+      const { name, amount, unit } = ingredient
+      if (name && amount) {
+        return `${name} ${amount}${unit || ''}`
+      }
+      return name || '未知食材'
+    }
+    
+    return '未知食材'
+  }
+
+  // 处理步骤显示
+  renderStep = (step: any, index: number) => {
+    if (!step) return null
+
+    const title = step.title || `步骤 ${index + 1}`
+    const time = step.time || 0
+    const content = step.content || []
+
+    return (
+      <View key={index} className='step-item'>
+        <View className='step-number'>{index + 1}</View>
+        <View className='step-content'>
+          <Text className='step-title'>{title}</Text>
+          {time > 0 && <Text className='step-time'>⏱ {time}分钟</Text>}
+          {Array.isArray(content) ? content.map((contentItem: string, contentIndex: number) => (
+            <Text key={contentIndex} className='step-text'>• {contentItem}</Text>
+          )) : (
+            <Text className='step-text'>• {content}</Text>
+          )}
+        </View>
+      </View>
+    )
+  }
+
+  // 处理小贴士显示
+  renderTip = (tip: any, index: number) => {
+    if (typeof tip === 'string') {
+      return <View><Text key={index} className='tip-text'>• {tip}</Text></View>
+    }
+    
+    if (tip && typeof tip === 'object' && tip.content) {
+      return <View><Text key={index} className='tip-text'>• {tip.content}</Text></View>
+    }
+    
+    return null
   }
 
   render() {
@@ -189,14 +243,18 @@ export default class RecipeDetail extends Component<{}, State> {
             <Text className='description'>{recipe.description}</Text>
             
             <View className='meta-info'>
-              <View className='meta-item'>
-                <Text className='meta-label'>⏱ 烹饪时间</Text>
-                <Text className='meta-value'>{recipe.cookingTime}分钟</Text>
-              </View>
-              <View className='meta-item'>
-                <Text className='meta-label'>🔥 难度</Text>
-                <Text className='meta-value'>{recipe.difficulty}</Text>
-              </View>
+              {recipe.cookingTime && (
+                <View className='meta-item'>
+                  <Text className='meta-label'>⏱ 烹饪时间</Text>
+                  <Text className='meta-value'>{recipe.cookingTime}分钟</Text>
+                </View>
+              )}
+              {recipe.difficulty && (
+                <View className='meta-item'>
+                  <Text className='meta-label'>🔥 难度</Text>
+                  <Text className='meta-value'>{recipe.difficulty}</Text>
+                </View>
+              )}
               {recipe.servings && (
                 <View className='meta-item'>
                   <Text className='meta-label'>👥 份量</Text>
@@ -217,10 +275,10 @@ export default class RecipeDetail extends Component<{}, State> {
           <View className='section'>
             <Text className='section-title'>🥘 食材清单</Text>
             <View className='ingredients'>
-              {recipe.ingredients.map((ingredient, index) => (
+              {Array.isArray(recipe.ingredients) && recipe.ingredients.map((ingredient, index) => (
                 <View key={index} className='ingredient-item'>
                   <Text className='ingredient-text'>
-                    {ingredient.name} {ingredient.amount}{ingredient.unit}
+                    {this.renderIngredient(ingredient)}
                   </Text>
                 </View>
               ))}
@@ -230,18 +288,9 @@ export default class RecipeDetail extends Component<{}, State> {
           <View className='section'>
             <Text className='section-title'>👩‍🍳 制作步骤</Text>
             <View className='steps'>
-              {recipe.steps.map((step, index) => (
-                <View key={index} className='step-item'>
-                  <View className='step-number'>{index + 1}</View>
-                  <View className='step-content'>
-                    <Text className='step-title'>{step.title}</Text>
-                    <Text className='step-time'>⏱ {step.time}分钟</Text>
-                    {step.content.map((content: string, contentIndex: number) => (
-                      <Text key={contentIndex} className='step-text'>• {content}</Text>
-                    ))}
-                  </View>
-                </View>
-              ))}
+              {Array.isArray(recipe.steps) && recipe.steps.map((step, index) => 
+                this.renderStep(step, index)
+              )}
             </View>
           </View>
 
@@ -249,11 +298,9 @@ export default class RecipeDetail extends Component<{}, State> {
             <View className='section'>
               <Text className='section-title'>💡 小贴士</Text>
               <View className='tips'>
-                {recipe.tips.map((tip, index) => (
-                  <View key={index} className='tip-item'>
-                    <Text className='tip-text'>• {tip}</Text>
-                  </View>
-                ))}
+                {recipe.tips.map((tip, index) => 
+                  this.renderTip(tip, index)
+                )}
               </View>
             </View>
           )}

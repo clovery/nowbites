@@ -318,30 +318,6 @@ export default class MealPlan extends Component<{}, State> {
         <View className='header'>
           <Text className='title'>用餐计划</Text>
           <Text className='subtitle'>安排每天要做的菜</Text>
-          <Button 
-            className='debug-btn' 
-            onClick={() => {
-              console.log('当前状态:', this.state)
-              console.log('存储中的计划:', Taro.getStorageSync('plans'))
-              console.log('存储中的菜谱:', Taro.getStorageSync('mealPlans'))
-              Taro.showToast({
-                title: `选中: ${this.state.selectedDate}`,
-                icon: 'none'
-              })
-            }}
-            style={{
-              position: 'absolute',
-              top: '20rpx',
-              right: '20rpx',
-              background: 'rgba(255,255,255,0.2)',
-              color: 'white',
-              fontSize: '24rpx',
-              padding: '8rpx 16rpx',
-              borderRadius: '20rpx'
-            }}
-          >
-            调试
-          </Button>
         </View>
 
         <View className='date-selector'>

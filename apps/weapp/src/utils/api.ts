@@ -38,15 +38,25 @@ interface Recipe {
   id: string
   title: string
   description?: string
-  ingredients: any[]
+  ingredients: Array<{
+    name: string
+    amount: string
+    unit?: string
+  } | string>
   sauce: any[]
-  steps: any[]
-  tips: any[]
-  cookingTime?: number
-  servings?: number
-  difficulty?: string
-  imageUrl?: string
-  coverImage?: string
+  steps: Array<{
+    title: string
+    content: string[]
+    time?: number
+  }>
+  tips: Array<{
+    content: string
+  } | string>
+  cookingTime?: number | null
+  servings?: number | null
+  difficulty?: string | null
+  imageUrl?: string | null
+  coverImage?: string | null
   tags?: string[]
   isPublic?: boolean
   createdAt: string

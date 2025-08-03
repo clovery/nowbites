@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { Recipe, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 // Recipe creation request interface
 interface CreateRecipeRequest {

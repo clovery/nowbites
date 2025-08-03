@@ -22,22 +22,10 @@ export default defineAppConfig({
     borderStyle: 'black',
     list: [
       {
-        pagePath: 'pages/kitchen/index',
-        iconPath: 'assets/tab-bar/group.png',
-        selectedIconPath: 'assets/tab-bar/group-active.png',
-        text: '厨房'
-      },
-      {
         pagePath: 'pages/recipes/index',
         iconPath: 'assets/tab-bar/recipe.png',
         selectedIconPath: 'assets/tab-bar/recipe-active.png',
-        text: '浏览'
-      },
-      {
-        pagePath: 'pages/index/index',
-        iconPath: 'assets/tab-bar/plus.png',
-        selectedIconPath: 'assets/tab-bar/plus-active.png',
-        text: '发布'
+        text: '菜谱'
       },
       {
         pagePath: 'pages/meal-plan/index',
@@ -50,7 +38,7 @@ export default defineAppConfig({
         iconPath: 'assets/tab-bar/my.png',
         selectedIconPath: 'assets/tab-bar/my-active.png',
         text: '我的'
-      }
+      },
     ]
   }
 })
