@@ -1,213 +1,339 @@
-# @nowbites/parse-markdown-recipe
+# Parse Markdown Recipe
 
-A utility package for parsing markdown recipe files and extracting structured data.
+A TypeScript library for parsing markdown recipe files and converting them to structured data formats.
 
 ## Features
 
-- Parse markdown recipe files with frontmatter metadata
-- Extract ingredients and cooking instructions
-- Convert markdown content to HTML
-- Support for both English and Chinese recipe formats
-- Convert parsed recipes to Prisma database format
+- Parse markdown recipe files with frontmatter
+- Extract ingredients, instructions, and metadata
+- Support for Chinese recipe formats
+- Structured recipe format with main/auxiliary ingredients and sauce
+- Validation and conversion utilities
 - TypeScript support with full type definitions
-- Direct source code exposure (no build step required)
-- Comprehensive Jest test suite with coverage
 
 ## Installation
 
-This package is part of the monorepo and can be used by other packages in the workspace.
-
-## Development
-
 ```bash
-# Install dependencies
-pnpm install
-
-# Run tests
-pnpm test
-
-# Run tests with coverage
-pnpm test -- --coverage
-
-# Run tests in watch mode
-pnpm test:watch
-
-# Lint code
-pnpm lint
-
-# Check types
-pnpm check-types
+npm install @nowbites/parse-markdown-recipe
 ```
 
-## Usage
+## Basic Usage
+
+### Parse a markdown recipe file
 
 ```typescript
-import { parseMarkdownRecipe, extractIngredients, extractInstructions, convertToRecipeFormat } from '@nowbites/parse-markdown-recipe';
+import { parseMarkdownRecipe, convertToRecipeFormat } from '@nowbites/parse-markdown-recipe';
 
-// Parse a markdown recipe
 const markdown = `
 ---
-title: "Spaghetti Carbonara"
-description: "Classic Italian pasta dish"
-cookingTime: "20 minutes"
-servings: "4"
-difficulty: "Medium"
-tags: ["pasta", "italian", "quick"]
+title: 红烧带鱼
+description: 经典的红烧带鱼，肉质鲜美
+cookingTime: 110分钟
+servings: 4人份
+difficulty: medium
+tags: [海鲜, 红烧]
 ---
 
-## Ingredients
+### 主料
+- 带鱼 500g（新鲜或冻带鱼，不能有臭味）
 
-- 400g spaghetti
-- 200g pancetta or guanciale
-- 4 large eggs
-- 100g Pecorino Romano cheese
-- Black pepper
-- Salt
+### 辅料
+- 花雕酒 25g
+- 食用油 130g
+- 蒜 30g
+- 姜 30g
 
-## Instructions
+### 调味汁
+- 酱油 50g
+- 米醋 50g
+- 白糖 80g
+- 味精 1g
+- 料酒 10g
 
-1. Bring a large pot of salted water to boil
-2. Cook spaghetti according to package directions
-3. Meanwhile, cook pancetta in a large skillet until crispy
-4. Beat eggs with grated cheese and black pepper
-5. Drain pasta, reserving some cooking water
-6. Toss hot pasta with egg mixture and pancetta
-7. Add reserved cooking water if needed for creaminess
+### 步骤
+1. 准备食材
+   - 将带鱼清洗干净，去除内脏和鱼鳞
+   - 将带鱼切成段，每段约5-6厘米
+
+2. 腌制带鱼
+   - 将带鱼段放入碗中
+   - 加入料酒、盐腌制30分钟
+
+### 小贴士
+- 选择新鲜的带鱼很重要，避免有臭味的鱼
+- 煎制带鱼时火候要控制好，避免煎糊
 `;
 
-const recipe = await parseMarkdownRecipe(markdown);
+const parsedRecipe = await parseMarkdownRecipe(markdown);
+const recipe = convertToRecipeFormat(parsedRecipe);
+```
 
-console.log(recipe.metadata.title); // "Spaghetti Carbonara"
-console.log(recipe.metadata.cookingTime); // "20 minutes"
+### Use structured recipe format
 
-// Extract ingredients and instructions
-const ingredients = extractIngredients(recipe.content);
-const instructions = extractInstructions(recipe.content);
+```typescript
+import { parseIngredients, parseSauce, validateRecipe, recipeToMarkdown } from '@nowbites/parse-markdown-recipe';
+import type { Recipe } from '@nowbites/parse-markdown-recipe';
 
-console.log(ingredients);
-// ["400g spaghetti", "200g pancetta or guanciale", ...]
+// Parse ingredients from markdown format
+const mainIngredientsText = `
+- 带鱼 500g（新鲜或冻带鱼，不能有臭味）
+`;
 
-console.log(instructions);
-// ["Bring a large pot of salted water to boil", ...]
+const auxiliaryIngredientsText = `
+- 花雕酒 25g
+- 食用油 130g
+- 蒜 30g
+- 姜 30g
+`;
 
-// Convert to Recipe format for database storage
-const recipeData = convertToRecipeFormat(recipe);
-console.log(recipeData);
-// {
-//   title: "Spaghetti Carbonara",
-//   ingredients: [{ name: "spaghetti", amount: "400g", unit: "g" }, ...],
-//   steps: [{ title: "步骤 1", content: ["Bring a large pot..."] }, ...],
-//   cookingTime: 20,
-//   servings: 4,
-//   ...
-// }
+const sauceText = `
+- 酱油 50g
+- 米醋 50g
+- 白糖 80g
+`;
+
+// Parse structured ingredients
+const ingredients = parseIngredients(mainIngredientsText, auxiliaryIngredientsText);
+const sauce = parseSauce(sauceText);
+
+// Create a complete recipe
+const recipe: Recipe = {
+  title: '红烧带鱼',
+  description: '经典的红烧带鱼，肉质鲜美，味道浓郁',
+  ingredients,
+  sauce,
+  steps: [
+    {
+      title: '准备食材',
+      time: 15,
+      content: [
+        '将带鱼清洗干净，去除内脏和鱼鳞',
+        '将带鱼切成段，每段约5-6厘米'
+      ]
+    },
+    {
+      title: '腌制带鱼',
+      time: 30,
+      content: [
+        '将带鱼段放入碗中',
+        '加入料酒、盐腌制30分钟'
+      ]
+    }
+  ],
+  tips: [
+    { content: '选择新鲜的带鱼很重要，避免有臭味的鱼' },
+    { content: '煎制带鱼时火候要控制好，避免煎糊' }
+  ],
+  cookingTime: 45,
+  servings: 4,
+  difficulty: 'medium',
+  tags: ['海鲜', '红烧', '带鱼']
+};
+
+// Validate the recipe
+const validation = validateRecipe(recipe);
+if (validation.isValid) {
+  console.log('✅ Recipe is valid!');
+  
+  // Convert to markdown format
+  const markdown = recipeToMarkdown(recipe);
+  console.log(markdown);
+}
+```
+
+## Structured Recipe Format
+
+The library supports a structured recipe format that separates ingredients into categories:
+
+### Recipe Structure
+
+```typescript
+interface Recipe {
+  title: string;
+  description?: string;
+  ingredients: RecipeIngredients;  // Main and auxiliary ingredients
+  sauce: Sauce[];                  // Sauce ingredients
+  steps: Step[];                   // Cooking steps
+  tips: Tip[];                     // Cooking tips
+  cookingTime?: number;            // Total cooking time in minutes
+  servings?: number;               // Number of servings
+  difficulty?: string;              // easy, medium, hard
+  tags: string[];                  // Recipe tags
+  coverImage?: string;             // Cover image URL
+  imageUrl?: string;               // Additional image URL
+}
+```
+
+### Ingredients Structure
+
+```typescript
+interface RecipeIngredients {
+  main: Ingredient[];      // 主料 (Main ingredients)
+  auxiliary: Ingredient[]; // 辅料 (Auxiliary ingredients)
+}
+
+interface Ingredient {
+  name: string;     // Ingredient name
+  amount: string;   // Amount (e.g., "500", "2")
+  unit?: string;    // Unit (e.g., "g", "勺", "颗")
+  note?: string;    // Optional note (e.g., "新鲜或冻带鱼，不能有臭味")
+}
+
+interface Sauce {
+  name: string;     // Sauce name
+  amount: string;   // Amount
+  unit?: string;    // Unit
+}
+```
+
+### Steps Structure
+
+```typescript
+interface Step {
+  title: string;           // Step title
+  time?: number;           // Time in minutes
+  content: string[];       // Step instructions
+}
+
+interface Tip {
+  content: string;         // Tip content
+}
 ```
 
 ## API Reference
 
-### `parseMarkdownRecipe(markdown: string): Promise<ParsedRecipe>`
+### Core Functions
 
-Parses a markdown recipe file and returns structured data.
+#### `parseMarkdownRecipe(markdown: string): Promise<ParsedRecipe>`
 
-**Parameters:**
-- `markdown` (string): The markdown content to parse
+Parse a markdown recipe file and extract metadata and content.
 
-**Returns:**
-- `ParsedRecipe` object with:
-  - `metadata`: Frontmatter data as RecipeMetadata
-  - `content`: Raw markdown content
-  - `html`: HTML version of the content
+#### `convertToRecipeFormat(parsedRecipe: ParsedRecipe): Recipe`
 
-### `extractIngredients(content: string): string[]`
+Convert a parsed recipe to the structured Recipe format.
 
-Extracts ingredients from recipe content by looking for bullet points or table format (for Chinese recipes).
+### Structured Recipe Utilities
 
-### `extractInstructions(content: string): string[]`
+#### `parseIngredients(mainIngredients: string, auxiliaryIngredients: string): RecipeIngredients`
 
-Extracts cooking instructions from recipe content by looking for numbered or bulleted lists in instruction sections (supports both English and Chinese).
+Parse main and auxiliary ingredients from markdown format.
 
-### `convertToRecipeFormat(parsedRecipe: ParsedRecipe): Recipe`
+#### `parseSauce(content: string): Sauce[]`
 
-Converts a parsed recipe to the Recipe database format with structured JSON fields for ingredients, steps, and tips.
+Parse sauce ingredients from markdown format.
 
-**Parameters:**
-- `parsedRecipe` (ParsedRecipe): The parsed recipe from parseMarkdownRecipe
+#### `validateRecipe(recipe: Recipe): { isValid: boolean; errors: string[] }`
 
-**Returns:**
-- `Recipe` object ready for database insertion
+Validate a recipe structure and return validation results.
 
-## Types
+#### `recipeToMarkdown(recipe: Recipe): string`
 
-### `RecipeMetadata`
+Convert a structured recipe back to markdown format.
 
-```typescript
-interface RecipeMetadata {
-  title?: string;
-  description?: string;
-  ingredients?: string[];
-  instructions?: string[];
-  cookingTime?: string;
-  servings?: string;
-  difficulty?: string;
-  tags?: string[];
-  [key: string]: any;
-}
+### Content Extraction Functions
+
+#### `extractIngredients(content: string): string[]`
+
+Extract ingredients from recipe content.
+
+#### `extractInstructions(content: string): string[]`
+
+Extract cooking instructions from recipe content.
+
+## Supported Formats
+
+### Markdown Recipe Format
+
+The library supports recipes written in markdown with the following structure:
+
+```markdown
+---
+title: Recipe Title
+description: Recipe description
+cookingTime: 30分钟
+servings: 4人份
+difficulty: medium
+tags: [tag1, tag2]
+---
+
+### 主料
+- 食材1 100g
+- 食材2 200g（备注信息）
+
+### 辅料
+- 辅料1 50g
+- 辅料2 2勺
+
+### 调味汁
+- 酱油 30g
+- 盐 适量
+
+### 步骤
+1. 第一步
+   - 具体操作1
+   - 具体操作2
+
+2. 第二步
+   - 具体操作3
+
+### 小贴士
+- 小贴士1
+- 小贴士2
 ```
 
-### `ParsedRecipe`
+### Ingredient Parsing
+
+The library can parse ingredients in various formats:
+
+- `带鱼 500g（新鲜或冻带鱼，不能有臭味）` → name: "带鱼", amount: "500", unit: "g", note: "新鲜或冻带鱼，不能有臭味"
+- `花雕酒 25g` → name: "花雕酒", amount: "25", unit: "g"
+- `盐 适量` → name: "盐", amount: "适量", unit: ""
+- `糖 2勺` → name: "糖", amount: "2", unit: "勺"
+
+## Database Integration
+
+The structured recipe format is designed to work with databases like PostgreSQL using Prisma:
 
 ```typescript
-interface ParsedRecipe {
-  metadata: RecipeMetadata;
-  content: string;
-  html: string;
+// Prisma schema
+model Recipe {
+  id          String   @id @default(cuid())
+  title       String
+  ingredients Json     // RecipeIngredients structure
+  sauce       Json     // Sauce[] structure
+  steps       Json     // Step[] structure
+  tips        Json     // Tip[] structure
+  // ... other fields
 }
+
+// Store recipe in database
+const databaseRecipe = {
+  title: recipe.title,
+  ingredients: recipe.ingredients, // Stored as JSON
+  sauce: recipe.sauce,             // Stored as JSON
+  steps: recipe.steps,             // Stored as JSON
+  tips: recipe.tips,               // Stored as JSON
+  // ... other fields
+};
 ```
 
-### `Recipe`
+## Examples
 
-```typescript
-interface Recipe {
-  id?: string;
-  title: string;
-  coverImage?: string;
-  ingredients: Json;
-  sauce: Json;
-  steps: Json;
-  tips: Json;
-  description?: string;
-  cookingTime?: number;
-  servings?: number;
-  difficulty?: string;
-  imageUrl?: string;
-  tags: string[];
-}
-```
+See the `examples/` directory for complete working examples:
 
-### `Ingredient`
+- `structured-recipe-example.ts` - Complete example with your recipe format
+- `chinese-recipe.test.ts` - Test cases for Chinese recipe parsing
+- `recipe-conversion.test.ts` - Test cases for recipe conversion
 
-```typescript
-interface Ingredient {
-  name: string;
-  amount: string;
-  unit?: string;
-}
-```
+## Contributing
 
-### `Step`
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Run `npm test` to ensure all tests pass
+6. Submit a pull request
 
-```typescript
-interface Step {
-  title: string;
-  time?: number; // in minutes
-  content: string[];
-}
-```
+## License
 
-### `Tip`
-
-```typescript
-interface Tip {
-  content: string;
-}
-``` 
+MIT 

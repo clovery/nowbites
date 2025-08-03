@@ -169,14 +169,105 @@ export default class RecipeDetail extends Component<{}, State> {
     }
     
     if (ingredient && typeof ingredient === 'object') {
-      const { name, amount, unit } = ingredient
+      const { name, amount, unit, note } = ingredient
       if (name && amount) {
-        return `${name} ${amount}${unit || ''}`
+        let text = `${name} ${amount}${unit || ''}`
+        if (note) {
+          text += ` (${note})`
+        }
+        return text
       }
       return name || '未知食材'
     }
     
     return '未知食材'
+  }
+
+  // 处理主要食材
+  renderMainIngredients = (ingredients: any) => {
+    if (!ingredients || !Array.isArray(ingredients)) return null
+
+    return (
+      <View className='ingredient-group'>
+        <Text className='ingredient-group-title'>主要食材</Text>
+        {ingredients.map((ingredient, index) => (
+          <View key={index} className='ingredient-item'>
+            <Text className='ingredient-text'>
+              {this.renderIngredient(ingredient)}
+            </Text>
+          </View>
+        ))}
+      </View>
+    )
+  }
+
+  // 处理辅助食材
+  renderAuxiliaryIngredients = (ingredients: any) => {
+    if (!ingredients || !Array.isArray(ingredients)) return null
+
+    return (
+      <View className='ingredient-group'>
+        <Text className='ingredient-group-title'>辅助食材</Text>
+        {ingredients.map((ingredient, index) => (
+          <View key={index} className='ingredient-item'>
+            <Text className='ingredient-text'>
+              {this.renderIngredient(ingredient)}
+            </Text>
+          </View>
+        ))}
+      </View>
+    )
+  }
+
+  // 处理调味料
+  renderSauceIngredients = (sauce: any) => {
+    if (!sauce || !Array.isArray(sauce)) return null
+
+    return (
+      <View className='ingredient-group'>
+        <Text className='ingredient-group-title'>调味料</Text>
+        {sauce.map((ingredient, index) => (
+          <View key={index} className='ingredient-item'>
+            <Text className='ingredient-text'>
+              {this.renderIngredient(ingredient)}
+            </Text>
+          </View>
+        ))}
+      </View>
+    )
+  }
+
+  // 处理食材清单显示
+  renderIngredients = (ingredients: any) => {
+    if (!ingredients) return null
+
+    // 如果是新的结构化格式
+    if (ingredients.main || ingredients.auxiliary || ingredients.sauce) {
+      return (
+        <View className='ingredients'>
+          {this.renderMainIngredients(ingredients.main)}
+          {this.renderAuxiliaryIngredients(ingredients.auxiliary)}
+          {this.renderSauceIngredients(ingredients.sauce)}
+        </View>
+      )
+    }
+
+    // 如果是旧的数组格式
+    if (Array.isArray(ingredients)) {
+      return (
+        <View className='ingredients'>
+          {ingredients.map((ingredient, index) => (
+            <View key={index} className='ingredient-item'>
+              <Text className='ingredient-text'>
+                {this.renderIngredient(ingredient)}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )
+    }
+
+    return null
   }
 
   // 处理步骤显示
@@ -274,15 +365,7 @@ export default class RecipeDetail extends Component<{}, State> {
 
           <View className='section'>
             <Text className='section-title'>🥘 食材清单</Text>
-            <View className='ingredients'>
-              {Array.isArray(recipe.ingredients) && recipe.ingredients.map((ingredient, index) => (
-                <View key={index} className='ingredient-item'>
-                  <Text className='ingredient-text'>
-                    {this.renderIngredient(ingredient)}
-                  </Text>
-                </View>
-              ))}
-            </View>
+            {this.renderIngredients(recipe.ingredients)}
           </View>
 
           <View className='section'>

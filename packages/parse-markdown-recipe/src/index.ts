@@ -17,8 +17,18 @@ export type {
   Ingredient, 
   Step, 
   Tip, 
-  Json 
+  Json,
+  RecipeIngredients,
+  Sauce
 } from "./types";
+
+// Export structured recipe utilities
+export {
+  parseIngredients,
+  parseSauce,
+  validateRecipe,
+  recipeToMarkdown
+} from "./recipe-utils";
 
 /**
  * Parse a markdown recipe file and extract metadata and content

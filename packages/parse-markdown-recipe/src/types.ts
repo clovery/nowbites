@@ -19,15 +19,15 @@ export interface ParsedRecipe {
   html: string;
 }
 
-// Recipe model interfaces
+// Enhanced Recipe model interfaces
 export interface Recipe {
   id?: string;
   title: string;
   coverImage?: string;
-  ingredients: Json;
-  sauce: Json;
-  steps: Json;
-  tips: Json;
+  ingredients: RecipeIngredients;
+  sauce: Sauce[];
+  steps: Step[];
+  tips: Tip[];
   description?: string;
   cookingTime?: number;
   servings?: number;
@@ -36,10 +36,17 @@ export interface Recipe {
   tags: string[];
 }
 
+// Structured ingredients with main and auxiliary categories
+export interface RecipeIngredients {
+  main: Ingredient[];      // 主料
+  auxiliary: Ingredient[]; // 辅料
+}
+
 export interface Ingredient {
   name: string;
   amount: string;
   unit?: string;
+  note?: string; // 备注，如"新鲜或冻带鱼，不能有臭味"
 }
 
 export interface Sauce {

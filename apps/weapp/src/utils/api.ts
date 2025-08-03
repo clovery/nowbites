@@ -38,12 +38,31 @@ interface Recipe {
   id: string
   title: string
   description?: string
-  ingredients: Array<{
+  ingredients: {
+    main?: Array<{
+      name: string
+      amount: string
+      unit?: string
+      note?: string
+    }>
+    auxiliary?: Array<{
+      name: string
+      amount: string
+      unit?: string
+      note?: string
+    }>
+    sauce?: Array<{
+      name: string
+      amount: string
+      unit?: string
+      note?: string
+    }>
+  } | Array<{
     name: string
     amount: string
     unit?: string
+    note?: string
   } | string>
-  sauce: any[]
   steps: Array<{
     title: string
     content: string[]

@@ -106,6 +106,24 @@
   gap: 16rpx;
 }
 
+.ingredient-group {
+  margin-bottom: 32rpx;
+}
+
+.ingredient-group:last-child {
+  margin-bottom: 0;
+}
+
+.ingredient-group-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+  display: block;
+  padding: 12rpx 0;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
 .ingredient-item {
   display: flex;
   align-items: center;
