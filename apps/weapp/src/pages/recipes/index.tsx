@@ -1,7 +1,8 @@
 import { Component } from 'react'
-import { View, Text, ScrollView, Input, Button, Image } from '@tarojs/components'
+import { View, Text, ScrollView, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { apiService, Recipe } from '../../utils/api'
+import CustomNavigation from '../../components/custom-navigation'
 import './index.scss'
 
 interface State {
@@ -79,20 +80,7 @@ export default class RecipeList extends Component<{}, State> {
     }
   }
 
-  onSearchChange = (e: any) => {
-    const searchText = e.detail.value
-    const { recipes } = this.state
-    const filteredRecipes = recipes.filter(recipe => 
-      recipe.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      (recipe.description && recipe.description.toLowerCase().includes(searchText.toLowerCase())) ||
-      (recipe.tags && recipe.tags.some(tag => tag.toLowerCase().includes(searchText.toLowerCase())))
-    )
-    
-    this.setState({
-      searchText,
-      filteredRecipes
-    })
-  }
+
 
   navigateToDetail = (recipe: Recipe) => {
     Taro.navigateTo({
@@ -195,27 +183,38 @@ export default class RecipeList extends Component<{}, State> {
 
     return (
       <View className='recipe-list'>
-        <View className='search-bar'>
-          <Input
-            className='search-input'
-            placeholder='搜索菜谱...'
-            value={searchText}
-            onInput={this.onSearchChange}
-          />
-        </View>
-
-        {filteredRecipes.length === 0 ? (
-          <View className='empty-state'>
-            <View className='empty-icon'>📝</View>
-            <Text className='empty-title'>还没有菜谱</Text>
-            <Text className='empty-desc'>点击下方按钮开始上传你的第一个菜谱吧</Text>
-            <View className='empty-action' onClick={this.navigateToUpload}>
-              <Text className='upload-btn'>上传菜谱</Text>
+        <CustomNavigation
+          showSearch={true}
+          searchValue={searchText}
+          searchPlaceholder='搜索菜谱...'
+          onSearchChange={(value) => {
+            const { recipes } = this.state
+            const filteredRecipes = recipes.filter(recipe => 
+              recipe.title.toLowerCase().includes(value.toLowerCase()) ||
+              (recipe.description && recipe.description.toLowerCase().includes(value.toLowerCase())) ||
+              (recipe.tags && recipe.tags.some(tag => tag.toLowerCase().includes(value.toLowerCase())))
+            )
+            
+            this.setState({
+              searchText: value,
+              filteredRecipes
+            })
+          }}
+        />
+        
+        <View className='recipe-content'>
+          {filteredRecipes.length === 0 ? (
+            <View className='empty-state'>
+              <View className='empty-icon'>📝</View>
+              <Text className='empty-title'>还没有菜谱</Text>
+              <Text className='empty-desc'>点击下方按钮开始上传你的第一个菜谱吧</Text>
+              <View className='empty-action' onClick={this.navigateToUpload}>
+                <Text className='upload-btn'>上传菜谱</Text>
+              </View>
             </View>
-          </View>
-        ) : (
-          <ScrollView className='recipe-scroll' scrollY>
-            <View className='recipe-grid'>
+          ) : (
+            <ScrollView className='recipe-scroll' scrollY>
+              <View className='recipe-grid'>
               {filteredRecipes.map(recipe => {
                 const isAdded = addedRecipeIds.includes(recipe.id)
                 return (
@@ -263,25 +262,26 @@ export default class RecipeList extends Component<{}, State> {
                   </View>
                 )
               })}
+              </View>
+            </ScrollView>
+          )}
+          
+          {/* 当有计划ID时显示完成按钮 */}
+          {planId && (
+            <View className='done-section'>
+              <Button 
+                className='done-btn' 
+                onClick={() => {
+                  Taro.switchTab({
+                    url: '/pages/meal-plan/index'
+                  })
+                }}
+              >
+                完成添加
+              </Button>
             </View>
-          </ScrollView>
-        )}
-
-        {/* 当有计划ID时显示完成按钮 */}
-        {planId && (
-          <View className='done-section'>
-            <Button 
-              className='done-btn' 
-              onClick={() => {
-                Taro.switchTab({
-                  url: '/pages/meal-plan/index'
-                })
-              }}
-            >
-              完成添加
-            </Button>
-          </View>
-        )}
+          )}
+        </View>
       </View>
     )
   }

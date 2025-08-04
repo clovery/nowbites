@@ -1,20 +1,11 @@
 .recipe-list {
-  padding: 16rpx;
   background: #fff;
-  min-height: 100vh;
+  height: 100vh;
+  margin-top: 160rpx;
 }
 
-.search-bar {
-  margin-bottom: 24rpx;
-}
-
-.search-input {
-  background: white;
-  border-radius: 50rpx;
-  padding: 24rpx 24rpx;
-  font-size: 28rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
-  border: 1rpx solid #e9ecef;
+.recipe-content {
+  padding: 16rpx;
 }
 
 .loading-state {
@@ -110,7 +101,7 @@
 }
 
 .recipe-scroll {
-  height: calc(100vh - 200rpx);
+  height: calc(100vh - 320rpx); /* 调整高度以适应自定义导航栏 */
 }
 
 .recipe-grid {
@@ -174,11 +165,6 @@
   color: white;
   font-size: 28rpx;
   font-weight: bold;
-}
-
-.recipe-content {
-  padding: 20rpx;
-  background: white;
 }
 
 .recipe-title {
