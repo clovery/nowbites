@@ -203,6 +203,31 @@ class ApiService {
 
     return response.data
   }
+
+  // 解析Markdown菜谱
+  async parseMarkdownRecipe(markdown: string): Promise<{
+    success: boolean
+    recipe?: Recipe
+    error?: string
+  }> {
+    const response = await this.request<{
+      success: boolean
+      recipe?: Recipe
+      error?: string
+    }>('/api/recipes/parse-markdown', {
+      method: 'POST',
+      data: { markdown }
+    })
+
+    if (response.statusCode !== 200) {
+      return {
+        success: false,
+        error: '解析菜谱失败'
+      }
+    }
+
+    return response.data
+  }
 }
 
 export const apiService = new ApiService()

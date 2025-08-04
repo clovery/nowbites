@@ -1,4 +1,4 @@
-import { parseMarkdownRecipe, convertToRecipeFormat } from '../index';
+import { parseMarkdownRecipe } from '../index';
 import type { Recipe } from '../types';
 
 describe('Recipe Format Conversion', () => {
@@ -59,10 +59,10 @@ describe('Recipe Format Conversion', () => {
 
 > 📌 建议每周饮用 2~3 次，坚持调养效果更佳。`;
 
-  describe('convertToRecipeFormat', () => {
+  describe('MarkdownParser toJson', () => {
     it('should convert parsed recipe to Recipe format', async () => {
-      const parsedRecipe = await parseMarkdownRecipe(testRecipeMarkdown);
-      const recipe = convertToRecipeFormat(parsedRecipe);
+      const parser = await parseMarkdownRecipe(testRecipeMarkdown);
+      const recipe = parser.toJson();
       console.log('recipe', JSON.stringify(recipe, null, 2));
       expect(recipe).toBeDefined();
       expect(recipe.title).toBe('乌发养生豆浆食谱');
@@ -75,12 +75,15 @@ describe('Recipe Format Conversion', () => {
     });
 
     it('should have correct Recipe interface structure', async () => {
-      const parsedRecipe = await parseMarkdownRecipe(testRecipeMarkdown);
-      const recipe: Recipe = convertToRecipeFormat(parsedRecipe);
+      const parser = await parseMarkdownRecipe(testRecipeMarkdown);
+      const recipe: Recipe = parser.toJson();
       
       // Check required fields
       expect(typeof recipe.title).toBe('string');
-      expect(Array.isArray(recipe.ingredients)).toBe(true);
+      expect(recipe.ingredients).toHaveProperty('main');
+      expect(recipe.ingredients).toHaveProperty('auxiliary');
+      expect(Array.isArray(recipe.ingredients.main)).toBe(true);
+      expect(Array.isArray(recipe.ingredients.auxiliary)).toBe(true);
       expect(Array.isArray(recipe.sauce)).toBe(true);
       expect(Array.isArray(recipe.steps)).toBe(true);
       expect(Array.isArray(recipe.tips)).toBe(true);
@@ -88,10 +91,10 @@ describe('Recipe Format Conversion', () => {
     });
 
     it('should convert ingredients to structured format', async () => {
-      const parsedRecipe = await parseMarkdownRecipe(testRecipeMarkdown);
-      const recipe = convertToRecipeFormat(parsedRecipe);
+      const parser = await parseMarkdownRecipe(testRecipeMarkdown);
+      const recipe = parser.toJson();
       
-      const ingredients = recipe.ingredients as unknown as Array<{ name: string; amount: string; unit?: string }>;
+      const ingredients = recipe.ingredients.main;
       expect(ingredients.length).toBeGreaterThan(0);
       
       // Check ingredient structure
@@ -105,8 +108,8 @@ describe('Recipe Format Conversion', () => {
     });
 
     it('should convert steps to structured format', async () => {
-      const parsedRecipe = await parseMarkdownRecipe(testRecipeMarkdown);
-      const recipe = convertToRecipeFormat(parsedRecipe);
+      const parser = await parseMarkdownRecipe(testRecipeMarkdown);
+      const recipe = parser.toJson();
       
       const steps = recipe.steps as unknown as Array<{ title: string; content: string[] }>;
       expect(steps.length).toBeGreaterThan(0);
@@ -121,8 +124,8 @@ describe('Recipe Format Conversion', () => {
     });
 
     it('should extract tips correctly', async () => {
-      const parsedRecipe = await parseMarkdownRecipe(testRecipeMarkdown);
-      const recipe = convertToRecipeFormat(parsedRecipe);
+      const parser = await parseMarkdownRecipe(testRecipeMarkdown);
+      const recipe = parser.toJson();
       
       const tips = recipe.tips as unknown as Array<{ content: string }>;
       expect(tips.length).toBeGreaterThan(0);
@@ -147,8 +150,8 @@ describe('Recipe Format Conversion', () => {
 
 1. 测试步骤`;
 
-      const parsedRecipe = await parseMarkdownRecipe(minimalMarkdown);
-      const recipe = convertToRecipeFormat(parsedRecipe);
+      const parser = await parseMarkdownRecipe(minimalMarkdown);
+      const recipe = parser.toJson();
       
       expect(recipe.title).toBe('Test Recipe');
       expect(recipe.cookingTime).toBeUndefined();

@@ -60,23 +60,35 @@ describe('Chinese Recipe Parsing', () => {
 
   describe('parseMarkdownRecipe', () => {
     it('should parse Chinese recipe metadata correctly', async () => {
-      const recipe = await parseMarkdownRecipe(chineseRecipeMarkdown);
+      const parser = await parseMarkdownRecipe(chineseRecipeMarkdown);
+      const parsedRecipe = parser.getParsedRecipe();
       
       // Since there's no frontmatter, metadata should be empty or have default values
-      expect(recipe.metadata.title).toBeUndefined();
-      expect(recipe.metadata.description).toBeUndefined();
-      expect(recipe.metadata.cookingTime).toBeUndefined();
-      expect(recipe.metadata.servings).toBeUndefined();
-      expect(recipe.metadata.difficulty).toBeUndefined();
-      expect(recipe.metadata.tags).toBeUndefined();
+      expect(parsedRecipe?.metadata.title).toBeUndefined();
+      expect(parsedRecipe?.metadata.description).toBeUndefined();
+      expect(parsedRecipe?.metadata.cookingTime).toBeUndefined();
+      expect(parsedRecipe?.metadata.servings).toBeUndefined();
+      expect(parsedRecipe?.metadata.difficulty).toBeUndefined();
+      expect(parsedRecipe?.metadata.tags).toBeUndefined();
     });
 
     it('should generate HTML content', async () => {
-      const recipe = await parseMarkdownRecipe(chineseRecipeMarkdown);
+      const parser = await parseMarkdownRecipe(chineseRecipeMarkdown);
+      const parsedRecipe = parser.getParsedRecipe();
       
-      expect(recipe.html).toContain('<h1>');
-      expect(recipe.html).toContain('乌发养生豆浆食谱');
-      expect(recipe.html).toContain('<h2>');
+      expect(parsedRecipe?.html).toContain('<h1>');
+      expect(parsedRecipe?.html).toContain('乌发养生豆浆食谱');
+      expect(parsedRecipe?.html).toContain('<h2>');
+    });
+
+    it('should convert to JSON format', async () => {
+      const parser = await parseMarkdownRecipe(chineseRecipeMarkdown);
+      const recipe = parser.toJson();
+      
+      expect(recipe.title).toBe('乌发养生豆浆食谱');
+      expect(recipe.description).toBe('一款适合日常养发、补肾养血的健康饮品，选用黑色食材与坚果搭配，营养丰富，口感香浓。');
+      expect(recipe.ingredients.main.length).toBeGreaterThan(0);
+      expect(recipe.steps.length).toBeGreaterThan(0);
     });
   });
 

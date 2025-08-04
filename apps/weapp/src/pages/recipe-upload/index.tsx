@@ -1,19 +1,24 @@
 import { Component } from 'react'
 import { View, Text, Textarea, Button, Input } from '@tarojs/components'
 import Taro from '@tarojs/taro'
+import { apiService } from '../../utils/api'
 import './index.scss'
 
 interface Recipe {
   id: string
   title: string
-  description: string
-  ingredients: string[]
-  steps: string[]
-  cookTime: string
-  difficulty: string
+  description?: string
+  ingredients: {
+    main: Array<{ name: string; amount: string; unit?: string; note?: string }>
+    auxiliary: Array<{ name: string; amount: string; unit?: string; note?: string }>
+  }
+  sauce: Array<{ name: string; amount: string; unit?: string }>
+  steps: Array<{ title: string; content: string[]; time?: number }>
+  tips: Array<{ content: string }>
+  cookingTime?: number
+  servings?: number
+  difficulty?: string
   tags: string[]
-  servings?: string
-  prepTime?: string
 }
 
 interface State {
@@ -126,143 +131,46 @@ export default class RecipeUpload extends Component<{}, State> {
     this.setState({ markdownText: e.detail.value })
   }
 
-  parseMarkdown = (markdown: string): Recipe[] => {
-    const recipes: Recipe[] = []
-    const sections = markdown.split('---').map(s => s.trim()).filter(s => s)
-    
-    sections.forEach(section => {
-      const lines = section.split('\n').map(l => l.trim()).filter(l => l)
-      if (lines.length === 0) return
+  parseMarkdown = async (markdown: string): Promise<Recipe[]> => {
+    try {
+      // Use the API service to parse the markdown
+      const response = await apiService.parseMarkdownRecipe(markdown)
       
+      if (!response.success || !response.recipe) {
+        console.error('Failed to parse markdown:', response.error)
+        return []
+      }
+      
+      const recipeData = response.recipe
+      
+      // Convert API Recipe to component Recipe interface
       const recipe: Recipe = {
         id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-        title: '',
-        description: '',
-        ingredients: [],
-        steps: [],
-        cookTime: '',
-        difficulty: '',
-        tags: [],
-        servings: '',
-        prepTime: ''
+        title: recipeData.title || '未命名菜谱',
+        description: recipeData.description,
+        ingredients: {
+          main: Array.isArray(recipeData.ingredients) ? [] : (recipeData.ingredients?.main || []),
+          auxiliary: Array.isArray(recipeData.ingredients) ? [] : (recipeData.ingredients?.auxiliary || [])
+        },
+        sauce: Array.isArray(recipeData.ingredients) ? [] : (recipeData.ingredients?.sauce || []),
+        steps: recipeData.steps || [],
+        tips: recipeData.tips?.map(tip => 
+          typeof tip === 'string' ? { content: tip } : tip
+        ) || [],
+        cookingTime: recipeData.cookingTime || undefined,
+        servings: recipeData.servings || undefined,
+        difficulty: recipeData.difficulty || undefined,
+        tags: recipeData.tags || []
       }
       
-      let currentSection = ''
-      let stepCounter = 0
-      let inIngredientsSection = false
-      let inStepsSection = false
-      
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i]
-        
-        // 标题
-        if (line.startsWith('# ')) {
-          recipe.title = line.substring(2).trim()
-          continue
-        }
-        
-        // 二级标题 - 支持带emoji的格式
-        if (line.startsWith('## ')) {
-          const sectionTitle = line.substring(3).trim()
-          // 移除emoji和空格，获取纯文本
-          const cleanTitle = sectionTitle.replace(/^[^\u4e00-\u9fa5a-zA-Z]*/, '').trim()
-          
-          if (cleanTitle.includes('食材') || cleanTitle.includes('准备')) {
-            currentSection = '食材'
-            inIngredientsSection = true
-            inStepsSection = false
-          } else if (cleanTitle.includes('步骤') || cleanTitle.includes('烹饪')) {
-            currentSection = '制作步骤'
-            inIngredientsSection = false
-            inStepsSection = true
-          } else if (cleanTitle.includes('贴士') || cleanTitle.includes('提示')) {
-            currentSection = '小贴士'
-            inIngredientsSection = false
-            inStepsSection = false
-          }
-          stepCounter = 0
-          continue
-        }
-        
-        // 三级标题 - 支持带emoji的格式
-        if (line.startsWith('### ')) {
-          const subsectionTitle = line.substring(4).trim()
-          const cleanSubtitle = subsectionTitle.replace(/^[^\u4e00-\u9fa5a-zA-Z]*/, '').trim()
-          
-          if (inIngredientsSection) {
-            // 食材子分类（主料、辅料、调味汁等）
-            currentSection = '食材'
-          } else if (inStepsSection) {
-            // 步骤子分类
-            currentSection = '制作步骤'
-            stepCounter = 0
-          }
-          continue
-        }
-        
-        // 描述（第一个非标题行）
-        if (!recipe.description && !line.startsWith('#') && !line.startsWith('**') && !line.startsWith('-') && line.length > 0) {
-          recipe.description = line
-          continue
-        }
-        
-        // 元数据
-        if (line.startsWith('**烹饪时间：**')) {
-          recipe.cookTime = line.replace('**烹饪时间：**', '').trim()
-        } else if (line.startsWith('**难度：**')) {
-          recipe.difficulty = line.replace('**难度：**', '').trim()
-        } else if (line.startsWith('**份量：**')) {
-          recipe.servings = line.replace('**份量：**', '').trim()
-        } else if (line.startsWith('**标签：**')) {
-          const tagsStr = line.replace('**标签：**', '').trim()
-          recipe.tags = tagsStr.split(',').map(t => t.trim()).filter(t => t)
-        }
-        
-        // 食材 - 支持带emoji的格式
-        if (inIngredientsSection && line.startsWith('- ')) {
-          const ingredient = line.substring(2).trim()
-          // 移除可能的emoji前缀
-          const cleanIngredient = ingredient.replace(/^[^\u4e00-\u9fa5a-zA-Z0-9]*/, '').trim()
-          if (cleanIngredient) {
-            recipe.ingredients.push(cleanIngredient)
-          }
-        }
-        
-        // 步骤 - 支持带emoji和时间戳的格式
-        if (inStepsSection) {
-          // 匹配带emoji的步骤标题
-          if (line.match(/^###\s*[^\u4e00-\u9fa5a-zA-Z]*\s*第.*步/)) {
-            stepCounter++
-            continue
-          }
-          
-          // 匹配带时间戳的步骤
-          if (line.match(/^###\s*[^\u4e00-\u9fa5a-zA-Z]*\s*.*\(\d{1,2}:\d{2}\)/)) {
-            stepCounter++
-            continue
-          }
-          
-          // 普通步骤
-          if (line.startsWith('- ') && stepCounter > 0) {
-            const step = line.substring(2).trim()
-            // 移除可能的emoji前缀
-            const cleanStep = step.replace(/^[^\u4e00-\u9fa5a-zA-Z0-9]*/, '').trim()
-            if (cleanStep) {
-              recipe.steps.push(cleanStep)
-            }
-          }
-        }
-      }
-      
-      if (recipe.title) {
-        recipes.push(recipe)
-      }
-    })
-    
-    return recipes
+      return [recipe]
+    } catch (error) {
+      console.error('Error parsing markdown:', error)
+      return []
+    }
   }
 
-  previewRecipes = () => {
+  previewRecipes = async () => {
     const { markdownText } = this.state
     if (!markdownText.trim()) {
       Taro.showToast({
@@ -273,7 +181,7 @@ export default class RecipeUpload extends Component<{}, State> {
     }
     
     try {
-      const recipes = this.parseMarkdown(markdownText)
+      const recipes = await this.parseMarkdown(markdownText)
       if (recipes.length === 0) {
         Taro.showToast({
           title: '未识别到有效菜谱',
@@ -392,13 +300,86 @@ export default class RecipeUpload extends Component<{}, State> {
             {previewRecipes.map((recipe, index) => (
               <View key={recipe.id} className='preview-card'>
                 <Text className='preview-title'>{index + 1}. {recipe.title}</Text>
-                <Text className='preview-desc'>{recipe.description}</Text>
+                {recipe.description && (
+                  <Text className='preview-desc'>{recipe.description}</Text>
+                )}
+                
                 <View className='preview-meta'>
-                  <Text className='preview-time'>⏱ {recipe.cookTime}</Text>
-                  <Text className='preview-difficulty'>🔥 {recipe.difficulty}</Text>
+                  <Text className='preview-time'>⏱ {recipe.cookingTime ? `${recipe.cookingTime}分钟` : '未设置'}</Text>
+                  <Text className='preview-difficulty'>🔥 {recipe.difficulty || '未设置'}</Text>
+                  {recipe.servings && (
+                    <Text className='preview-servings'>👥 {recipe.servings}人份</Text>
+                  )}
                 </View>
+
+                {/* 食材预览 */}
+                <View className='preview-ingredients'>
+                  <Text className='preview-subtitle'>🧂 食材</Text>
+                  {recipe.ingredients?.main?.length > 0 && (
+                    <View className='ingredient-group'>
+                      <Text className='ingredient-label'>主料：</Text>
+                      {recipe.ingredients.main.map((ingredient, idx) => (
+                        <Text key={idx} className='ingredient-item'>
+                          {ingredient.name} {ingredient.amount}{ingredient.unit}
+                          {ingredient.note && ` (${ingredient.note})`}
+                        </Text>
+                      ))}
+                    </View>
+                  )}
+                  {recipe.ingredients?.auxiliary?.length > 0 && (
+                    <View className='ingredient-group'>
+                      <Text className='ingredient-label'>辅料：</Text>
+                      {recipe.ingredients.auxiliary.map((ingredient, idx) => (
+                        <Text key={idx} className='ingredient-item'>
+                          {ingredient.name} {ingredient.amount}{ingredient.unit}
+                          {ingredient.note && ` (${ingredient.note})`}
+                        </Text>
+                      ))}
+                    </View>
+                  )}
+                  {recipe.sauce?.length > 0 && (
+                    <View className='ingredient-group'>
+                      <Text className='ingredient-label'>调味汁：</Text>
+                      {recipe.sauce.map((sauce, idx) => (
+                        <Text key={idx} className='ingredient-item'>
+                          {sauce.name} {sauce.amount}{sauce.unit}
+                        </Text>
+                      ))}
+                    </View>
+                  )}
+                </View>
+
+                {/* 步骤预览 */}
+                <View className='preview-steps'>
+                  <Text className='preview-subtitle'>👨‍🍳 烹饪步骤</Text>
+                  {recipe.steps?.slice(0, 3).map((step, idx) => (
+                    <View key={idx} className='step-item'>
+                      <Text className='step-title'>{step.title}</Text>
+                      {step.content?.map((content, contentIdx) => (
+                        <Text key={contentIdx} className='step-content'>• {content}</Text>
+                      ))}
+                    </View>
+                  ))}
+                  {recipe.steps?.length > 3 && (
+                    <Text className='more-steps'>... 还有 {recipe.steps?.length - 3} 个步骤</Text>
+                  )}
+                </View>
+
+                {/* 小贴士预览 */}
+                {recipe.tips?.length > 0 && (
+                  <View className='preview-tips'>
+                    <Text className='preview-subtitle'>✅ 小贴士</Text>
+                    {recipe.tips.slice(0, 2).map((tip, idx) => (
+                      <Text key={idx} className='tip-item'>• {tip.content}</Text>
+                    ))}
+                    {recipe.tips.length > 2 && (
+                      <Text className='more-tips'>... 还有 {recipe.tips.length - 2} 条小贴士</Text>
+                    )}
+                  </View>
+                )}
+
                 <Text className='preview-count'>
-                  食材 {recipe.ingredients.length} 项 | 步骤 {recipe.steps.length} 步
+                  食材 {((recipe.ingredients?.main?.length || 0) + (recipe.ingredients?.auxiliary?.length || 0) + (recipe.sauce?.length || 0))} 项 | 步骤 {recipe.steps?.length || 0} 步
                 </Text>
               </View>
             ))}

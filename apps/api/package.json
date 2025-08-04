@@ -4,8 +4,8 @@
   "description": "NowBites API Server",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "tsx src/index.ts",
-    "build": "tsc",
+    "dev": "nodemon",
+    "build": "node esbuild.config.js",
     "start": "node dist/index.js",
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit",
@@ -22,6 +22,7 @@
     "@fastify/jwt": "^8.0.0",
     "@fastify/swagger": "^8.14.0",
     "@fastify/swagger-ui": "^2.1.0",
+    "@nowbites/parse-markdown-recipe": "workspace:*",
     "@prisma/client": "^6.13.0",
     "axios": "^1.6.7",
     "dotenv": "^16.4.5",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.3",
+    "esbuild": "^0.19.0",
     "eslint": "^9.0.0",
     "nodemon": "^3.1.0",
     "ts-node": "^10.9.2",

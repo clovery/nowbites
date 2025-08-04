@@ -22,7 +22,7 @@ npm install @nowbites/parse-markdown-recipe
 ### Parse a markdown recipe file
 
 ```typescript
-import { parseMarkdownRecipe, convertToRecipeFormat } from '@nowbites/parse-markdown-recipe';
+import { parseMarkdownRecipe } from '@nowbites/parse-markdown-recipe';
 
 const markdown = `
 ---
@@ -64,8 +64,8 @@ tags: [海鲜, 红烧]
 - 煎制带鱼时火候要控制好，避免煎糊
 `;
 
-const parsedRecipe = await parseMarkdownRecipe(markdown);
-const recipe = convertToRecipeFormat(parsedRecipe);
+const parser = await parseMarkdownRecipe(markdown);
+const recipe = parser.toJson();
 ```
 
 ### Use structured recipe format
@@ -200,17 +200,127 @@ interface Tip {
 }
 ```
 
+## Ingredients and Sauce Parsing
+
+The library provides dedicated parsers for ingredients and sauce sections in Chinese recipe formats.
+
+### Ingredients Parser
+
+The `parseIngredients` function can parse both main ingredients (主料) and auxiliary ingredients (辅料) from markdown format.
+
+```typescript
+import { parseIngredients } from '@nowbites/parse-markdown-recipe';
+
+const mainIngredientsText = `
+- 带鱼 500g（新鲜或冻带鱼，不能有臭味）
+`;
+
+const auxiliaryIngredientsText = `
+- 花雕酒 25g
+- 食用油 130g
+- 蒜 30g
+- 姜 30g
+- 花椒 10g
+- 干辣椒段 150g
+- 葱花 30g
+- 花生米 80g
+- 淀粉 5g
+`;
+
+const ingredients = parseIngredients(mainIngredientsText, auxiliaryIngredientsText);
+
+console.log(ingredients.main[0]);
+// Output: { name: '带鱼', amount: '500', unit: 'g', note: '新鲜或冻带鱼，不能有臭味' }
+
+console.log(ingredients.auxiliary[0]);
+// Output: { name: '花雕酒', amount: '25', unit: 'g' }
+```
+
+### Sauce Parser
+
+The `parseSauce` function can parse sauce/seasoning ingredients from markdown format.
+
+```typescript
+import { parseSauce } from '@nowbites/parse-markdown-recipe';
+
+const sauceText = `
+- 酱油 50g
+- 米醋 50g
+- 白糖 80g
+- 味精 1g
+- 料酒 10g
+`;
+
+const sauce = parseSauce(sauceText);
+
+console.log(sauce[0]);
+// Output: { name: '酱油', amount: '50', unit: 'g' }
+```
+
+### Supported Formats
+
+Both parsers support the following ingredient formats:
+
+1. **Standard format**: `- 食材名 数量单位`
+   - `- 带鱼 500g`
+   - `- 蒜 30g`
+   - `- 鸡蛋 3个`
+
+2. **With notes**: `- 食材名 数量单位（备注）`
+   - `- 带鱼 500g（新鲜或冻带鱼，不能有臭味）`
+   - `- 姜 30g（切片）`
+
+3. **Without specific units**: `- 食材名 数量`
+   - `- 盐 适量`
+   - `- 辣椒 适量`
+
+4. **Chinese units**: Supports various Chinese units like `个`, `勺`, `杯`, `片`, etc.
+
+### Integration with Recipe Conversion
+
+The parsers are automatically used when converting markdown recipes to structured format:
+
+```typescript
+import { parseMarkdownRecipe } from '@nowbites/parse-markdown-recipe';
+
+const markdown = `# 红烧带鱼
+
+## 主料
+- 带鱼 500g（新鲜或冻带鱼，不能有臭味）
+
+## 辅料
+- 花雕酒 25g
+- 食用油 130g
+
+## 调味汁
+- 酱油 50g
+- 米醋 50g
+
+## 步骤
+1. 准备食材
+`;
+
+const parser = await parseMarkdownRecipe(markdown);
+const recipe = parser.toJson();
+
+console.log(recipe.ingredients.main[0]);
+// Output: { name: '带鱼', amount: '500', unit: 'g', note: '新鲜或冻带鱼，不能有臭味' }
+
+console.log(recipe.sauce[0]);
+// Output: { name: '酱油', amount: '50', unit: 'g' }
+```
+
 ## API Reference
 
 ### Core Functions
 
-#### `parseMarkdownRecipe(markdown: string): Promise<ParsedRecipe>`
+#### `parseMarkdownRecipe(markdown: string): Promise<MarkdownParser>`
 
-Parse a markdown recipe file and extract metadata and content.
+Parse a markdown recipe file and return a MarkdownParser instance.
 
-#### `convertToRecipeFormat(parsedRecipe: ParsedRecipe): Recipe`
+#### `MarkdownParser.toJson(): Recipe`
 
-Convert a parsed recipe to the structured Recipe format.
+Convert the parsed recipe to the structured Recipe format.
 
 ### Structured Recipe Utilities
 

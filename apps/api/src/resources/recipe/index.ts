@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Prisma } from '@prisma/client';
+import { parseMarkdownRecipe } from '@nowbites/parse-markdown-recipe';
 
 // Recipe creation request interface
 interface CreateRecipeRequest {
@@ -544,5 +545,75 @@ export default async function recipeRoutes(fastify: FastifyInstance) {
       }
     },
     getUserRecipes
+  );
+
+  // Parse markdown recipe (authenticated)
+  fastify.post<{ Body: { markdown: string } }>(
+    '/parse-markdown',
+    {
+      preHandler: [fastify.authenticate],
+      schema: {
+        description: 'Parse markdown recipe content',
+        tags: ['recipes'],
+        body: {
+          type: 'object',
+          required: ['markdown'],
+          properties: {
+            markdown: { type: 'string', minLength: 1 }
+          }
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              recipe: {
+                type: 'object',
+                properties: {
+                  title: { type: 'string' },
+                  description: { type: 'string' },
+                  ingredients: { type: 'object' },
+                  sauce: { type: 'array' },
+                  steps: { type: 'array' },
+                  tips: { type: 'array' },
+                  cookingTime: { type: 'number' },
+                  servings: { type: 'number' },
+                  difficulty: { type: 'string' },
+                  tags: { type: 'array' }
+                }
+              }
+            }
+          },
+          400: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              error: { type: 'string' }
+            }
+          }
+        }
+      }
+    },
+    async (request, reply) => {
+      try {
+        const { markdown } = request.body;
+        
+       
+        // Parse the markdown
+        const parser = await parseMarkdownRecipe(markdown);
+        const recipeData = parser.toJson();
+        
+        return reply.code(200).send({
+          success: true,
+          recipe: recipeData
+        });
+      } catch (error) {
+        request.log.error(error);
+        return reply.code(400).send({
+          success: false,
+          error: 'Failed to parse markdown recipe'
+        });
+      }
+    }
   );
 } 
