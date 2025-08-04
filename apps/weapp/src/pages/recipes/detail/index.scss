@@ -182,26 +182,3 @@
   background: white;
   box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.1);
 }
-
-.action-btn {
-  flex: 1;
-  border-radius: 50rpx;
-  padding: 32rpx;
-  font-size: 32rpx;
-  font-weight: bold;
-  border: none;
-}
-
-.action-btn::after {
-  border: none;
-}
-
-.action-btn.primary {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-  color: white;
-}
-
-.action-btn.secondary {
-  background: #f0f0f0;
-  color: #666;
-}

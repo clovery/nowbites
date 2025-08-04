@@ -39,6 +39,17 @@ jobs:
           pnpm db:generate
           pnpm build
 
+      - name: Remove workspace dependencies
+        working-directory: apps/api
+        run: |
+          # Remove workspace dependencies from package.json
+          sed -i '/workspace:\*/d' package.json
+          # Clean up empty lines that might be left
+          sed -i '/^[[:space:]]*$/d' package.json
+          # Remove trailing commas before closing braces
+          sed -i 's/,[[:space:]]*}/}/g' package.json
+          sed -i 's/,[[:space:]]*]/]/g' package.json
+
       - name: Package application
         working-directory: apps/api
         run: |

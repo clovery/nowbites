@@ -285,13 +285,15 @@ export default class RecipeUpload extends Component<{}, State> {
             <Text className='clear-btn' onClick={this.clearContent}>清空</Text>
           </View>
           
-          <Textarea
-            className='markdown-input'
-            placeholder='请输入Markdown格式的菜谱内容...\n\n支持格式：\n# 菜谱名称\n## 🧂 食材准备\n### 主料\n- 食材1\n### 辅料\n- 食材2\n## 👨‍🍳 烹饪步骤\n### 🥢 第一步：处理食材（00:18）\n- 步骤描述\n### 🔥 第二步：烹饪（00:55）\n- 步骤描述\n## ✅ 小贴士\n- 提示内容'
-            value={markdownText}
-            onInput={this.onTextareaChange}
-            maxlength={-1}
-          />
+          <View className='markdown-input-container'>
+            <Textarea
+              className='markdown-input'
+              placeholder='请输入Markdown格式的菜谱内容...\n\n支持格式：\n# 菜谱名称\n## 🧂 食材准备\n### 主料\n- 食材1\n### 辅料\n- 食材2\n## 👨‍🍳 烹饪步骤\n### 🥢 第一步：处理食材（00:18）\n- 步骤描述\n### 🔥 第二步：烹饪（00:55）\n- 步骤描述\n## ✅ 小贴士\n- 提示内容'
+              value={markdownText}
+              onInput={this.onTextareaChange}
+                maxlength={-1}
+              />
+          </View>
         </View>
 
         {previewRecipes.length > 0 && (

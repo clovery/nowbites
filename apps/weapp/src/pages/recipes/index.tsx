@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import { View, Text, ScrollView, Input, Button } from '@tarojs/components'
+import { View, Text, ScrollView, Input, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { apiService, Recipe } from '../../utils/api'
 import './index.scss'
@@ -215,44 +215,55 @@ export default class RecipeList extends Component<{}, State> {
           </View>
         ) : (
           <ScrollView className='recipe-scroll' scrollY>
-            {filteredRecipes.map(recipe => {
-              const isAdded = addedRecipeIds.includes(recipe.id)
-              return (
-                <View 
-                  key={recipe.id} 
-                  className={`recipe-card ${isAdded ? 'added' : ''}`}
-                  onClick={() => this.addToPlan(recipe)}
-                >
-                  <View className='recipe-header'>
-                    <Text className='recipe-title'>{recipe.title}</Text>
-                    <View className='recipe-meta'>
-                      <Text className='cook-time'>⏱ {recipe.cookingTime ? `${recipe.cookingTime}分钟` : '未知'}</Text>
-                      <Text className='difficulty'>🔥 {recipe.difficulty || '未知'}</Text>
+            <View className='recipe-grid'>
+              {filteredRecipes.map(recipe => {
+                const isAdded = addedRecipeIds.includes(recipe.id)
+                return (
+                  <View 
+                    key={recipe.id} 
+                    className={`recipe-card ${isAdded ? 'added' : ''}`}
+                    onClick={() => this.addToPlan(recipe)}
+                  >
+                    <View className='recipe-image-container'>
+                      <Image 
+                        className='recipe-image'
+                        src={recipe.coverImage || recipe.imageUrl || 'https://via.placeholder.com/300x200/f0f0f0/999?text=Recipe'}
+                        mode='aspectFill'
+                      />
+                      {isAdded && (
+                        <View className='added-overlay'>
+                          <Text className='added-text'>✓ 已添加</Text>
+                        </View>
+                      )}
+                    </View>
+                    
+                    <View className='recipe-content'>
+                      <Text className='recipe-title'>{recipe.title}</Text>
+                      
+                      <View className='recipe-meta'>
+                        <Text className='cook-time'>⏱ {recipe.cookingTime ? `${recipe.cookingTime}分钟` : '未知'}</Text>
+                        <Text className='difficulty'>🔥 {recipe.difficulty || '未知'}</Text>
+                      </View>
+                      
+                      {recipe.description && (
+                        <Text className='recipe-description'>{recipe.description}</Text>
+                      )}
+                      
+                      {recipe.tags && recipe.tags.length > 0 && (
+                        <View className='recipe-tags'>
+                          {recipe.tags.slice(0, 2).map((tag, index) => (
+                            <Text key={index} className='tag'>#{tag}</Text>
+                          ))}
+                          {recipe.tags.length > 2 && (
+                            <Text className='tag more'>+{recipe.tags.length - 2}</Text>
+                          )}
+                        </View>
+                      )}
                     </View>
                   </View>
-                  
-                  {recipe.description && (
-                    <Text className='recipe-description'>{recipe.description}</Text>
-                  )}
-                  
-                  {recipe.tags && recipe.tags.length > 0 && (
-                    <View className='recipe-tags'>
-                      {recipe.tags.map((tag, index) => (
-                        <Text key={index} className='tag'>#{tag}</Text>
-                      ))}
-                    </View>
-                  )}
-                  
-                  {planId && (
-                    <View className='add-to-plan-btn'>
-                      <Text className={`add-btn-text ${isAdded ? 'added' : ''}`}>
-                        {isAdded ? '✓ 已添加' : '+ 添加到计划'}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              )
-            })}
+                )
+              })}
+            </View>
           </ScrollView>
         )}
 

@@ -13,13 +13,6 @@ page {
   box-sizing: border-box;
 }
 
-.recipe-card {
-  background: white;
-  border-radius: 16rpx;
-  padding: 32rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
-}
-
 .recipe-title {
   font-size: 36rpx;
   font-weight: bold;
@@ -49,4 +42,37 @@ page {
 
 .btn-secondary {
   background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+}
+
+.action-btn {
+  flex: 1;
+  border-radius: 50rpx;
+  padding: 16rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  border: none;
+}
+
+.action-btn::after {
+  border: none;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.action-btn.primary[disabled] {
+  background: #ccc;
+  color: #999;
+}
+
+.action-btn.secondary {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.action-btn.secondary[disabled] {
+  background: #f8f8f8;
+  color: #ccc;
 }
