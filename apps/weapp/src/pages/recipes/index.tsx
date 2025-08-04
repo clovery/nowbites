@@ -9,10 +9,13 @@ interface State {
   recipes: Recipe[]
   searchText: string
   filteredRecipes: Recipe[]
-  planId?: string // 如果从计划页面跳转过来，会有计划ID
-  addedRecipeIds: string[] // 已添加到计划的菜谱ID列表
+  planId?: string
+  addedRecipeIds: string[]
   loading: boolean
   error: string | null
+  page: number
+  hasMore: boolean
+  loadingMore: boolean
 }
 
 export default class RecipeList extends Component<{}, State> {
@@ -25,7 +28,10 @@ export default class RecipeList extends Component<{}, State> {
       filteredRecipes: [],
       addedRecipeIds: [],
       loading: false,
-      error: null
+      error: null,
+      page: 1,
+      hasMore: true,
+      loadingMore: false
     }
   }
 
@@ -35,43 +41,58 @@ export default class RecipeList extends Component<{}, State> {
   }
 
   checkPlanId = () => {
-    // 从全局存储中检查是否有计划ID
     const planId = Taro.getStorageSync('currentPlanId')
-    
+
     if (planId) {
       this.setState({ planId }, () => {
-        // 在设置planId后，更新已添加的菜谱列表
         this.updateAddedRecipes()
       })
       Taro.setNavigationBarTitle({
         title: '选择菜谱'
       })
-      // 清除存储的计划ID，避免影响后续使用
       Taro.removeStorageSync('currentPlanId')
     }
   }
 
-  loadRecipes = async () => {
+  loadRecipes = async (isLoadMore = false) => {
     try {
-      this.setState({ loading: true, error: null })
-      
+      if (isLoadMore) {
+        this.setState({ loadingMore: true })
+      } else {
+        this.setState({ loading: true, error: null, page: 1 })
+      }
+
+      const { page } = this.state
       const response = await apiService.getRecipes({
-        page: 1,
-        limit: 50 // 获取前50个菜谱
+        page: isLoadMore ? page + 1 : 1,
+        limit: 20
       })
-      
-      this.setState({
-        recipes: response.recipes,
-        filteredRecipes: response.recipes,
-        loading: false
-      })
+
+      if (isLoadMore) {
+        this.setState(prevState => ({
+          recipes: [...prevState.recipes, ...response.recipes],
+          filteredRecipes: [...prevState.filteredRecipes, ...response.recipes],
+          page: prevState.page + 1,
+          hasMore: response.recipes.length === 20,
+          loadingMore: false
+        }))
+      } else {
+        this.setState({
+          recipes: response.recipes,
+          filteredRecipes: response.recipes,
+          page: 1,
+          hasMore: response.recipes.length === 20,
+          loading: false
+        })
+      }
     } catch (error) {
       console.error('加载菜谱失败:', error)
       this.setState({
         error: '加载菜谱失败，请稍后重试',
-        loading: false
+        loading: false,
+        loadingMore: false
       })
-      
+
       Taro.showToast({
         title: '加载菜谱失败',
         icon: 'none',
@@ -80,7 +101,13 @@ export default class RecipeList extends Component<{}, State> {
     }
   }
 
+  onScrollToLower = () => {
+    const { hasMore, loadingMore, searchText } = this.state
 
+    if (hasMore && !loadingMore && !searchText) {
+      this.loadRecipes(true)
+    }
+  }
 
   navigateToDetail = (recipe: Recipe) => {
     Taro.navigateTo({
@@ -90,18 +117,15 @@ export default class RecipeList extends Component<{}, State> {
 
   addToPlan = (recipe: Recipe) => {
     const { planId } = this.state
-    
+
     if (!planId) {
-      // 如果没有planId，跳转到详情页
       this.navigateToDetail(recipe)
       return
     }
 
-    // 将菜谱添加到计划中
     const mealPlans = Taro.getStorageSync('mealPlans') || {}
     const planMeals = mealPlans[planId] || []
-    
-    // 检查是否已经添加过这个菜谱
+
     const existingMeal = planMeals.find((meal: any) => meal.id === recipe.id)
     if (existingMeal) {
       Taro.showToast({
@@ -111,7 +135,6 @@ export default class RecipeList extends Component<{}, State> {
       return
     }
 
-    // 创建新的菜谱项
     const newMeal = {
       id: recipe.id,
       title: recipe.title,
@@ -130,8 +153,6 @@ export default class RecipeList extends Component<{}, State> {
       duration: 1000
     })
 
-    // 不返回上一页，让用户可以继续添加
-    // 更新已添加的菜谱列表，避免重复添加
     this.updateAddedRecipes()
   }
 
@@ -143,7 +164,6 @@ export default class RecipeList extends Component<{}, State> {
     const planMeals = mealPlans[planId] || []
     const addedRecipeIds = planMeals.map((meal: any) => meal.id)
 
-    // 更新状态，标记已添加的菜谱
     this.setState({
       addedRecipeIds: addedRecipeIds
     })
@@ -156,7 +176,7 @@ export default class RecipeList extends Component<{}, State> {
   }
 
   render() {
-    const { filteredRecipes, searchText, planId, addedRecipeIds, loading, error } = this.state
+    const { filteredRecipes, searchText, planId, addedRecipeIds, loading, error, hasMore, loadingMore } = this.state
 
     if (loading) {
       return (
@@ -173,7 +193,7 @@ export default class RecipeList extends Component<{}, State> {
         <View className='recipe-list'>
           <View className='error-state'>
             <Text className='error-text'>{error}</Text>
-            <Button className='retry-btn' onClick={this.loadRecipes}>
+            <Button className='retry-btn' onClick={() => this.loadRecipes()}>
               重试
             </Button>
           </View>
@@ -183,25 +203,27 @@ export default class RecipeList extends Component<{}, State> {
 
     return (
       <View className='recipe-list'>
-        <CustomNavigation
-          showSearch={true}
-          searchValue={searchText}
-          searchPlaceholder='搜索菜谱...'
-          onSearchChange={(value) => {
-            const { recipes } = this.state
-            const filteredRecipes = recipes.filter(recipe => 
-              recipe.title.toLowerCase().includes(value.toLowerCase()) ||
-              (recipe.description && recipe.description.toLowerCase().includes(value.toLowerCase())) ||
-              (recipe.tags && recipe.tags.some(tag => tag.toLowerCase().includes(value.toLowerCase())))
-            )
-            
-            this.setState({
-              searchText: value,
-              filteredRecipes
-            })
-          }}
-        />
-        
+        <View className='navigation-fixed'>
+          <CustomNavigation
+            showSearch={true}
+            searchValue={searchText}
+            searchPlaceholder='搜索菜谱...'
+            onSearchChange={(value) => {
+              const { recipes } = this.state
+              const filteredRecipes = recipes.filter(recipe =>
+                recipe.title.toLowerCase().includes(value.toLowerCase()) ||
+                (recipe.description && recipe.description.toLowerCase().includes(value.toLowerCase())) ||
+                (recipe.tags && recipe.tags.some(tag => tag.toLowerCase().includes(value.toLowerCase())))
+              )
+
+              this.setState({
+                searchText: value,
+                filteredRecipes
+              })
+            }}
+          />
+        </View>
+
         <View className='recipe-content'>
           {filteredRecipes.length === 0 ? (
             <View className='empty-state'>
@@ -213,64 +235,61 @@ export default class RecipeList extends Component<{}, State> {
               </View>
             </View>
           ) : (
-            <ScrollView className='recipe-scroll' scrollY>
+            <ScrollView
+              className='recipe-scroll'
+              scrollY
+              onScrollToLower={this.onScrollToLower}
+              lowerThreshold={100}
+            >
               <View className='recipe-grid'>
-              {filteredRecipes.map(recipe => {
-                const isAdded = addedRecipeIds.includes(recipe.id)
-                return (
-                  <View 
-                    key={recipe.id} 
-                    className={`recipe-card ${isAdded ? 'added' : ''}`}
-                    onClick={() => this.addToPlan(recipe)}
-                  >
-                    <View className='recipe-image-container'>
-                      <Image 
-                        className='recipe-image'
-                        src={recipe.coverImage || recipe.imageUrl || 'https://via.placeholder.com/300x200/f0f0f0/999?text=Recipe'}
-                        mode='aspectFill'
-                      />
-                      {isAdded && (
-                        <View className='added-overlay'>
-                          <Text className='added-text'>✓ 已添加</Text>
-                        </View>
-                      )}
-                    </View>
-                    
-                    <View className='recipe-content'>
-                      <Text className='recipe-title'>{recipe.title}</Text>
-                      
-                      <View className='recipe-meta'>
-                        <Text className='cook-time'>⏱ {recipe.cookingTime ? `${recipe.cookingTime}分钟` : '未知'}</Text>
-                        <Text className='difficulty'>🔥 {recipe.difficulty || '未知'}</Text>
+                {filteredRecipes.map(recipe => {
+                  const isAdded = addedRecipeIds.includes(recipe.id)
+                  return (
+                    <View
+                      key={recipe.id}
+                      className={`recipe-card ${isAdded ? 'added' : ''}`}
+                      onClick={() => this.addToPlan(recipe)}
+                    >
+                      <View className='recipe-image-container'>
+                        <Image
+                          className='recipe-image single'
+                          src={recipe.coverImage || recipe.imageUrl || 'https://via.placeholder.com/300x200/f0f0f0/999?text=Recipe'}
+                          mode='aspectFill'
+                        />
+                        {isAdded && (
+                          <View className='added-overlay'>
+                            <Text className='added-text'>✓ 已添加</Text>
+                          </View>
+                        )}
                       </View>
-                      
-                      {recipe.description && (
-                        <Text className='recipe-description'>{recipe.description}</Text>
-                      )}
-                      
-                      {recipe.tags && recipe.tags.length > 0 && (
-                        <View className='recipe-tags'>
-                          {recipe.tags.slice(0, 2).map((tag, index) => (
-                            <Text key={index} className='tag'>#{tag}</Text>
-                          ))}
-                          {recipe.tags.length > 2 && (
-                            <Text className='tag more'>+{recipe.tags.length - 2}</Text>
-                          )}
-                        </View>
-                      )}
+
+                      <View className='recipe-content'>
+                        <Text className='recipe-title'>{recipe.title}</Text>
+                        <Text className='recipe-count'>{recipe.cookingTime ? `${recipe.cookingTime}分钟` : '未知时间'}</Text>
+                      </View>
                     </View>
-                  </View>
-                )
-              })}
+                  )
+                })}
               </View>
+
+              {loadingMore && (
+                <View className='loading-more'>
+                  <Text className='loading-more-text'>加载更多...</Text>
+                </View>
+              )}
+
+              {!hasMore && filteredRecipes.length > 0 && (
+                <View className='no-more'>
+                  <Text className='no-more-text'>没有更多菜谱了</Text>
+                </View>
+              )}
             </ScrollView>
           )}
-          
-          {/* 当有计划ID时显示完成按钮 */}
+
           {planId && (
             <View className='done-section'>
-              <Button 
-                className='done-btn' 
+              <Button
+                className='done-btn'
                 onClick={() => {
                   Taro.switchTab({
                     url: '/pages/meal-plan/index'

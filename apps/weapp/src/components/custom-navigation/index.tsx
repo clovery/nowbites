@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import { View, Input } from '@tarojs/components'
+import { View, Input, Text } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import './index.scss'
 
@@ -8,6 +8,7 @@ interface Props {
   searchValue?: string
   searchPlaceholder?: string
   onSearchChange?: (value: string) => void
+  onSearchFocus?: () => void
   backgroundColor?: string
   children?: React.ReactNode
 }
@@ -21,13 +22,13 @@ interface State {
 }
 
 export default class CustomNavigation extends Component<Props, State> {
-  
+
   constructor(props: Props) {
     super(props)
-    
+
     const app = Taro.getApp()
     const globalData = app.globalData || {}
-    
+
     this.state = {
       navBarHeight: globalData.navBarHeight || 0,
       menuRight: globalData.menuRight || 0,
@@ -44,52 +45,62 @@ export default class CustomNavigation extends Component<Props, State> {
     }
   }
 
+  onSearchFocus = () => {
+    const { onSearchFocus } = this.props
+    if (onSearchFocus) {
+      onSearchFocus()
+    }
+  }
+
   render() {
-    const { 
-      showSearch = false, 
-      searchValue = '', 
-      searchPlaceholder = '搜索...', 
+    const {
+      showSearch = false,
+      searchValue = '',
+      searchPlaceholder = '搜索...',
       backgroundColor = '#fff',
-      children 
+      children
     } = this.props
-    
+
     const { navBarHeight, menuRight, menuBottom, menuHeight, statusBarHeight } = this.state
 
     return (
-      <View 
-        className='custom-nav' 
+      <View
+        className='custom-nav'
         style={{
           height: `${navBarHeight}px`,
           backgroundColor
         }}
       >
         {/* 状态栏占位 */}
-        <View 
-          className='status-bar' 
+        <View
+          className='status-bar'
           style={{
             height: `${statusBarHeight}px`
           }}
         />
-        
+
         {/* 导航内容区域 */}
-        <View 
+        <View
           className='nav-content'
           style={{
             height: `${menuHeight}px`,
             minHeight: `${menuHeight}px`,
             lineHeight: `${menuHeight}px`,
             bottom: `${menuBottom}px`,
-            left: `${menuRight}px`,
+            left: 0,
             right: `${menuRight}px`
           }}
         >
           {showSearch ? (
             <View className='nav-search-container'>
+              <Text className='nav-search-icon'>🔍</Text>
               <Input
                 className='nav-search-input'
                 placeholder={searchPlaceholder}
                 value={searchValue}
                 onInput={this.onSearchInput}
+                onFocus={this.onSearchFocus}
+                confirmType='search'
               />
             </View>
           ) : (
