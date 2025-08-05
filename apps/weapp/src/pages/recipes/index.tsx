@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { apiService, Recipe } from '../../utils/api'
 import CustomNavigation from '../../components/custom-navigation'
-import './index.scss'
+import styles from './index.module.scss'
 
 interface State {
   recipes: Recipe[]
@@ -180,9 +180,9 @@ export default class RecipeList extends Component<{}, State> {
 
     if (loading) {
       return (
-        <View className='recipe-list'>
-          <View className='loading-state'>
-            <Text className='loading-text'>加载中...</Text>
+        <View className={styles.recipeList}>
+          <View className={styles.loadingState}>
+            <Text className={styles.loadingText}>加载中...</Text>
           </View>
         </View>
       )
@@ -190,10 +190,10 @@ export default class RecipeList extends Component<{}, State> {
 
     if (error) {
       return (
-        <View className='recipe-list'>
-          <View className='error-state'>
-            <Text className='error-text'>{error}</Text>
-            <Button className='retry-btn' onClick={() => this.loadRecipes()}>
+        <View className={styles.recipeList}>
+          <View className={styles.errorState}>
+            <Text className={styles.errorText}>{error}</Text>
+            <Button className={styles.retryBtn} onClick={() => this.loadRecipes()}>
               重试
             </Button>
           </View>
@@ -202,8 +202,8 @@ export default class RecipeList extends Component<{}, State> {
     }
 
     return (
-      <View className='recipe-list'>
-        <View className='navigation-fixed'>
+      <View className={styles.recipeList}>
+        <View className={styles.navigationFixed}>
           <CustomNavigation
             showSearch={true}
             searchValue={searchText}
@@ -224,48 +224,48 @@ export default class RecipeList extends Component<{}, State> {
           />
         </View>
 
-        <View className='recipe-content'>
+        <View className={styles.recipeContent}>
           {filteredRecipes.length === 0 ? (
-            <View className='empty-state'>
-              <View className='empty-icon'>📝</View>
-              <Text className='empty-title'>还没有菜谱</Text>
-              <Text className='empty-desc'>点击下方按钮开始上传你的第一个菜谱吧</Text>
-              <View className='empty-action' onClick={this.navigateToUpload}>
-                <Text className='upload-btn'>上传菜谱</Text>
+            <View className={styles.emptyState}>
+              <View className={styles.emptyIcon}>📝</View>
+              <Text className={styles.emptyTitle}>还没有菜谱</Text>
+              <Text className={styles.emptyDesc}>点击下方按钮开始上传你的第一个菜谱吧</Text>
+              <View className={styles.emptyAction} onClick={this.navigateToUpload}>
+                <Text className={styles.uploadBtn}>上传菜谱</Text>
               </View>
             </View>
           ) : (
             <ScrollView
-              className='recipe-scroll'
+              className={styles.recipeScroll}
               scrollY
               onScrollToLower={this.onScrollToLower}
               lowerThreshold={100}
             >
-              <View className='recipe-grid'>
+              <View className={styles.recipeGrid}>
                 {filteredRecipes.map(recipe => {
                   const isAdded = addedRecipeIds.includes(recipe.id)
                   return (
                     <View
                       key={recipe.id}
-                      className={`recipe-card ${isAdded ? 'added' : ''}`}
+                      className={`${styles.recipeCard} ${isAdded ? styles.added : ''}`}
                       onClick={() => this.addToPlan(recipe)}
                     >
-                      <View className='recipe-image-container'>
+                      <View className={styles.recipeImageContainer}>
                         <Image
-                          className='recipe-image single'
+                          className={`${styles.recipeImage} ${styles.single}`}
                           src={recipe.coverImage || recipe.imageUrl || 'https://via.placeholder.com/300x200/f0f0f0/999?text=Recipe'}
                           mode='aspectFill'
                         />
                         {isAdded && (
-                          <View className='added-overlay'>
-                            <Text className='added-text'>✓ 已添加</Text>
+                          <View className={styles.addedOverlay}>
+                            <Text className={styles.addedText}>✓ 已添加</Text>
                           </View>
                         )}
                       </View>
 
-                      <View className='recipe-content'>
-                        <Text className='recipe-title'>{recipe.title}</Text>
-                        <Text className='recipe-count'>{recipe.cookingTime ? `${recipe.cookingTime}分钟` : '未知时间'}</Text>
+                      <View className={styles.recipeFooter}>
+                        <Text className={styles.recipeTitle}>{recipe.title}</Text>
+                        <Text className={styles.recipeCount}>{recipe.cookingTime ? `${recipe.cookingTime}分钟` : '未知时间'}</Text>
                       </View>
                     </View>
                   )
@@ -273,23 +273,23 @@ export default class RecipeList extends Component<{}, State> {
               </View>
 
               {loadingMore && (
-                <View className='loading-more'>
-                  <Text className='loading-more-text'>加载更多...</Text>
+                <View className={styles.loadingMore}>
+                  <Text className={styles.loadingMoreText}>加载更多...</Text>
                 </View>
               )}
 
               {!hasMore && filteredRecipes.length > 0 && (
-                <View className='no-more'>
-                  <Text className='no-more-text'>没有更多菜谱了</Text>
+                <View className={styles.noMore}>
+                  <Text className={styles.noMoreText}>没有更多菜谱了</Text>
                 </View>
               )}
             </ScrollView>
           )}
 
           {planId && (
-            <View className='done-section'>
+            <View className={styles.doneSection}>
               <Button
-                className='done-btn'
+                className={styles.doneBtn}
                 onClick={() => {
                   Taro.switchTab({
                     url: '/pages/meal-plan/index'

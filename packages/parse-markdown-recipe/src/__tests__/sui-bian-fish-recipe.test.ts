@@ -177,7 +177,7 @@ describe('Sui Bian Fish Recipe Parsing', () => {
     it('should parse ingredients with notes correctly', async () => {
       const parser = await parseMarkdownRecipe(suiBianFishRecipeMarkdown);
       const recipe = parser.toJson();
-      console.log('recipe', recipe);
+      console.log('recipe', JSON.stringify(recipe, null, 2));
       
       // Check main ingredient with note
       const mainIngredient = recipe.ingredients.main.find(ing => ing.name === '带鱼');

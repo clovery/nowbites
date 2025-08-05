@@ -1,6 +1,4 @@
-import { Recipe, Step, Tip } from './types';
-import { parseIngredients } from './ingredients-parser';
-import { parseSauce } from './sauce-parser';
+import { Recipe } from './types';
 
 // Re-export the parsing functions for backward compatibility
 export { parseIngredients } from './ingredients-parser';
