@@ -1,4 +1,4 @@
-.recipe-detail {
+.recipeDetail {
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -43,14 +43,14 @@
   display: block;
 }
 
-.meta-info {
+.metaInfo {
   display: flex;
   flex-wrap: wrap;
   gap: 24rpx;
   margin-bottom: 24rpx;
 }
 
-.meta-item {
+.metaItem {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -58,13 +58,13 @@
   min-width: 120rpx;
 }
 
-.meta-label {
+.metaLabel {
   font-size: 24rpx;
   color: #999;
   margin-bottom: 8rpx;
 }
 
-.meta-value {
+.metaValue {
   font-size: 28rpx;
   font-weight: bold;
   color: #333;
@@ -92,7 +92,7 @@
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
 }
 
-.section-title {
+.sectionTitle {
   font-size: 36rpx;
   font-weight: bold;
   color: #333;
@@ -106,15 +106,15 @@
   gap: 16rpx;
 }
 
-.ingredient-group {
+.ingredientGroup {
   margin-bottom: 32rpx;
 }
 
-.ingredient-group:last-child {
+.ingredientGroup:last-child {
   margin-bottom: 0;
 }
 
-.ingredient-group-title {
+.ingredientGroupTitle {
   font-size: 28rpx;
   font-weight: bold;
   color: #333;
@@ -124,21 +124,42 @@
   border-bottom: 2rpx solid #f0f0f0;
 }
 
-.ingredient-item {
+.ingredientItem {
   display: flex;
   align-items: center;
   padding: 16rpx 0;
   border-bottom: 1rpx solid #f0f0f0;
 }
 
-.ingredient-item:last-child {
+.ingredientItem:last-child {
   border-bottom: none;
 }
 
-.ingredient-text {
+.ingredientText {
   font-size: 32rpx;
   color: #333;
   line-height: 1.5;
+}
+
+.sauceTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.sauceTag {
+  background: linear-gradient(135deg, #ff9a56 0%, #ff6b35 100%);
+  color: white;
+  padding: 12rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(255, 107, 53, 0.3);
+}
+
+.sauceTagText {
+  font-size: 24rpx;
+  color: white;
+  font-weight: 500;
 }
 
 .steps {
@@ -147,13 +168,13 @@
   gap: 24rpx;
 }
 
-.step-item {
+.stepItem {
   display: flex;
   align-items: flex-start;
   gap: 24rpx;
 }
 
-.step-number {
+.stepNumber {
   width: 48rpx;
   height: 48rpx;
   background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
@@ -168,11 +189,26 @@
   margin-top: 8rpx;
 }
 
-.step-text {
+.stepContent {
+}
+
+.stepTitle {
+}
+
+.stepTime {
+}
+
+.stepText {
   font-size: 32rpx;
   color: #333;
   line-height: 1.6;
   flex: 1;
+}
+
+.tips {
+}
+
+.tipText {
 }
 
 .actions {
@@ -181,4 +217,13 @@
   padding: 32rpx;
   background: white;
   box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.actionBtn {
+}
+
+.primary {
+}
+
+.secondary {
 }
