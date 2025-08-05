@@ -103,5 +103,130 @@ describe('Ingredients Parser', () => {
         unit: ''
       });
     });
+
+    it('should handle ingredients with descriptive amounts', () => {
+      const mainIngredients = `
+- 水（用于泡淀粉）
+- 色拉油（炸肉使用）
+- 豆油（少量，调香）
+`;
+
+      const result = parseIngredients(mainIngredients, '');
+
+      expect(result.main[0]).toEqual({
+        name: '水',
+        amount: '用于泡淀粉',
+        unit: '',
+        note: undefined
+      });
+
+      expect(result.main[1]).toEqual({
+        name: '色拉油',
+        amount: '炸肉使用',
+        unit: '',
+        note: undefined
+      });
+
+      expect(result.main[2]).toEqual({
+        name: '豆油',
+        amount: '少量，调香',
+        unit: '',
+        note: undefined
+      });
+    });
+
+    it('should handle ingredients with range amounts', () => {
+      const mainIngredients = `
+- 白糖 50–60g
+- 米醋 3–5g
+`;
+
+      const result = parseIngredients(mainIngredients, '');
+
+      expect(result.main[0]).toEqual({
+        name: '白糖',
+        amount: '50–60',
+        unit: 'g'
+      });
+
+      expect(result.main[1]).toEqual({
+        name: '米醋',
+        amount: '3–5',
+        unit: 'g'
+      });
+    });
+
+    it('should handle ingredients with only name', () => {
+      const mainIngredients = `
+- 葱丝
+- 香菜
+- 姜丝
+- 胡萝卜丝
+- 蒜片
+`;
+
+      const result = parseIngredients(mainIngredients, '');
+
+      expect(result.main[0]).toEqual({
+        name: '葱丝',
+        amount: '',
+        unit: ''
+      });
+
+      expect(result.main[1]).toEqual({
+        name: '香菜',
+        amount: '',
+        unit: ''
+      });
+
+      expect(result.main[2]).toEqual({
+        name: '姜丝',
+        amount: '',
+        unit: ''
+      });
+
+      expect(result.main[3]).toEqual({
+        name: '胡萝卜丝',
+        amount: '',
+        unit: ''
+      });
+
+      expect(result.main[4]).toEqual({
+        name: '蒜片',
+        amount: '',
+        unit: ''
+      });
+    });
+
+    it('should handle ingredients with complex notes', () => {
+      const mainIngredients = `
+- 盐（腌肉 3–5g + 调汁 2g）
+- 胡椒粉（适量）
+- 黄酒（适量）
+`;
+
+      const result = parseIngredients(mainIngredients, '');
+
+      expect(result.main[0]).toEqual({
+        name: '盐',
+        amount: '腌肉 3–5g + 调汁 2g',
+        unit: '',
+        note: undefined
+      });
+
+      expect(result.main[1]).toEqual({
+        name: '胡椒粉',
+        amount: '适量',
+        unit: '',
+        note: undefined
+      });
+
+      expect(result.main[2]).toEqual({
+        name: '黄酒',
+        amount: '适量',
+        unit: '',
+        note: undefined
+      });
+    });
   });
 }); 

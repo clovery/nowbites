@@ -55,10 +55,12 @@
     "@tarojs/shared": "4.1.4",
     "@tarojs/taro": "4.1.4",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "taro-ui": "^3.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.8.0",
+    "@babel/plugin-proposal-decorators": "^7.28.0",
     "@babel/preset-react": "^7.22.0",
     "@tarojs/cli": "4.1.4",
     "@tarojs/vite-runner": "4.1.4",

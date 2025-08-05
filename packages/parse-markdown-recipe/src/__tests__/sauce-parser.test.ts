@@ -134,5 +134,82 @@ Some other text
         unit: ''
       });
     });
+
+    it('should handle sauce with descriptive amounts', () => {
+      const sauceContent = `
+- 盐（腌肉 3–5g + 调汁 2g）
+- 胡椒粉（适量）
+- 黄酒（适量）
+`;
+
+      const result = parseSauce(sauceContent);
+
+      expect(result[0]).toEqual({
+        name: '盐',
+        amount: '腌肉 3–5g + 调汁 2g',
+        unit: ''
+      });
+
+      expect(result[1]).toEqual({
+        name: '胡椒粉',
+        amount: '适量',
+        unit: ''
+      });
+
+      expect(result[2]).toEqual({
+        name: '黄酒',
+        amount: '适量',
+        unit: ''
+      });
+    });
+
+    it('should handle sauce with range amounts', () => {
+      const sauceContent = `
+- 白糖 50–60g
+- 米醋 3–5g
+`;
+
+      const result = parseSauce(sauceContent);
+
+      expect(result[0]).toEqual({
+        name: '白糖',
+        amount: '50–60',
+        unit: 'g'
+      });
+
+      expect(result[1]).toEqual({
+        name: '米醋',
+        amount: '3–5',
+        unit: 'g'
+      });
+    });
+
+    it('should handle sauce with only name', () => {
+      const sauceContent = `
+- 葱丝
+- 香菜
+- 姜丝
+`;
+
+      const result = parseSauce(sauceContent);
+
+      expect(result[0]).toEqual({
+        name: '葱丝',
+        amount: '',
+        unit: ''
+      });
+
+      expect(result[1]).toEqual({
+        name: '香菜',
+        amount: '',
+        unit: ''
+      });
+
+      expect(result[2]).toEqual({
+        name: '姜丝',
+        amount: '',
+        unit: ''
+      });
+    });
   });
 }); 

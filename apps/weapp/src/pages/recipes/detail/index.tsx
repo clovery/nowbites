@@ -1,102 +1,104 @@
-import { Component } from "react"
-import { View, Text, ScrollView, Button } from "@tarojs/components"
-import Taro from "@tarojs/taro"
-import { apiService, Recipe } from "../../../utils/api"
-import styles from "./index.module.scss"
+import { Component } from "react";
+import { View, Text, ScrollView, Button } from "@tarojs/components";
+import { AtTag } from "taro-ui";
+import Taro from "@tarojs/taro";
+
+import { apiService, Recipe } from "../../../utils/api";
+import styles from "./index.module.scss";
 
 interface State {
-  recipe: Recipe | null
-  loading: boolean
-  error: string | null
+  recipe: Recipe | null;
+  loading: boolean;
+  error: string | null;
 }
 
 export default class RecipeDetail extends Component<{}, State> {
   constructor(props: any) {
-    super(props)
+    super(props);
     this.state = {
       recipe: null,
       loading: true,
       error: null,
-    }
+    };
   }
 
   componentDidMount() {
-    const params = Taro.getCurrentInstance().router?.params
-    const id = params?.id
+    const params = Taro.getCurrentInstance().router?.params;
+    const id = params?.id;
     if (id) {
-      this.loadRecipe(id)
+      this.loadRecipe(id);
     } else {
       Taro.showToast({
         title: "参数错误",
         icon: "error",
-      })
-      Taro.navigateBack()
+      });
+      Taro.navigateBack();
     }
   }
 
   loadRecipe = async (id: string) => {
     try {
-      this.setState({ loading: true, error: null })
+      this.setState({ loading: true, error: null });
 
-      const recipe = await apiService.getRecipe(id)
+      const recipe = await apiService.getRecipe(id);
 
       this.setState({
         recipe,
         loading: false,
-      })
+      });
 
       Taro.setNavigationBarTitle({
         title: recipe.title,
-      })
+      });
     } catch (error) {
-      console.error("Failed to load recipe:", error)
+      console.error("Failed to load recipe:", error);
       this.setState({
         loading: false,
         error: "加载菜谱失败",
-      })
+      });
 
       Taro.showToast({
         title: "加载失败",
         icon: "error",
-      })
+      });
     }
-  }
+  };
 
   addToMealPlan = () => {
-    const { recipe } = this.state
-    if (!recipe) return
+    const { recipe } = this.state;
+    if (!recipe) return;
 
     Taro.showActionSheet({
       itemList: ["今天", "明天", "后天", "选择其他日期"],
       success: (res) => {
-        let targetDate = new Date()
+        let targetDate = new Date();
 
         switch (res.tapIndex) {
           case 0:
             // 今天
-            break
+            break;
           case 1:
             // 明天
-            targetDate.setDate(targetDate.getDate() + 1)
-            break
+            targetDate.setDate(targetDate.getDate() + 1);
+            break;
           case 2:
             // 后天
-            targetDate.setDate(targetDate.getDate() + 2)
-            break
+            targetDate.setDate(targetDate.getDate() + 2);
+            break;
           case 3:
             // 选择其他日期
-            this.showDatePicker()
-            return
+            this.showDatePicker();
+            return;
         }
 
-        this.saveMealPlan(recipe, targetDate)
+        this.saveMealPlan(recipe, targetDate);
       },
-    })
-  }
+    });
+  };
 
   showDatePicker = () => {
-    const { recipe } = this.state
-    if (!recipe) return
+    const { recipe } = this.state;
+    if (!recipe) return;
 
     Taro.showModal({
       title: "选择日期",
@@ -106,140 +108,132 @@ export default class RecipeDetail extends Component<{}, State> {
         if (res.confirm) {
           Taro.switchTab({
             url: "/pages/meal-plan/index",
-          })
+          });
         }
       },
-    })
-  }
+    });
+  };
 
   saveMealPlan = (recipe: Recipe, date: Date) => {
-    const dateStr = date.toISOString().split("T")[0]
-    const mealPlans = Taro.getStorageSync("mealPlans") || {}
+    const dateStr = date.toISOString().split("T")[0];
+    const mealPlans = Taro.getStorageSync("mealPlans") || {};
 
     console.log("添加菜谱到计划:", {
       recipe: recipe.title,
       date: dateStr,
       existingPlans: mealPlans,
-    })
+    });
 
     if (!mealPlans[dateStr]) {
-      mealPlans[dateStr] = []
+      mealPlans[dateStr] = [];
     }
 
     // 检查是否已经添加过
-    const exists = mealPlans[dateStr].some((plan: any) => plan.id === recipe.id)
+    const exists = mealPlans[dateStr].some(
+      (plan: any) => plan.id === recipe.id
+    );
     if (exists) {
       Taro.showToast({
         title: "该菜谱已在计划中",
         icon: "none",
-      })
-      return
+      });
+      return;
     }
 
     mealPlans[dateStr].push({
       id: recipe.id,
       title: recipe.title,
       cookTime: recipe.cookingTime || 0,
-    })
+    });
 
-    Taro.setStorageSync("mealPlans", mealPlans)
+    Taro.setStorageSync("mealPlans", mealPlans);
 
-    console.log("保存后的用餐计划:", mealPlans)
+    console.log("保存后的用餐计划:", mealPlans);
 
     Taro.showToast({
       title: "已添加到用餐计划",
       icon: "success",
-    })
-  }
+    });
+  };
 
   shareRecipe = () => {
-    const { recipe } = this.state
-    if (!recipe) return
+    const { recipe } = this.state;
+    if (!recipe) return;
 
     Taro.showShareMenu({
       withShareTicket: true,
-    })
-  }
+    });
+  };
 
   // 处理食材显示
   renderIngredient = (ingredient: any) => {
     if (typeof ingredient === "string") {
-      return ingredient
+      return ingredient;
     }
 
     if (ingredient && typeof ingredient === "object") {
-      const { name, amount, unit, note } = ingredient
+      const { name, amount, unit, note } = ingredient;
       if (name && amount) {
-        let text = `${name} ${amount}${unit || ""}`
+        let text = `${name} ${amount}${unit || ""}`;
         if (note) {
-          text += ` (${note})`
+          text += ` (${note})`;
         }
-        return text
+        return <AtTag type="primary">{text}</AtTag>;
       }
-      return name || "未知食材"
+      return name || "未知食材";
     }
 
-    return "未知食材"
-  }
+    return <AtTag type="primary">未知食材</AtTag>;
+  };
 
   // 处理主要食材
   renderMainIngredients = (ingredients: any) => {
-    if (!ingredients || !Array.isArray(ingredients)) return null
+    if (!ingredients || !Array.isArray(ingredients)) return null;
 
     return (
       <View className={styles.ingredientGroup}>
         <Text className={styles.ingredientGroupTitle}>主要食材</Text>
-        {ingredients.map((ingredient, index) => (
-          <View key={index} className={styles.ingredientItem}>
-            <Text className={styles.ingredientText}>
-              {this.renderIngredient(ingredient)}
-            </Text>
-          </View>
-        ))}
+        <View className={styles.ingredientTags}>
+          {ingredients.map((ingredient, index) =>
+            this.renderIngredient(ingredient)
+          )}
+        </View>
       </View>
-    )
-  }
+    );
+  };
 
   // 处理辅助食材
   renderAuxiliaryIngredients = (ingredients: any) => {
-    if (!ingredients || !Array.isArray(ingredients)) return null
+    if (!ingredients || !Array.isArray(ingredients)) return null;
 
     return (
       <View className={styles.ingredientGroup}>
         <Text className={styles.ingredientGroupTitle}>辅助食材</Text>
-        {ingredients.map((ingredient, index) => (
-          <View key={index} className={styles.ingredientItem}>
-            <Text className={styles.ingredientText}>
-              {this.renderIngredient(ingredient)}
-            </Text>
-          </View>
-        ))}
+        <View className={styles.ingredientTags}>
+          {ingredients.map((ingredient, index) =>
+            this.renderIngredient(ingredient)
+          )}
+        </View>
       </View>
-    )
-  }
+    );
+  };
 
   renderSauce = (sauce: any) => {
-    if (!sauce || !Array.isArray(sauce)) return null
+    if (!sauce || !Array.isArray(sauce)) return null;
 
     return (
       <View className={styles.ingredientGroup}>
         <Text className={styles.ingredientGroupTitle}>调料</Text>
         <View className={styles.sauceTags}>
-          {sauce.map((ingredient, index) => (
-            <View key={index} className={styles.sauceTag}>
-              <Text className={styles.sauceTagText}>
-                {this.renderIngredient(ingredient)}
-              </Text>
-            </View>
-          ))}
+          {sauce.map((ingredient, index) => this.renderIngredient(ingredient))}
         </View>
       </View>
-    )
-  }
+    );
+  };
 
   // 处理食材清单显示
   renderIngredients = (ingredients: any) => {
-    if (!ingredients) return null
+    if (!ingredients) return null;
 
     // 如果是新的结构化格式
     if (ingredients.main || ingredients.auxiliary || ingredients.sauce) {
@@ -248,34 +242,32 @@ export default class RecipeDetail extends Component<{}, State> {
           {this.renderMainIngredients(ingredients.main)}
           {this.renderAuxiliaryIngredients(ingredients.auxiliary)}
         </View>
-      )
+      );
     }
 
     // 如果是旧的数组格式
     if (Array.isArray(ingredients)) {
       return (
         <View className={styles.ingredients}>
-          {ingredients.map((ingredient, index) => (
-            <View key={index} className={styles.ingredientItem}>
-              <Text className={styles.ingredientText}>
-                {this.renderIngredient(ingredient)}
-              </Text>
-            </View>
-          ))}
+          <View className={styles.ingredientTags}>
+            {ingredients.map((ingredient, index) =>
+              this.renderIngredient(ingredient)
+            )}
+          </View>
         </View>
-      )
+      );
     }
 
-    return null
-  }
+    return null;
+  };
 
   // 处理步骤显示
   renderStep = (step: any, index: number) => {
-    if (!step) return null
+    if (!step) return null;
 
-    const title = step.title || `步骤 ${index + 1}`
-    const time = step.time || 0
-    const content = step.content || []
+    const title = step.title || `步骤 ${index + 1}`;
+    const time = step.time || 0;
+    const content = step.content || [];
 
     return (
       <View key={index} className={styles.stepItem}>
@@ -294,8 +286,8 @@ export default class RecipeDetail extends Component<{}, State> {
           )}
         </View>
       </View>
-    )
-  }
+    );
+  };
 
   // 处理小贴士显示
   renderTip = (tip: any, index: number) => {
@@ -306,7 +298,7 @@ export default class RecipeDetail extends Component<{}, State> {
             • {tip}
           </Text>
         </View>
-      )
+      );
     }
 
     if (tip && typeof tip === "object" && tip.content) {
@@ -316,21 +308,21 @@ export default class RecipeDetail extends Component<{}, State> {
             • {tip.content}
           </Text>
         </View>
-      )
+      );
     }
 
-    return null
-  }
+    return null;
+  };
 
   render() {
-    const { recipe, loading, error } = this.state
+    const { recipe, loading, error } = this.state;
 
     if (loading) {
       return (
         <View className={styles.loading}>
           <Text>加载中...</Text>
         </View>
-      )
+      );
     }
 
     if (error || !recipe) {
@@ -338,7 +330,7 @@ export default class RecipeDetail extends Component<{}, State> {
         <View className={styles.error}>
           <Text>{error || "菜谱不存在"}</Text>
         </View>
-      )
+      );
     }
 
     return (
@@ -352,7 +344,9 @@ export default class RecipeDetail extends Component<{}, State> {
               {recipe.cookingTime && (
                 <View className={styles.metaItem}>
                   <Text className={styles.metaLabel}>⏱ 烹饪时间</Text>
-                  <Text className={styles.metaValue}>{recipe.cookingTime}分钟</Text>
+                  <Text className={styles.metaValue}>
+                    {recipe.cookingTime}分钟
+                  </Text>
                 </View>
               )}
               {recipe.difficulty && (
@@ -364,7 +358,9 @@ export default class RecipeDetail extends Component<{}, State> {
               {recipe.servings && (
                 <View className={styles.metaItem}>
                   <Text className={styles.metaLabel}>👥 份量</Text>
-                  <Text className={styles.metaValue}>{recipe.servings}人份</Text>
+                  <Text className={styles.metaValue}>
+                    {recipe.servings}人份
+                  </Text>
                 </View>
               )}
             </View>
@@ -406,14 +402,20 @@ export default class RecipeDetail extends Component<{}, State> {
         </ScrollView>
 
         <View className={styles.actions}>
-          <Button className={`${styles.actionBtn} ${styles.secondary}`} onClick={this.shareRecipe}>
+          <Button
+            className={`${styles.actionBtn} ${styles.secondary}`}
+            onClick={this.shareRecipe}
+          >
             分享菜谱
           </Button>
-          <Button className={`${styles.actionBtn} ${styles.primary}`} onClick={this.addToMealPlan}>
+          <Button
+            className={`${styles.actionBtn} ${styles.primary}`}
+            onClick={this.addToMealPlan}
+          >
             加入计划
           </Button>
         </View>
       </View>
-    )
+    );
   }
 }
