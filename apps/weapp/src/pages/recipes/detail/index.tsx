@@ -405,11 +405,11 @@ export default class RecipeDetail extends Component<{}, State> {
           )}
         </ScrollView>
 
-        <View className="actions">
-          <Button className="action-btn secondary" onClick={this.shareRecipe}>
+        <View className={styles.actions}>
+          <Button className={`${styles.actionBtn} ${styles.secondary}`} onClick={this.shareRecipe}>
             分享菜谱
           </Button>
-          <Button className="action-btn primary" onClick={this.addToMealPlan}>
+          <Button className={`${styles.actionBtn} ${styles.primary}`} onClick={this.addToMealPlan}>
             加入计划
           </Button>
         </View>
