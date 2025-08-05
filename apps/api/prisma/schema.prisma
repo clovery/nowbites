@@ -28,6 +28,7 @@ model User {
 
   // Relations
   recipes Recipe[]
+  plans    Plan[]
 
   @@map("users")
 }
@@ -53,6 +54,42 @@ model Recipe {
   // Relations
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mealPlanItems MealPlanItem[]
 
   @@map("recipes")
+}
+
+model Plan {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  date        DateTime // 关联的日期
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mealPlanItems MealPlanItem[]
+
+  @@map("plans")
+}
+
+model MealPlanItem {
+  id        String   @id @default(cuid())
+  title     String
+  cookTime  String   // 烹饪时间，如 "45分钟"
+  completed Boolean  @default(false)
+  order     Int      // 在计划中的顺序
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  planId String
+  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Cascade)
+  
+  recipeId String?
+  recipe   Recipe? @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+
+  @@map("meal_plan_items")
 }

@@ -17,7 +17,7 @@ export default class Index extends Component {
 
   navigateToRecipeList = () => {
     Taro.switchTab({
-      url: '/pages/recipe-list/index'
+      url: '/pages/recipes/index'
     })
   }
 

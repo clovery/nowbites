@@ -8,6 +8,7 @@ import swaggerUi from '@fastify/swagger-ui';
 // 导入路由和插件
 import authRoutes from './resources/auth/index.js';
 import recipeRoutes from './resources/recipe/index.js';
+import mealPlanRoutes from './resources/meal-plan/index.js';
 import authPlugin from './plugins/auth.js';
 import prismaPlugin from './plugins/prisma.js';
 
@@ -71,6 +72,7 @@ async function registerRoutes() {
   });
   server.register(authRoutes, { prefix: '/api/auth' });
   server.register(recipeRoutes, { prefix: '/api/recipes' });
+  server.register(mealPlanRoutes, { prefix: '/api/meal-plans' });
 }
 
 // 启动服务器

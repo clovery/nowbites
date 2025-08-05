@@ -3,9 +3,10 @@
   "ingredients": {
     "main": [
       {
-        "name": "带鱼 500g",
-        "amount": "新鲜或冻带鱼，不能有臭味",
-        "unit": ""
+        "name": "带鱼",
+        "amount": "500",
+        "unit": "g",
+        "note": "新鲜或冻带鱼，不能有臭味"
       }
     ],
     "auxiliary": [

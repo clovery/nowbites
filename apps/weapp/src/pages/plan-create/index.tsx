@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import { View, Text, Input, Button, ScrollView, Picker } from '@tarojs/components'
 import Taro from '@tarojs/taro'
+import { apiService } from '../../utils/api'
 import './index.scss'
 
 interface Plan {
@@ -67,7 +68,7 @@ export default class PlanCreate extends Component<{}, State> {
     })
   }
 
-  createPlan = () => {
+  createPlan = async () => {
     const { planName, planDescription, selectedDate } = this.state
     
     if (!planName.trim()) {
@@ -81,32 +82,12 @@ export default class PlanCreate extends Component<{}, State> {
     this.setState({ loading: true })
 
     try {
-      const plans = Taro.getStorageSync('plans') || []
-      
-      // 检查同一日期是否已有同名计划
-      const existingPlan = plans.find((plan: Plan) => 
-        plan.name === planName.trim() && plan.date === selectedDate
-      )
-      if (existingPlan) {
-        Taro.showToast({
-          title: '该日期已有同名计划',
-          icon: 'none'
-        })
-        this.setState({ loading: false })
-        return
-      }
-
-      const newPlan: Plan = {
-        id: Date.now().toString(),
+      // 调用API创建计划
+      const newPlan = await apiService.createPlan({
         name: planName.trim(),
         description: planDescription.trim(),
-        date: selectedDate,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-
-      plans.push(newPlan)
-      Taro.setStorageSync('plans', plans)
+        date: selectedDate
+      })
 
       Taro.showToast({
         title: '创建成功',
@@ -124,8 +105,9 @@ export default class PlanCreate extends Component<{}, State> {
       }, 1500)
 
     } catch (error) {
+      console.error('创建计划失败:', error)
       Taro.showToast({
-        title: '创建失败',
+        title: error instanceof Error ? error.message : '创建失败',
         icon: 'error'
       })
     } finally {

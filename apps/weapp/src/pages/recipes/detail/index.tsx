@@ -166,9 +166,9 @@ export default class RecipeDetail extends Component<{}, State> {
   };
 
   // 处理食材显示
-  renderIngredient = (ingredient: any) => {
+  renderIngredient = (ingredient: any, index: number) => {
     if (typeof ingredient === "string") {
-      return ingredient;
+      return <AtTag key={index} type="primary">{ingredient}</AtTag>;
     }
 
     if (ingredient && typeof ingredient === "object") {
@@ -178,12 +178,12 @@ export default class RecipeDetail extends Component<{}, State> {
         if (note) {
           text += ` (${note})`;
         }
-        return <AtTag type="primary">{text}</AtTag>;
+        return <AtTag key={index} type="primary">{text}</AtTag>;
       }
-      return name || "未知食材";
+      return <AtTag key={index} type="primary">{name || "未知食材"}</AtTag>;
     }
 
-    return <AtTag type="primary">未知食材</AtTag>;
+    return <AtTag key={index} type="primary">未知食材</AtTag>;
   };
 
   // 处理主要食材
@@ -195,7 +195,7 @@ export default class RecipeDetail extends Component<{}, State> {
         <Text className={styles.ingredientGroupTitle}>主要食材</Text>
         <View className={styles.ingredientTags}>
           {ingredients.map((ingredient, index) =>
-            this.renderIngredient(ingredient)
+            this.renderIngredient(ingredient, index)
           )}
         </View>
       </View>
@@ -211,7 +211,7 @@ export default class RecipeDetail extends Component<{}, State> {
         <Text className={styles.ingredientGroupTitle}>辅助食材</Text>
         <View className={styles.ingredientTags}>
           {ingredients.map((ingredient, index) =>
-            this.renderIngredient(ingredient)
+            this.renderIngredient(ingredient, index)
           )}
         </View>
       </View>
@@ -225,7 +225,7 @@ export default class RecipeDetail extends Component<{}, State> {
       <View className={styles.ingredientGroup}>
         <Text className={styles.ingredientGroupTitle}>调料</Text>
         <View className={styles.sauceTags}>
-          {sauce.map((ingredient, index) => this.renderIngredient(ingredient))}
+          {sauce.map((ingredient, index) => this.renderIngredient(ingredient, index))}
         </View>
       </View>
     );
@@ -251,7 +251,7 @@ export default class RecipeDetail extends Component<{}, State> {
         <View className={styles.ingredients}>
           <View className={styles.ingredientTags}>
             {ingredients.map((ingredient, index) =>
-              this.renderIngredient(ingredient)
+              this.renderIngredient(ingredient, index)
             )}
           </View>
         </View>

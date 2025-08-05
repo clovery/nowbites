@@ -275,6 +275,7 @@
   flex-wrap: wrap;
   gap: 12rpx;
   margin-top: 6rpx;
+  align-items: flex-start;
 }
 
 .sauceTag {
@@ -486,4 +487,36 @@
 .secondary:hover {
   transform: translateY(-2rpx);
   box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.4);
+}
+
+// Custom styles for AtTag components to handle text wrapping
+:global(.at-tag) {
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+  line-height: 1.4;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+:global(.at-tag--primary) {
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+  line-height: 1.4;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+:global(.at-tag__text) {
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+  line-height: 1.4;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  display: inline-block;
 }

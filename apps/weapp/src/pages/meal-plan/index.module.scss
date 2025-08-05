@@ -1,4 +1,4 @@
-.meal-plan {
+.mealPlan {
   background-color: #f5f5f5;
   min-height: 100vh;
 }
@@ -23,46 +23,55 @@
   display: block;
 }
 
-.date-selector {
+.dateSelector {
   background: white;
   padding: 24rpx 0;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
 }
 
-.date-scroll {
+.dateScroll {
   white-space: nowrap;
+  padding: 0 16px;
 }
 
-.date-item {
+.dateItem {
   display: inline-block;
   padding: 20rpx 32rpx;
   margin: 0 8rpx;
-  border-radius: 50rpx;
+  padding: 8px 16px;
+  margin-right: 8px;
+  background: white;
+  border-radius: 20px;
   text-align: center;
   position: relative;
   transition: all 0.2s ease;
+  border: 1rpx solid #e0e0e0;
+  min-width: 60px;
 }
 
-.date-item.active {
-  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+.dateItem:last-child {
+  margin-right: 16px;
 }
 
-.date-item.today {
-  border: 2rpx solid #4ecdc4;
-}
-
-.date-text {
+.dateText {
   font-size: 28rpx;
   color: #333;
   white-space: nowrap;
 }
 
-.date-item.active .date-text {
+.dateItem.active .dateText {
   color: white;
-  font-weight: bold;
 }
 
-.meal-count {
+.dateItem.active {
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+}
+
+.dateItem.today {
+  border: 1rpx solid #4ecdc4;
+}
+
+.mealCount {
   position: absolute;
   top: -8rpx;
   right: -8rpx;
@@ -78,15 +87,15 @@
   font-weight: bold;
 }
 
-.plan-content {
+.planContent {
   padding: 32rpx;
 }
 
-.plan-header {
+.planHeader {
   margin-bottom: 32rpx;
 }
 
-.plan-title {
+.planTitle {
   font-size: 40rpx;
   font-weight: bold;
   color: #333;
@@ -94,19 +103,21 @@
   display: block;
 }
 
-.plan-stats {
+.planStats {
+  font-size: 24rpx;
+  color: #2e7d32;
   background: #e8f5e8;
-  padding: 16rpx 24rpx;
-  border-radius: 24rpx;
+  padding: 12rpx 20rpx;
+  border-radius: 16rpx;
   display: inline-block;
 }
 
-.stats-text {
+.statsText {
   font-size: 24rpx;
   color: #2e7d32;
 }
 
-.empty-plan {
+.emptyPlan {
   background: white;
   border-radius: 24rpx;
   padding: 80rpx 40rpx;
@@ -114,12 +125,12 @@
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
 }
 
-.empty-icon {
+.emptyIcon {
   font-size: 120rpx;
   margin-bottom: 32rpx;
 }
 
-.empty-title {
+.emptyTitle {
   font-size: 36rpx;
   font-weight: bold;
   color: #333;
@@ -127,14 +138,14 @@
   display: block;
 }
 
-.empty-desc {
+.emptyDesc {
   font-size: 28rpx;
   color: #666;
   margin-bottom: 48rpx;
   display: block;
 }
 
-.add-btn {
+.addBtn {
   background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
   color: white;
   border: none;
@@ -144,14 +155,28 @@
   font-weight: bold;
 }
 
-.add-btn::after {
+.addBtn::after {
   border: none;
 }
 
-.meal-list {
+.loadingState {
+  background: white;
+  border-radius: 24rpx;
+  padding: 80rpx 40rpx;
+  text-align: center;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
 }
 
-.meal-item {
+.loadingText {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.mealList {
+  padding: 0 32rpx 32rpx;
+}
+
+.mealItem {
   background: white;
   border-radius: 24rpx;
   padding: 32rpx;
@@ -163,23 +188,23 @@
   transition: all 0.2s ease;
 }
 
-.meal-item.completed {
+.mealItem.completed {
   background: #f8f9fa;
   opacity: 0.7;
 }
 
-.meal-item.completed .meal-title {
+.mealItem.completed .mealTitle {
   text-decoration: line-through;
   color: #999;
 }
 
-.meal-info {
+.mealInfo {
   display: flex;
   align-items: center;
   flex: 1;
 }
 
-.meal-number {
+.mealNumber {
   width: 48rpx;
   height: 48rpx;
   background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
@@ -194,11 +219,11 @@
   flex-shrink: 0;
 }
 
-.meal-details {
+.mealDetails {
   flex: 1;
 }
 
-.meal-title {
+.mealTitle {
   font-size: 32rpx;
   font-weight: bold;
   color: #333;
@@ -206,18 +231,18 @@
   display: block;
 }
 
-.meal-time {
+.mealTime {
   font-size: 24rpx;
   color: #666;
   display: block;
 }
 
-.meal-actions {
+.mealActions {
   display: flex;
   gap: 16rpx;
 }
 
-.action-btn {
+.actionBtn {
   width: 56rpx;
   height: 56rpx;
   border-radius: 50%;
@@ -227,32 +252,32 @@
   transition: all 0.2s ease;
 }
 
-.complete-btn {
+.completeBtn {
   background: #e0e0e0;
   color: #666;
 }
 
-.complete-btn.completed {
+.completeBtn.completed {
   background: #4caf50;
   color: white;
 }
 
-.remove-btn {
+.removeBtn {
   background: #ffebee;
   color: #f44336;
 }
 
-.action-text {
+.actionText {
   font-size: 32rpx;
   font-weight: bold;
 }
 
-.add-more {
+.addMore {
   padding: 32rpx 0;
   text-align: center;
 }
 
-.add-more-btn {
+.addMoreBtn {
   background: #f0f0f0;
   color: #666;
   border: 2rpx dashed #ccc;
@@ -261,12 +286,12 @@
   font-size: 28rpx;
 }
 
-.add-more-btn::after {
+.addMoreBtn::after {
   border: none;
 }
 
 /* 计划列表样式 */
-.plans-section {
+.plansSection {
   margin: 32rpx;
   background: white;
   border-radius: 24rpx;
@@ -274,77 +299,41 @@
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
 }
 
-.plans-header {
+.plansHeader {
   background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
   padding: 24rpx 32rpx;
 }
 
-.plans-title {
+.plansTitle {
   font-size: 32rpx;
   font-weight: bold;
   color: white;
 }
 
-.plans-list {
-  max-height: 400rpx;
+.plansList {
+  max-height: calc(100vh - 400rpx);
 }
 
-.plan-item {
+.planItem {
   padding: 24rpx 32rpx;
   border-bottom: 1rpx solid #f0f0f0;
   transition: background-color 0.2s ease;
 }
 
-.plan-item:last-child {
+.planItem:last-child {
   border-bottom: none;
 }
 
-.plan-item:active {
+.planItem:active {
   background: #f8f9fa;
 }
 
-.plan-info {
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
-}
-
-.plan-name {
-  font-size: 28rpx;
-  font-weight: bold;
-  color: #333;
-}
-
-.plan-description {
-  font-size: 24rpx;
-  color: #666;
-  line-height: 1.4;
-}
-
-.plan-date {
-  font-size: 22rpx;
-  color: #999;
-}
-
-/* 新的计划显示样式 */
-.plans-list {
-  max-height: calc(100vh - 400rpx);
-}
-
-.plan-section {
-  background: white;
-  border-radius: 24rpx;
-  margin-bottom: 24rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
-}
-
-.plan-info {
+.planInfo {
   padding: 32rpx;
   border-bottom: 1rpx solid #f0f0f0;
 }
 
-.plan-name {
+.planName {
   font-size: 36rpx;
   font-weight: bold;
   color: #333;
@@ -352,7 +341,7 @@
   display: block;
 }
 
-.plan-description {
+.planDescription {
   font-size: 26rpx;
   color: #666;
   margin-bottom: 16rpx;
@@ -360,28 +349,33 @@
   line-height: 1.4;
 }
 
-.plan-stats {
-  font-size: 24rpx;
-  color: #2e7d32;
-  background: #e8f5e8;
-  padding: 12rpx 20rpx;
-  border-radius: 16rpx;
-  display: inline-block;
+.planDate {
+  font-size: 22rpx;
+  color: #999;
 }
 
-.empty-meals {
+/* 新的计划显示样式 */
+.planSection {
+  background: white;
+  border-radius: 24rpx;
+  margin-bottom: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.emptyMeals {
   padding: 40rpx;
   text-align: center;
 }
 
-.empty-meals-text {
+.emptyMealsText {
   font-size: 28rpx;
   color: #999;
   margin-bottom: 24rpx;
   display: block;
 }
 
-.add-meal-btn {
+.addMealBtn {
   background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
   color: white;
   border: none;
@@ -391,16 +385,12 @@
   font-weight: bold;
 }
 
-.add-meal-btn::after {
+.addMealBtn::after {
   border: none;
 }
 
-.add-meal-section {
+.addMealSection {
   padding: 24rpx 32rpx;
   border-top: 1rpx solid #f0f0f0;
   text-align: center;
-}
-
-.meal-list {
-  padding: 0 32rpx 32rpx;
-}
+} 

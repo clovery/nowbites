@@ -40,18 +40,18 @@
         "unit": ""
       },
       {
-        "name": "水（用于泡淀粉）",
-        "amount": "",
+        "name": "水",
+        "amount": "用于泡淀粉",
         "unit": ""
       },
       {
-        "name": "色拉油（炸肉使用）",
-        "amount": "",
+        "name": "色拉油",
+        "amount": "炸肉使用",
         "unit": ""
       },
       {
-        "name": "豆油（少量，调香）",
-        "amount": "",
+        "name": "豆油",
+        "amount": "少量，调香",
         "unit": ""
       }
     ]
@@ -63,13 +63,13 @@
       "unit": ""
     },
     {
-      "name": "胡椒粉（适量）",
-      "amount": "",
+      "name": "胡椒粉",
+      "amount": "适量",
       "unit": ""
     },
     {
-      "name": "黄酒（适量）",
-      "amount": "",
+      "name": "黄酒",
+      "amount": "适量",
       "unit": ""
     },
     {

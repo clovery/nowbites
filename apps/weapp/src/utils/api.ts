@@ -105,6 +105,45 @@ interface RecipeListResponse {
   }
 }
 
+interface Plan {
+  id: string
+  name: string
+  description?: string
+  date: string
+  createdAt: string
+  updatedAt: string
+  mealPlanItems: Array<{
+    id: string
+    title: string
+    cookTime: string
+    completed: boolean
+    order: number
+    recipeId?: string
+    recipe?: {
+      id: string
+      title: string
+      coverImage?: string
+      cookingTime?: number
+    }
+  }>
+}
+
+interface PlanListResponse {
+  plans: Plan[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    pages: number
+  }
+}
+
+interface CreatePlanRequest {
+  name: string
+  description?: string
+  date: string
+}
+
 class ApiService {
   public baseUrl: string
 
@@ -239,7 +278,79 @@ class ApiService {
 
     return response.data
   }
+
+  // 获取计划列表
+  async getPlans(params?: {
+    page?: number
+    limit?: number
+    date?: string
+  }): Promise<PlanListResponse> {
+    const queryParams = new URLSearchParams()
+
+    if (params?.page) queryParams.append("page", params.page.toString())
+    if (params?.limit) queryParams.append("limit", params.limit.toString())
+    if (params?.date) queryParams.append("date", params.date)
+
+    const url = `/api/meal-plans${queryParams.toString() ? `?${queryParams.toString()}` : ""}`
+    const response = await this.request<PlanListResponse>(url)
+
+    if (response.statusCode !== 200) {
+      throw new Error("获取计划列表失败")
+    }
+
+    return response.data
+  }
+
+  // 获取单个计划详情
+  async getPlan(id: string): Promise<Plan> {
+    const response = await this.request<Plan>(`/api/meal-plans/${id}`)
+
+    if (response.statusCode !== 200) {
+      throw new Error("获取计划详情失败")
+    }
+
+    return response.data
+  }
+
+  // 创建计划
+  async createPlan(planData: CreatePlanRequest): Promise<Plan> {
+    const response = await this.request<Plan>("/api/meal-plans", {
+      method: "POST",
+      data: planData,
+    })
+
+    if (response.statusCode !== 201) {
+      throw new Error("创建计划失败")
+    }
+
+    return response.data
+  }
+
+  // 更新计划
+  async updatePlan(id: string, planData: Partial<CreatePlanRequest>): Promise<Plan> {
+    const response = await this.request<Plan>(`/api/meal-plans/${id}`, {
+      method: "PUT",
+      data: planData,
+    })
+
+    if (response.statusCode !== 200) {
+      throw new Error("更新计划失败")
+    }
+
+    return response.data
+  }
+
+  // 删除计划
+  async deletePlan(id: string): Promise<void> {
+    const response = await this.request(`/api/meal-plans/${id}`, {
+      method: "DELETE",
+    })
+
+    if (response.statusCode !== 200) {
+      throw new Error("删除计划失败")
+    }
+  }
 }
 
 export const apiService = new ApiService()
-export type { LoginResponse, LoginRequest, Recipe, RecipeListResponse }
+export type { LoginResponse, LoginRequest, Recipe, RecipeListResponse, Plan, PlanListResponse, CreatePlanRequest }

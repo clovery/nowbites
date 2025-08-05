@@ -240,7 +240,7 @@ export default class RecipeUpload extends Component<{}, State> {
       // 跳转到菜谱列表
       setTimeout(() => {
         Taro.switchTab({
-          url: '/pages/recipe-list/index'
+          url: '/pages/recipes/index'
         })
       }, 1500)
       
