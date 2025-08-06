@@ -50,7 +50,7 @@ cp .env.example .env
 pnpm dev
 ```
 
-服务器将在 http://localhost:3100 上运行，API文档可在 http://localhost:3100/documentation 访问。
+服务器将在 http://localhost:3300 上运行，API文档可在 http://localhost:3300/documentation 访问。
 
 ### 数据库设置
 

@@ -53,7 +53,7 @@ async function registerPlugins() {
         description: 'NowBites API documentation',
         version: '1.0.0',
       },
-      host: `${process.env.HOST || 'localhost'}:${process.env.PORT || 3100}`,
+      host: `${process.env.HOST || 'localhost'}:${process.env.PORT || 3300}`,
       schemes: ['http'],
       consumes: ['application/json'],
       produces: ['application/json'],
@@ -81,7 +81,7 @@ async function start() {
     await registerPlugins();
     await registerRoutes();
 
-    const port = parseInt(process.env.PORT || '3100', 10);
+    const port = parseInt(process.env.PORT || '3300', 10);
     const host = process.env.HOST || '0.0.0.0';
 
     await server.listen({ port, host });

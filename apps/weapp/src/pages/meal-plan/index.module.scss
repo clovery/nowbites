@@ -331,6 +331,12 @@
 .planInfo {
   padding: 32rpx;
   border-bottom: 1rpx solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.planInfo:active {
+  background-color: #f8f9fa;
 }
 
 .planName {

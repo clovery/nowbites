@@ -1,12 +1,12 @@
-const ci = require("miniprogram-ci")
-const path = require("path")
-const fs = require("fs")
-const dotenv = require("dotenv")
+import * as ci from "miniprogram-ci"
+import * as path from "path"
+import * as fs from "fs"
+import * as dotenv from "dotenv"
 
 dotenv.config()
 
 const project = new ci.Project({
-  appid: process.env.WECHAT_APPID,
+  appid: process.env.WECHAT_APPID!,
   type: "miniProgram",
   projectPath: path.resolve(__dirname, "../out/weapp"), // 项目路径
   privateKeyPath: path.resolve(__dirname, "../private.key"),
@@ -15,12 +15,11 @@ const project = new ci.Project({
 
 ci.upload({
   project,
-  version: "0.0.1",
+  version: "0.0.2",
   desc: "CI 自动上传",
   setting: {
-    useProjectConfig: true,
-    useCOS: true
-  },
+    minify: true,
+  }
 })
   .then((res) => {
     console.log("上传成功", res)

@@ -1,4 +1,4 @@
-name: Deploy API to Alibaba Cloud ECS
+name: Deploy API to Cloud ECS
 
 on:
   push:

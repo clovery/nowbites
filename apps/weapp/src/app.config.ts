@@ -6,8 +6,11 @@ export default defineAppConfig({
     'pages/recipes/detail/index',
     'pages/recipe-upload/index',
     'pages/meal-plan/index',
+    'pages/meal-plan/detail/index',
+    'pages/meal-plan/share/index',
     'pages/plan-create/index',
-    'pages/my/index'
+    'pages/my/index',
+    'pages/tools/index'
   ],
   window: {
     backgroundTextStyle: 'light',

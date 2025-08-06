@@ -230,6 +230,12 @@ export default class MealPlan extends Component<{}, State> {
     });
   };
 
+  viewPlanDetail = (planId: string) => {
+    Taro.navigateTo({
+      url: `/pages/meal-plan/detail/index?id=${planId}`,
+    });
+  };
+
   addMealToPlan = (planId: string) => {
     // 由于菜谱列表是tabbar页面，无法直接传递参数
     // 使用全局存储来传递计划ID
@@ -327,7 +333,10 @@ export default class MealPlan extends Component<{}, State> {
 
                 return (
                   <View key={plan.id} className={styles.planSection}>
-                    <View className={styles.planInfo}>
+                    <View 
+                      className={styles.planInfo}
+                      onClick={() => this.viewPlanDetail(plan.id)}
+                    >
                       <Text className={styles.planName}>{plan.name}</Text>
                       {plan.description && (
                         <Text className={styles.planDescription}>

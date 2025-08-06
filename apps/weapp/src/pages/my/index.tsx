@@ -216,6 +216,12 @@ export default class MyPage extends Component<{}, State> {
             <Text className='function-text'>设置</Text>
             <View className='arrow'>›</View>
           </View>
+          
+          <View className='function-item' onClick={() => Taro.navigateTo({ url: '/pages/tools/index' })}>
+            <View className='function-icon tools-icon'>🔧</View>
+            <Text className='function-text'>配方计算器器</Text>
+            <View className='arrow'>›</View>
+          </View>
         </View>
 
         {/* Logout Section */}

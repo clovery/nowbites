@@ -6,7 +6,7 @@ interface Config {
 
 // 开发环境配置
 const devConfig: Config = {
-  apiBaseUrl: 'http://localhost:3100'
+  apiBaseUrl: 'http://localhost:3300'
 };
 
 // 生产环境配置

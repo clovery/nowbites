@@ -10,13 +10,18 @@ interface RequestOptions extends Taro.request.Option {
  * @param options 请求选项
  */
 const request = (options: RequestOptions) => {
-  const { url, needToken = false, header = {}, ...rest } = options;
+  const { url, needToken = false, header = {}, method = 'GET', data, ...rest } = options;
   
   // 构建完整URL
   const fullUrl = /^https?:\/\//.test(url) ? url : `${config.apiBaseUrl}${url}`;
   
+  // 构建请求头
+  let requestHeader: Record<string, string> = { 
+    'Content-Type': 'application/json',
+    ...header 
+  };
+  
   // 如果需要token，从本地存储获取并添加到请求头
-  let requestHeader = { ...header };
   if (needToken) {
     const token = Taro.getStorageSync('token');
     if (token) {
@@ -24,6 +29,11 @@ const request = (options: RequestOptions) => {
     } else {
       // 如果需要token但没有token，可能需要重新登录
       console.warn('需要登录权限但未找到token');
+      Taro.showToast({
+        title: '请先登录',
+        icon: 'none'
+      });
+      return Promise.reject(new Error('未授权，请先登录'));
     }
   }
   
@@ -31,6 +41,8 @@ const request = (options: RequestOptions) => {
     Taro.request({
       ...rest,
       url: fullUrl,
+      method,
+      data,
       header: requestHeader,
       success: (res) => {
         // 请求成功
@@ -40,26 +52,56 @@ const request = (options: RequestOptions) => {
           // 未授权，清除token并提示用户登录
           Taro.removeStorageSync('token');
           Taro.showToast({
-            title: '请先登录',
+            title: '登录已过期，请重新登录',
             icon: 'none'
           });
-          reject(new Error('未授权，请先登录'));
+          reject(new Error('登录已过期，请重新登录'));
+        } else if (res.statusCode === 403) {
+          Taro.showToast({
+            title: '没有权限访问',
+            icon: 'none'
+          });
+          reject(new Error('没有权限访问'));
+        } else if (res.statusCode === 404) {
+          Taro.showToast({
+            title: '请求的资源不存在',
+            icon: 'none'
+          });
+          reject(new Error('请求的资源不存在'));
+        } else if (res.statusCode >= 500) {
+          Taro.showToast({
+            title: '服务器错误，请稍后重试',
+            icon: 'none'
+          });
+          reject(new Error('服务器错误，请稍后重试'));
         } else {
           // 其他错误
+          const errorMessage = res.data?.error || res.data?.message || `请求失败: ${res.statusCode}`;
           Taro.showToast({
-            title: `请求失败: ${res.statusCode}`,
+            title: errorMessage,
             icon: 'none'
           });
-          reject(new Error(`请求失败: ${res.statusCode}`));
+          reject(new Error(errorMessage));
         }
       },
       fail: (err) => {
         // 网络错误等
+        console.error('网络请求失败:', err);
+        let errorMessage = '网络请求失败';
+        
+        if (err.errMsg) {
+          if (err.errMsg.includes('timeout')) {
+            errorMessage = '请求超时，请检查网络连接';
+          } else if (err.errMsg.includes('fail')) {
+            errorMessage = '网络连接失败，请检查网络设置';
+          }
+        }
+        
         Taro.showToast({
-          title: '网络请求失败',
+          title: errorMessage,
           icon: 'none'
         });
-        reject(err);
+        reject(new Error(errorMessage));
       }
     });
   });
