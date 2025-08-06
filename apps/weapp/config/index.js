@@ -1,3 +1,5 @@
+const { UnifiedWebpackPluginV5 } = require('weapp-tailwindcss/webpack')
+
 const config = {
   projectName: 'nowbites-mini-program',
   date: '2024-8-1',
@@ -21,7 +23,7 @@ const config = {
     }
   },
   framework: 'react',
-  compiler: 'vite',
+  compiler: 'webpack5',
   cache: {
     enable: false // Webpack持久化缓存配置，建议开启。默认配置请参考：https://docs.taro.zone/docs/config-detail#cache
   },
@@ -46,6 +48,20 @@ const config = {
           generateScopedName: '[name]__[local]___[hash:base64:5]'
         }
       }
+    },
+    webpackChain(chain, webpack) {
+      chain.merge({
+        plugin: {
+          install: {
+            plugin: UnifiedWebpackPluginV5,
+            args: [{
+              appType: 'taro',
+              // 下面个配置，会开启 rem -> rpx 的转化
+              rem2rpx: true
+            }]
+          }
+        }
+      })
     }
   },
   h5: {

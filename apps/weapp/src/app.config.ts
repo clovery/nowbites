@@ -10,7 +10,8 @@ export default defineAppConfig({
     'pages/meal-plan/share/index',
     'pages/plan-create/index',
     'pages/my/index',
-    'pages/tools/index'
+    'pages/tools/index',
+    'pages/tailwind-demo/index'
   ],
   window: {
     backgroundTextStyle: 'light',

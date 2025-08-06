@@ -1,6 +1,6 @@
 import { Component, PropsWithChildren } from 'react'
 import Taro from '@tarojs/taro'
-import './app.scss'
+import './app.css'
 
 class App extends Component<PropsWithChildren> {
 
