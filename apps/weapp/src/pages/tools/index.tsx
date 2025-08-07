@@ -1,16 +1,7 @@
 import { Component } from "react";
 import { View, Text, ScrollView } from "@tarojs/components";
-import {
-  AtCard,
-  AtInput,
-  AtButton,
-  AtList,
-  AtListItem,
-  AtDivider,
-  AtIcon,
-} from "taro-ui";
+import { AtInput, AtButton, AtIcon } from "taro-ui";
 import Taro from "@tarojs/taro";
-import styles from "./index.module.scss";
 
 interface State {
   flourWeight: string;
@@ -115,85 +106,127 @@ export default class RecipeCalculator extends Component<{}, State> {
     );
 
     return (
-      <View className={styles.calculatorContainer}>
-        <ScrollView className={styles.calculatorContent}>
-          <AtCard title="输入面粉重量" className={styles.inputCard}>
-            <AtInput
-              name="flourWeight"
-              title="面粉重量"
-              type="digit"
-              placeholder="输入面粉重量"
-              value={flourWeight}
-              onChange={this.handleFlourWeightChange}
-              border={false}
-            >
-              <Text className={styles.unit}>克</Text>
-            </AtInput>
-          </AtCard>
-
-          <View className={`${styles.buttonGroup}`}>
-            <View className={styles.buttonCol}>
-              <AtButton
-                type="primary"
-                onClick={this.handleCalculate}
-                disabled={!flourWeight || isNaN(Number(flourWeight))}
-                className={styles.calculateBtn}
-              >
-                计算配方
-              </AtButton>
+      <View className="min-h-screen bg-gray-50">
+        <ScrollView className="h-full">
+          <View className="p-4 space-y-4">
+            {/* 输入卡片 */}
+            <View className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+              <View className="px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600">
+                <Text className="text-white text-lg font-semibold">输入面粉重量</Text>
+              </View>
+              <View className="p-4">
+                <View className="flex items-center space-x-2">
+                  <View className="flex-1">
+                    <AtInput
+                      name="flourWeight"
+                      title=""
+                      type="digit"
+                      placeholder="输入面粉重量"
+                      value={flourWeight}
+                      onChange={this.handleFlourWeightChange}
+                      border={false}
+                      className="bg-gray-50 rounded-lg px-3 py-2"
+                    />
+                  </View>
+                  <View className="bg-blue-100 px-3 py-2 rounded-lg">
+                    <Text className="text-blue-700 font-medium">克</Text>
+                  </View>
+                </View>
+              </View>
             </View>
-            <View className={styles.buttonCol}>
-              <AtButton
-                type="secondary"
-                onClick={this.handleReset}
-                className={styles.resetBtn}
-              >
-                重置
-              </AtButton>
+
+            {/* 按钮组 */}
+            <View className="flex space-x-3">
+              <View className="flex-1">
+                <AtButton
+                  type="primary"
+                  onClick={this.handleCalculate}
+                  disabled={!flourWeight || isNaN(Number(flourWeight))}
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold py-3 rounded-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  计算配方
+                </AtButton>
+              </View>
+              <View className="flex-1">
+                <AtButton
+                  type="secondary"
+                  onClick={this.handleReset}
+                  className="w-full bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg shadow-md hover:bg-gray-300"
+                >
+                  重置
+                </AtButton>
+              </View>
+            </View>
+
+            {/* 计算结果 */}
+            {isCalculated && ingredientEntries.length > 0 && (
+              <View className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <View className="px-4 py-3 bg-gradient-to-r from-green-500 to-green-600">
+                  <Text className="text-white text-lg font-semibold">调整后的配方</Text>
+                </View>
+                <View className="p-4">
+                  <View className="space-y-2">
+                    {ingredientEntries.map(([name, amount], index) => (
+                      <View
+                        key={index}
+                        className="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg"
+                      >
+                        <Text className="text-gray-800 font-medium">{name}</Text>
+                        <View className="bg-green-100 px-3 py-1 rounded-full">
+                          <Text className="text-green-700 font-semibold">
+                            {amount.toFixed(2)} 克
+                          </Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              </View>
+            )}
+
+            {/* 使用提示 */}
+            <View className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mt-4">
+              <View className="px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600">
+                <Text className="text-white text-lg font-semibold">使用提示</Text>
+              </View>
+              <View className="p-4">
+                <View className="space-y-3">
+                  <View className="flex items-start space-x-3">
+                    <View className="bg-blue-100 rounded-full mt-0.5 w-6 h-6 flex items-center justify-center">
+                      <AtIcon value="check-circle" size="14" color="#3B82F6" />
+                    </View>
+                    <Text className="text-gray-700 text-sm leading-relaxed flex-1">
+                      输入面粉重量后会自动计算其他配料的比例
+                    </Text>
+                  </View>
+                  <View className="flex items-start space-x-3">
+                    <View className="bg-blue-100 rounded-full mt-0.5 w-6 h-6 flex items-center justify-center">
+                      <AtIcon value="check-circle" size="14" color="#3B82F6" />
+                    </View>
+                    <Text className="text-gray-700 text-sm leading-relaxed flex-1">
+                      所有配料都按照原始配方比例自动调整
+                    </Text>
+                  </View>
+                  <View className="flex items-start space-x-3">
+                    <View className="bg-blue-100 rounded-full mt-0.5 w-6 h-6 flex items-center justify-center">
+                      <AtIcon value="check-circle" size="14" color="#3B82F6" />
+                    </View>
+                    <Text className="text-gray-700 text-sm leading-relaxed flex-1">
+                      水温建议控制在35°C左右
+                    </Text>
+                  </View>
+                  <View className="flex items-start space-x-3">
+                    <View className="bg-blue-100 rounded-full mt-0.5 w-6 h-6 flex items-center justify-center">
+                      <AtIcon value="check-circle" size="14" color="#3B82F6" />
+                    </View>
+                    <Text className="text-gray-700 text-sm leading-relaxed flex-1">
+                      可根据实际需要微调配料用量
+                    </Text>
+                  </View>
+                </View>
+              </View>
             </View>
           </View>
-
-          {isCalculated && ingredientEntries.length > 0 && (
-            <AtCard title="调整后的配方" className={styles.resultCard}>
-              <AtList>
-                {ingredientEntries.map(([name, amount], index) => (
-                  <AtListItem
-                    key={index}
-                    title={name}
-                    extraText={`${amount.toFixed(2)} 克`}
-                    className={styles.ingredientItem}
-                  />
-                ))}
-              </AtList>
-            </AtCard>
-          )}
-
-          <AtCard title="使用提示" className={styles.tipsCard}>
-            <View className={styles.tipsContent}>
-              <View className={styles.tipItem}>
-                <AtIcon value="check-circle" size="16" color="#007bff" />
-                <Text className={styles.tipText}>
-                  输入面粉重量后会自动计算其他配料的比例
-                </Text>
-              </View>
-              <View className={styles.tipItem}>
-                <AtIcon value="check-circle" size="16" color="#007bff" />
-                <Text className={styles.tipText}>
-                  所有配料都按照原始配方比例自动调整
-                </Text>
-              </View>
-              <View className={styles.tipItem}>
-                <AtIcon value="check-circle" size="16" color="#007bff" />
-                <Text className={styles.tipText}>水温建议控制在35°C左右</Text>
-              </View>
-              <View className={styles.tipItem}>
-                <AtIcon value="check-circle" size="16" color="#007bff" />
-                <Text className={styles.tipText}>
-                  可根据实际需要微调配料用量
-                </Text>
-              </View>
-            </View>
-          </AtCard>
         </ScrollView>
       </View>
     );

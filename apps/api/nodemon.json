@@ -19,5 +19,7 @@
   "colours": true,
   "restartable": "rs",
   "legacyWatch": false,
-  "polling": false
+  "polling": false,
+  "killSignal": "SIGTERM",
+  "signal": "SIGTERM"
 } 

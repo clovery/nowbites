@@ -102,7 +102,6 @@ function convertRecipeToDatabaseFormat(recipe: RecipeJson, userId: string, recip
     steps,
     tips,
     tags: recipe.tags,
-    userId,
     isPublic: true,
     // Set default values for missing fields
     cookingTime: 30,
@@ -116,37 +115,6 @@ function convertRecipeToDatabaseFormat(recipe: RecipeJson, userId: string, recip
 async function main() {
   console.log('🌱 Starting database seed...');
 
-  // Create sample users
-  const user1 = await prisma.user.upsert({
-    where: { openid: 'sample_user_1' },
-    update: {},
-    create: {
-      openid: 'sample_user_1',
-      nickName: 'Chef John',
-      avatarUrl: 'https://example.com/avatar1.jpg',
-      gender: 1,
-      country: 'China',
-      province: 'Guangdong',
-      city: 'Shenzhen'
-    }
-  });
-
-  const user2 = await prisma.user.upsert({
-    where: { openid: 'sample_user_2' },
-    update: {},
-    create: {
-      openid: 'sample_user_2',
-      nickName: 'Kitchen Master',
-      avatarUrl: 'https://example.com/avatar2.jpg',
-      gender: 2,
-      country: 'China',
-      province: 'Beijing',
-      city: 'Beijing'
-    }
-  });
-
-  console.log('✅ Users created');
-
   // Read and insert recipe JSON files
   console.log('📚 Reading recipe JSON files...');
   const recipeFiles = await readRecipeFiles();
@@ -156,7 +124,7 @@ async function main() {
     const recipeId = `json_recipe_${i + 1}`;
     
     try {
-      const recipeData = convertRecipeToDatabaseFormat(recipe, user1.id, recipeId);
+      const recipeData = convertRecipeToDatabaseFormat(recipe, '', recipeId);
       
       await prisma.recipe.upsert({
         where: { id: recipeId },

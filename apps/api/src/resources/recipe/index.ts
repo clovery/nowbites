@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Prisma } from '@prisma/client';
 import { parseMarkdownRecipe } from '@nowbites/parse-markdown-recipe';
+import { prisma } from '../../utils/prisma';
 
 // Recipe creation request interface
 interface CreateRecipeRequest {
@@ -50,7 +51,7 @@ export const createRecipe = async (
     }
 
     // Find user by openid
-    const user = await request.server.prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { openid: userId }
     });
 
@@ -58,7 +59,7 @@ export const createRecipe = async (
       return reply.code(404).send({ error: 'User not found' });
     }
 
-    const recipe = await request.server.prisma.recipe.create({
+    const recipe = await prisma.recipe.create({
       data: {
         ...recipeData,
         userId: user.id,
@@ -134,7 +135,7 @@ export const getRecipes = async (
     }
 
     const [recipes, total] = await Promise.all([
-      request.server.prisma.recipe.findMany({
+      prisma.recipe.findMany({
         where,
         include: {
           user: {
@@ -149,7 +150,7 @@ export const getRecipes = async (
         take: limitNum,
         orderBy: { createdAt: 'desc' }
       }),
-      request.server.prisma.recipe.count({ where })
+      prisma.recipe.count({ where })
     ]);
 
     return reply.send({
@@ -175,7 +176,7 @@ export const getRecipe = async (
   try {
     const { id } = request.params;
 
-    const recipe = await request.server.prisma.recipe.findUnique({
+    const recipe = await prisma.recipe.findUnique({
       where: { id },
       include: {
         user: {
@@ -199,7 +200,7 @@ export const getRecipe = async (
         return reply.code(401).send({ error: 'Unauthorized' });
       }
 
-      const user = await request.server.prisma.user.findUnique({
+      const user = await prisma.user.findUnique({
         where: { openid: userId }
       });
 
@@ -234,10 +235,10 @@ export const updateRecipe = async (
 
     // Find user and recipe
     const [user, recipe] = await Promise.all([
-      request.server.prisma.user.findUnique({
+      prisma.user.findUnique({
         where: { openid: userId }
       }),
-      request.server.prisma.recipe.findUnique({
+      prisma.recipe.findUnique({
         where: { id }
       })
     ]);
@@ -254,7 +255,7 @@ export const updateRecipe = async (
       return reply.code(403).send({ error: 'Forbidden' });
     }
 
-    const updatedRecipe = await request.server.prisma.recipe.update({
+    const updatedRecipe = await prisma.recipe.update({
       where: { id },
       data: {
         ...updateData,
@@ -297,10 +298,10 @@ export const deleteRecipe = async (
 
     // Find user and recipe
     const [user, recipe] = await Promise.all([
-      request.server.prisma.user.findUnique({
+      prisma.user.findUnique({
         where: { openid: userId }
       }),
-      request.server.prisma.recipe.findUnique({
+      prisma.recipe.findUnique({
         where: { id }
       })
     ]);
@@ -317,7 +318,7 @@ export const deleteRecipe = async (
       return reply.code(403).send({ error: 'Forbidden' });
     }
 
-    await request.server.prisma.recipe.delete({
+    await prisma.recipe.delete({
       where: { id }
     });
 
@@ -340,7 +341,7 @@ export const getUserRecipes = async (
       return reply.code(401).send({ error: 'Unauthorized' });
     }
 
-    const user = await request.server.prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { openid: userId }
     });
 
@@ -348,7 +349,7 @@ export const getUserRecipes = async (
       return reply.code(404).send({ error: 'User not found' });
     }
 
-    const recipes = await request.server.prisma.recipe.findMany({
+    const recipes = await prisma.recipe.findMany({
       where: { userId: user.id },
       include: {
         user: {
@@ -546,6 +547,8 @@ export default async function recipeRoutes(fastify: FastifyInstance) {
     },
     getUserRecipes
   );
+
+
 
   // Parse markdown recipe (authenticated)
   fastify.post<{ Body: { markdown: string } }>(

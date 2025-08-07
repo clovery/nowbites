@@ -6,7 +6,7 @@ import mealPlanService, {
   Plan,
   MealPlanItem,
   PlanSummary,
-} from "../../services/meal-plan-service";
+} from "../../services/meal-plan";
 import styles from "./index.module.scss";
 
 interface State {
@@ -334,19 +334,25 @@ export default class MealPlan extends Component<{}, State> {
                 return (
                   <View key={plan.id} className={styles.planSection}>
                     <View 
-                      className={styles.planInfo}
+                      className="py-2 px-4 border-b border-gray-200"
                       onClick={() => this.viewPlanDetail(plan.id)}
                     >
-                      <Text className={styles.planName}>{plan.name}</Text>
+                      <View className={styles.planTitleRow}>
+                        <Text className={styles.planName}>{plan.name}</Text>
+                        {planMeals.length > 0 && (
+                          <Text className={styles.planStats}>
+                            {completedCount}/{planMeals.length}
+                          </Text>
+                        )}
+                      </View>
                       {plan.description && (
                         <Text className={styles.planDescription}>
                           {plan.description}
                         </Text>
                       )}
                       {planMeals.length > 0 && (
-                        <Text className={styles.planStats}>
-                          {completedCount}/{planMeals.length} 已完成 | 预计{" "}
-                          {this.getTotalCookTime(planMeals)}
+                        <Text className={styles.planTime}>
+                          ⏱ {this.getTotalCookTime(planMeals)}
                         </Text>
                       )}
                     </View>
@@ -356,22 +362,20 @@ export default class MealPlan extends Component<{}, State> {
                         <Text className={styles.emptyMealsText}>暂无菜谱</Text>
                       </View>
                     ) : (
-                      <View className={styles.mealList}>
+                      <View>
                         {planMeals.map((meal: MealPlanItem, index: number) => (
                           <View
                             key={meal.id}
-                            className={`${styles.mealItem} ${meal.completed ? styles.completed : ""}`}
+                            className={`flex items-center justify-between p-2 ${meal.completed ? styles.completed : ""}`}
                           >
                             <View
                               className={styles.mealInfo}
-                              onClick={() => this.viewRecipeDetail(meal.id)}
+                              onClick={() => this.viewRecipeDetail(meal.recipeId!)}
                             >
                               <View className={styles.mealNumber}>{index + 1}</View>
                               <View className={styles.mealDetails}>
                                 <Text className={styles.mealTitle}>{meal.title}</Text>
-                                <Text className={styles.mealTime}>
-                                  ⏱ {meal.cookTime}
-                                </Text>
+                                <Text className={styles.mealTime}> {meal.cookTime}</Text>
                               </View>
                             </View>
 
@@ -400,7 +404,6 @@ export default class MealPlan extends Component<{}, State> {
                       </View>
                     )}
 
-                    {/* 始终显示添加菜谱按钮 */}
                     <View className={styles.addMealSection}>
                       <Button
                         className={styles.addMealBtn}

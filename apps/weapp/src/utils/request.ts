@@ -63,11 +63,12 @@ const request = (options: RequestOptions) => {
           });
           reject(new Error('没有权限访问'));
         } else if (res.statusCode === 404) {
+          const title = res.data?.error || res.data?.message || '请求的资源不存在';
           Taro.showToast({
-            title: '请求的资源不存在',
+            title,
             icon: 'none'
           });
-          reject(new Error('请求的资源不存在'));
+          reject(new Error(title));
         } else if (res.statusCode >= 500) {
           Taro.showToast({
             title: '服务器错误，请稍后重试',
@@ -108,7 +109,7 @@ const request = (options: RequestOptions) => {
 };
 
 // 常用请求方法封装
-export const get = (url: string, data?: any, needToken = false) => {
+export const get = (url: string, data?: any, needToken = true) => {
   return request({
     url,
     method: 'GET',
@@ -117,7 +118,7 @@ export const get = (url: string, data?: any, needToken = false) => {
   });
 };
 
-export const post = (url: string, data?: any, needToken = false) => {
+export const post = (url: string, data?: any, needToken = true) => {
   return request({
     url,
     method: 'POST',
@@ -126,7 +127,7 @@ export const post = (url: string, data?: any, needToken = false) => {
   });
 };
 
-export const put = (url: string, data?: any, needToken = false) => {
+export const put = (url: string, data?: any, needToken = true) => {
   return request({
     url,
     method: 'PUT',
@@ -135,7 +136,7 @@ export const put = (url: string, data?: any, needToken = false) => {
   });
 };
 
-export const del = (url: string, data?: any, needToken = false) => {
+export const del = (url: string, data?: any, needToken = true) => {
   return request({
     url,
     method: 'DELETE',

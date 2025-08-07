@@ -6,11 +6,11 @@ import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 
 // 导入路由和插件
-import authRoutes from './resources/auth/index.js';
-import recipeRoutes from './resources/recipe/index.js';
-import mealPlanRoutes from './resources/meal-plan/index.js';
-import authPlugin from './plugins/auth.js';
-import prismaPlugin from './plugins/prisma.js';
+import authRoutes from './resources/auth/index';
+import recipeRoutes from './resources/recipe/index';
+import mealPlanRoutes from './resources/meal-plan/index';
+import myRoutes from './resources/my/index';
+import authPlugin from './plugins/auth';
 
 // 加载环境变量
 dotenv.config();
@@ -42,9 +42,6 @@ async function registerPlugins() {
   // 注册认证中间件
   await server.register(authPlugin);
 
-  // 注册Prisma插件
-  await server.register(prismaPlugin);
-
   // Swagger 文档
   await server.register(swagger, {
     swagger: {
@@ -73,6 +70,7 @@ async function registerRoutes() {
   server.register(authRoutes, { prefix: '/api/auth' });
   server.register(recipeRoutes, { prefix: '/api/recipes' });
   server.register(mealPlanRoutes, { prefix: '/api/meal-plans' });
+  server.register(myRoutes, { prefix: '/api/my' });
 }
 
 // 启动服务器

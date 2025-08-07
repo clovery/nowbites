@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { WechatLoginRequest, WechatLoginResponse, UserInfo } from '../../models/user.js';
 import { createWechatAPI } from '../../utils/wechat.js';
+import { prisma } from '../../utils/prisma';
 
 // 微信登录控制器
 export const wechatLogin = async (request: FastifyRequest<{ Body: WechatLoginRequest }>, reply: FastifyReply) => {
@@ -24,13 +25,13 @@ export const wechatLogin = async (request: FastifyRequest<{ Body: WechatLoginReq
       }
       
       // 查找或创建用户
-      let user = await request.server.prisma.user.findUnique({
+      let user = await prisma.user.findUnique({
         where: { openid }
       });
 
       if (!user) {
         // 创建新用户
-        user = await request.server.prisma.user.create({
+        user = await prisma.user.create({
           data: {
             openid,
             nickName: userInfo?.nickName,
@@ -44,7 +45,7 @@ export const wechatLogin = async (request: FastifyRequest<{ Body: WechatLoginReq
         });
       } else {
         // 更新现有用户信息
-        user = await request.server.prisma.user.update({
+        user = await prisma.user.update({
           where: { openid },
           data: {
             nickName: userInfo?.nickName,

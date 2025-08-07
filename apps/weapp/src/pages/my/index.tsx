@@ -199,7 +199,7 @@ export default class MyPage extends Component<{}, State> {
             <View className='arrow'>›</View>
           </View>
           
-          <View className='function-item'>
+          <View className='function-item' onClick={() => Taro.navigateTo({ url: '/pages/my/recipes/index' })}>
             <View className='function-icon moments-icon'>🏔️</View>
             <Text className='function-text'>我的菜谱</Text>
             <View className='arrow'>›</View>
@@ -210,16 +210,10 @@ export default class MyPage extends Component<{}, State> {
             <Text className='function-text'>我的计划</Text>
             <View className='arrow'>›</View>
           </View>
-          
-          <View className='function-item'>
-            <View className='function-icon stickers-icon'>😊</View>
-            <Text className='function-text'>设置</Text>
-            <View className='arrow'>›</View>
-          </View>
-          
+
           <View className='function-item' onClick={() => Taro.navigateTo({ url: '/pages/tools/index' })}>
             <View className='function-icon tools-icon'>🔧</View>
-            <Text className='function-text'>配方计算器器</Text>
+            <Text className='function-text'>包子皮配方计算器</Text>
             <View className='arrow'>›</View>
           </View>
 

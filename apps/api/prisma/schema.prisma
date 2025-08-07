@@ -29,6 +29,7 @@ model User {
   // Relations
   recipes Recipe[]
   plans    Plan[]
+  mealPlanItems MealPlanItem[]
 
   @@map("users")
 }
@@ -52,8 +53,8 @@ model Recipe {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   mealPlanItems MealPlanItem[]
 
   @@map("recipes")
@@ -85,6 +86,9 @@ model MealPlanItem {
   updatedAt DateTime @updatedAt
 
   // Relations
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
   planId String
   plan   Plan   @relation(fields: [planId], references: [id], onDelete: Cascade)
   

@@ -1,4 +1,5 @@
 const { UnifiedWebpackPluginV5 } = require('weapp-tailwindcss/webpack')
+const path = require('path')
 
 const config = {
   projectName: 'nowbites-mini-program',
@@ -50,6 +51,10 @@ const config = {
       }
     },
     webpackChain(chain, webpack) {
+      // Add path alias configuration
+      chain.resolve.alias
+        .set('@', path.resolve(__dirname, '../src'))
+      
       chain.merge({
         plugin: {
           install: {

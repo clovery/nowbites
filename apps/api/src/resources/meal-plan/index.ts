@@ -1,5 +1,6 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { Prisma } from '@prisma/client';
+import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import { Prisma } from "@prisma/client";
+import { prisma } from "../../utils/prisma";
 
 // Plan creation request interface
 interface CreatePlanRequest {
@@ -42,36 +43,36 @@ export const createPlan = async (
     const userId = (request.user as any)?.openid;
 
     if (!userId) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+      return reply.code(401).send({ message: "Unauthorized" });
     }
 
     // Find user by openid
-    const user = await request.server.prisma.user.findUnique({
-      where: { openid: userId }
+    const user = await prisma.user.findUnique({
+      where: { openid: userId },
     });
 
     if (!user) {
-      return reply.code(404).send({ error: 'User not found' });
+      return reply.code(404).send({ message: "User not found" });
     }
 
-    const plan = await request.server.prisma.plan.create({
+    const plan = await prisma.plan.create({
       data: {
         name: planData.name,
         description: planData.description,
         date: new Date(planData.date),
-        userId: user.id
+        userId: user.id,
       },
       include: {
         mealPlanItems: {
-          orderBy: { order: 'asc' }
-        }
-      }
+          orderBy: { order: "asc" },
+        },
+      },
     });
 
     return reply.code(201).send(plan);
   } catch (error) {
     request.log.error(error);
-    return reply.code(500).send({ error: 'Internal server error' });
+    return reply.code(500).send({ message: "Internal server error" });
   }
 };
 
@@ -87,63 +88,63 @@ export const getPlans = async (
   reply: FastifyReply
 ) => {
   try {
-    console.log('getPlans', request.user);
+    console.log("getPlans", request.user);
     const userId = (request.user as any)?.openid;
 
     if (!userId) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+      return reply.code(401).send({ message: "Unauthorized" });
     }
 
-    const user = await request.server.prisma.user.findUnique({
-      where: { openid: userId }
+    const user = await prisma.user.findUnique({
+      where: { openid: userId },
     });
 
     if (!user) {
-      return reply.code(404).send({ error: 'User not found' });
+      return reply.code(404).send({ message: "User not found" });
     }
 
-    const page = parseInt(request.query.page || '1', 10);
-    const limit = parseInt(request.query.limit || '20', 10);
+    const page = parseInt(request.query.page || "1", 10);
+    const limit = parseInt(request.query.limit || "20", 10);
     const skip = (page - 1) * limit;
 
     const where: Prisma.PlanWhereInput = {
-      userId: user.id
+      userId: user.id,
     };
 
     if (request.query.date) {
       const targetDate = new Date(request.query.date);
       const nextDay = new Date(targetDate);
       nextDay.setDate(nextDay.getDate() + 1);
-      
+
       where.date = {
         gte: targetDate,
-        lt: nextDay
+        lt: nextDay,
       };
     }
 
     const [plans, total] = await Promise.all([
-      request.server.prisma.plan.findMany({
+      prisma.plan.findMany({
         where,
         include: {
           mealPlanItems: {
-            orderBy: { order: 'asc' },
+            orderBy: { order: "asc" },
             include: {
               recipe: {
                 select: {
                   id: true,
                   title: true,
                   coverImage: true,
-                  cookingTime: true
-                }
-              }
-            }
-          }
+                  cookingTime: true,
+                },
+              },
+            },
+          },
         },
-        orderBy: { date: 'desc' },
+        orderBy: { date: "desc" },
         skip,
-        take: limit
+        take: limit,
       }),
-      request.server.prisma.plan.count({ where })
+      prisma.plan.count({ where }),
     ]);
 
     return reply.send({
@@ -152,12 +153,12 @@ export const getPlans = async (
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     request.log.error(error);
-    return reply.code(500).send({ error: 'Internal server error' });
+    return reply.code(500).send({ message: "Internal server error" });
   }
 };
 
@@ -170,25 +171,25 @@ export const getPlan = async (
     const userId = (request.user as any)?.openid;
 
     if (!userId) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+      return reply.code(401).send({ message: "Unauthorized" });
     }
 
-    const user = await request.server.prisma.user.findUnique({
-      where: { openid: userId }
+    const user = await prisma.user.findUnique({
+      where: { openid: userId },
     });
 
     if (!user) {
-      return reply.code(404).send({ error: 'User not found' });
+      return reply.code(404).send({ message: "User not found" });
     }
 
-    const plan = await request.server.prisma.plan.findFirst({
+    const plan = await prisma.plan.findFirst({
       where: {
         id: request.params.id,
-        userId: user.id
+        userId: user.id,
       },
       include: {
         mealPlanItems: {
-          orderBy: { order: 'asc' },
+          orderBy: { order: "asc" },
           include: {
             recipe: {
               select: {
@@ -196,22 +197,22 @@ export const getPlan = async (
                 title: true,
                 coverImage: true,
                 cookingTime: true,
-                difficulty: true
-              }
-            }
-          }
-        }
-      }
+                difficulty: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!plan) {
-      return reply.code(404).send({ error: 'Plan not found' });
+      return reply.code(404).send({ message: "Plan not found" });
     }
 
     return reply.send(plan);
   } catch (error) {
     request.log.error(error);
-    return reply.code(500).send({ error: 'Internal server error' });
+    return reply.code(500).send({ message: "Internal server error" });
   }
 };
 
@@ -227,50 +228,52 @@ export const updatePlan = async (
     const userId = (request.user as any)?.openid;
 
     if (!userId) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+      return reply.code(401).send({ message: "Unauthorized" });
     }
 
-    const user = await request.server.prisma.user.findUnique({
-      where: { openid: userId }
+    const user = await prisma.user.findUnique({
+      where: { openid: userId },
     });
 
     if (!user) {
-      return reply.code(404).send({ error: 'User not found' });
+      return reply.code(404).send({ message: "User not found" });
     }
 
     const updateData: any = {};
     if (request.body.name !== undefined) updateData.name = request.body.name;
-    if (request.body.description !== undefined) updateData.description = request.body.description;
-    if (request.body.date !== undefined) updateData.date = new Date(request.body.date);
+    if (request.body.description !== undefined)
+      updateData.description = request.body.description;
+    if (request.body.date !== undefined)
+      updateData.date = new Date(request.body.date);
 
-    const plan = await request.server.prisma.plan.updateMany({
+    const plan = await prisma.plan.updateMany({
       where: {
         id: request.params.id,
-        userId: user.id
+        userId: user.id,
       },
-      data: updateData
+      data: updateData,
     });
 
     if (plan.count === 0) {
-      return reply.code(404).send({ error: 'Plan not found' });
+      return reply.code(404).send({ message: "Plan not found" });
     }
 
-    const updatedPlan = await request.server.prisma.plan.findFirst({
+    const updatedPlan = await prisma.plan.findFirst({
       where: {
         id: request.params.id,
-        userId: user.id
+        userId: user.id,
       },
       include: {
         mealPlanItems: {
-          orderBy: { order: 'asc' }
-        }
-      }
+          orderBy: { order: "asc" },
+        },
+      },
     });
 
     return reply.send(updatedPlan);
   } catch (error) {
     request.log.error(error);
-    return reply.code(500).send({ error: 'Internal server error' });
+    return reply.code(500).send({ message: "Internal server error" });
   }
 };
 
@@ -283,32 +286,32 @@ export const deletePlan = async (
     const userId = (request.user as any)?.openid;
 
     if (!userId) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+      return reply.code(401).send({ message: "Unauthorized" });
     }
 
-    const user = await request.server.prisma.user.findUnique({
-      where: { openid: userId }
+    const user = await prisma.user.findUnique({
+      where: { openid: userId },
     });
 
     if (!user) {
-      return reply.code(404).send({ error: 'User not found' });
+      return reply.code(404).send({ message: "User not found" });
     }
 
-    const plan = await request.server.prisma.plan.deleteMany({
+    const plan = await prisma.plan.deleteMany({
       where: {
         id: request.params.id,
-        userId: user.id
-      }
+        userId: user.id,
+      },
     });
 
     if (plan.count === 0) {
-      return reply.code(404).send({ error: 'Plan not found' });
+      return reply.code(404).send({ message: "Plan not found" });
     }
 
-    return reply.send({ message: 'Plan deleted successfully' });
+    return reply.send({ message: "Plan deleted successfully" });
   } catch (error) {
     request.log.error(error);
-    return reply.code(500).send({ error: 'Internal server error' });
+    return reply.code(500).send({ message: "Internal server error" });
   }
 };
 
@@ -324,44 +327,44 @@ export const addMealPlanItem = async (
     const userId = (request.user as any)?.openid;
 
     if (!userId) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+      return reply.code(401).send({ message: "Unauthorized" });
     }
 
-    const user = await request.server.prisma.user.findUnique({
-      where: { openid: userId }
+    const user = await prisma.user.findUnique({
+      where: { openid: userId },
     });
 
     if (!user) {
-      return reply.code(404).send({ error: 'User not found' });
+      return reply.code(404).send({ message: "User not found" });
     }
 
     // Verify plan exists and belongs to user
-    const plan = await request.server.prisma.plan.findFirst({
+    const plan = await prisma.plan.findFirst({
       where: {
         id: request.params.planId,
-        userId: user.id
-      }
+        userId: user.id,
+      },
     });
 
     if (!plan) {
-      return reply.code(404).send({ error: 'Plan not found' });
+      return reply.code(404).send({ message: "Plan not found" });
     }
 
     // Get the next order number
-    const lastItem = await request.server.prisma.mealPlanItem.findFirst({
+    const lastItem = await prisma.mealPlanItem.findFirst({
       where: { planId: request.params.planId },
-      orderBy: { order: 'desc' }
+      orderBy: { order: "desc" },
     });
 
     const order = request.body.order || (lastItem ? lastItem.order + 1 : 1);
 
-    const mealPlanItem = await request.server.prisma.mealPlanItem.create({
+    const mealPlanItem = await prisma.mealPlanItem.create({
       data: {
         title: request.body.title,
         cookTime: request.body.cookTime,
         recipeId: request.body.recipeId,
         order,
-        planId: request.params.planId
+        planId: request.params.planId,
       },
       include: {
         recipe: {
@@ -369,16 +372,16 @@ export const addMealPlanItem = async (
             id: true,
             title: true,
             coverImage: true,
-            cookingTime: true
-          }
-        }
-      }
+            cookingTime: true,
+          },
+        },
+      },
     });
 
     return reply.code(201).send(mealPlanItem);
   } catch (error) {
     request.log.error(error);
-    return reply.code(500).send({ error: 'Internal server error' });
+    return reply.code(500).send({ message: "Internal server error" });
   }
 };
 
@@ -394,39 +397,42 @@ export const updateMealPlanItem = async (
     const userId = (request.user as any)?.openid;
 
     if (!userId) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+      return reply.code(401).send({ message: "Unauthorized" });
     }
 
-    const user = await request.server.prisma.user.findUnique({
-      where: { openid: userId }
+    const user = await prisma.user.findUnique({
+      where: { openid: userId },
     });
 
     if (!user) {
-      return reply.code(404).send({ error: 'User not found' });
+      return reply.code(404).send({ message: "User not found" });
     }
 
     // Verify meal plan item belongs to user's plan
-    const mealPlanItem = await request.server.prisma.mealPlanItem.findFirst({
+    const mealPlanItem = await prisma.mealPlanItem.findFirst({
       where: {
         id: request.params.id,
         plan: {
-          userId: user.id
-        }
-      }
+          userId: user.id,
+        },
+      },
     });
 
     if (!mealPlanItem) {
-      return reply.code(404).send({ error: 'Meal plan item not found' });
+      return reply.code(404).send({ message: "Meal plan item not found" });
     }
 
     const updateData: any = {};
     if (request.body.title !== undefined) updateData.title = request.body.title;
-    if (request.body.cookTime !== undefined) updateData.cookTime = request.body.cookTime;
-    if (request.body.completed !== undefined) updateData.completed = request.body.completed;
+    if (request.body.cookTime !== undefined)
+      updateData.cookTime = request.body.cookTime;
+    if (request.body.completed !== undefined)
+      updateData.completed = request.body.completed;
     if (request.body.order !== undefined) updateData.order = request.body.order;
-    if (request.body.recipeId !== undefined) updateData.recipeId = request.body.recipeId;
+    if (request.body.recipeId !== undefined)
+      updateData.recipeId = request.body.recipeId;
 
-    const updatedItem = await request.server.prisma.mealPlanItem.update({
+    const updatedItem = await prisma.mealPlanItem.update({
       where: { id: request.params.id },
       data: updateData,
       include: {
@@ -435,16 +441,16 @@ export const updateMealPlanItem = async (
             id: true,
             title: true,
             coverImage: true,
-            cookingTime: true
-          }
-        }
-      }
+            cookingTime: true,
+          },
+        },
+      },
     });
 
     return reply.send(updatedItem);
   } catch (error) {
     request.log.error(error);
-    return reply.code(500).send({ error: 'Internal server error' });
+    return reply.code(500).send({ message: "Internal server error" });
   }
 };
 
@@ -462,60 +468,63 @@ export const getPlanSummaries = async (
     const userId = (request.user as any)?.openid;
 
     if (!userId) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+      return reply.code(401).send({ message: "Unauthorized" });
     }
 
-    const user = await request.server.prisma.user.findUnique({
-      where: { openid: userId }
+    const user = await prisma.user.findUnique({
+      where: { openid: userId },
     });
 
     if (!user) {
-      return reply.code(404).send({ error: 'User not found' });
+      return reply.code(404).send({ message: "User not found" });
     }
 
     const { startDate, endDate } = request.query;
 
     // Get plans with meal counts for the date range
-    const plans = await request.server.prisma.plan.findMany({
+    const plans = await prisma.plan.findMany({
       where: {
         userId: user.id,
         date: {
           gte: new Date(startDate),
-          lte: new Date(endDate)
-        }
+          lte: new Date(endDate),
+        },
       },
       include: {
         _count: {
           select: {
-            mealPlanItems: true
-          }
-        }
-      }
+            mealPlanItems: true,
+          },
+        },
+      },
     });
 
     // Group by date and calculate summaries
-    const summaries = plans.reduce((acc, plan) => {
-      const dateKey = plan.date.toISOString().split('T')[0];
-      const existing = acc.find(s => s.date === dateKey);
-      
-      if (existing) {
-        existing.planCount += 1;
-        existing.mealCount += plan._count.mealPlanItems;
-      } else {
-        acc.push({
-          date: dateKey,
-          planCount: 1,
-          mealCount: plan._count.mealPlanItems
-        });
-      }
-      
-      return acc;
-    }, [] as Array<{ date: string; planCount: number; mealCount: number }>);
+    const summaries = plans.reduce(
+      (acc, plan) => {
+        const dateKey = plan.date.toISOString().split("T")[0];
+        const existing = acc.find((s) => s.date === dateKey);
+
+        if (existing) {
+          existing.planCount += 1;
+          existing.mealCount += plan._count.mealPlanItems;
+        } else {
+          acc.push({
+            date: dateKey,
+            planCount: 1,
+            mealCount: plan._count.mealPlanItems,
+          });
+        }
+
+        return acc;
+      },
+      [] as Array<{ date: string; planCount: number; mealCount: number }>
+    );
 
     return reply.send({ summaries });
   } catch (error) {
     request.log.error(error);
-    return reply.code(500).send({ error: 'Internal server error' });
+    return reply.code(500).send({ message: "Internal server error" });
   }
 };
 
@@ -528,71 +537,246 @@ export const deleteMealPlanItem = async (
     const userId = (request.user as any)?.openid;
 
     if (!userId) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+      return reply.code(401).send({ message: "Unauthorized" });
     }
 
-    const user = await request.server.prisma.user.findUnique({
-      where: { openid: userId }
+    const user = await prisma.user.findUnique({
+      where: { openid: userId },
     });
 
     if (!user) {
-      return reply.code(404).send({ error: 'User not found' });
+      return reply.code(404).send({ message: "User not found" });
     }
 
     // Verify meal plan item belongs to user's plan
-    const mealPlanItem = await request.server.prisma.mealPlanItem.findFirst({
+    const mealPlanItem = await prisma.mealPlanItem.findFirst({
       where: {
         id: request.params.id,
         plan: {
-          userId: user.id
-        }
-      }
+          userId: user.id,
+        },
+      },
     });
 
     if (!mealPlanItem) {
-      return reply.code(404).send({ error: 'Meal plan item not found' });
+      return reply.code(404).send({ message: "Meal plan item not found" });
     }
 
-    await request.server.prisma.mealPlanItem.delete({
-      where: { id: request.params.id }
+    await prisma.mealPlanItem.delete({
+      where: { id: request.params.id },
     });
 
-    return reply.send({ message: 'Meal plan item deleted successfully' });
+    return reply.send({ message: "Meal plan item deleted successfully" });
   } catch (error) {
     request.log.error(error);
-    return reply.code(500).send({ error: 'Internal server error' });
+    return reply.code(500).send({ message: "Internal server error" });
+  }
+};
+
+// Get shared plan (public access)
+export const getSharedPlan = async (
+  request: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply
+) => {
+  try {
+    const plan = await prisma.plan.findFirst({
+      where: {
+        id: request.params.id,
+      },
+      include: {
+        mealPlanItems: {
+          orderBy: { order: "asc" },
+          include: {
+            recipe: {
+              select: {
+                id: true,
+                title: true,
+                coverImage: true,
+                cookingTime: true,
+                difficulty: true,
+              },
+            },
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            nickName: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    });
+
+    if (!plan) {
+      return reply.code(404).send({ message: "Plan not found" });
+    }
+
+    return reply.send({
+      plan,
+      isPublic: true,
+    });
+  } catch (error) {
+    request.log.error(error);
+    return reply.code(500).send({ message: "Internal server error" });
   }
 };
 
 export default async function mealPlanRoutes(fastify: FastifyInstance) {
   // Plan routes
-  fastify.post<{ Body: CreatePlanRequest }>('/', {
-    preHandler: [fastify.authenticate]
-  }, createPlan);
-  fastify.get<{ Querystring: { page?: string; limit?: string; date?: string } }>('/', {
-    preHandler: [fastify.authenticate]
-  }, getPlans);
-  fastify.get<{ Querystring: { startDate: string; endDate: string } }>('/summaries', {
-    preHandler: [fastify.authenticate]
-  }, getPlanSummaries);
-  fastify.get<{ Params: { id: string } }>('/:id', {
-    preHandler: [fastify.authenticate]
-  }, getPlan);
-  fastify.put<{ Params: { id: string }; Body: UpdatePlanRequest }>('/:id', {
-    preHandler: [fastify.authenticate]
-  }, updatePlan);
-  fastify.delete<{ Params: { id: string } }>('/:id', {
-    preHandler: [fastify.authenticate]
-  }, deletePlan);
+  fastify.post<{ Body: CreatePlanRequest }>(
+    "/",
+    {
+      preHandler: [fastify.authenticate],
+    },
+    createPlan
+  );
+  fastify.get<{
+    Querystring: { page?: string; limit?: string; date?: string };
+  }>(
+    "/",
+    {
+      preHandler: [fastify.authenticate],
+    },
+    getPlans
+  );
+  fastify.get<{ Querystring: { startDate: string; endDate: string } }>(
+    "/summaries",
+    {
+      preHandler: [fastify.authenticate],
+    },
+    getPlanSummaries
+  );
+  fastify.get<{ Params: { id: string } }>(
+    "/:id",
+    {
+      preHandler: [fastify.authenticate],
+    },
+    getPlan
+  );
+  fastify.put<{ Params: { id: string }; Body: UpdatePlanRequest }>(
+    "/:id",
+    {
+      preHandler: [fastify.authenticate],
+    },
+    updatePlan
+  );
+  fastify.delete<{ Params: { id: string } }>(
+    "/:id",
+    {
+      preHandler: [fastify.authenticate],
+    },
+    deletePlan
+  );
 
   // Meal plan item routes
-  fastify.post<{ Params: { planId: string }; Body: CreateMealPlanItemRequest }>('/:planId/items', {
-    preHandler: [fastify.authenticate]
-  }, addMealPlanItem);
-  fastify.put<{ Params: { id: string }; Body: UpdateMealPlanItemRequest }>('/items/:id', {
-    preHandler: [fastify.authenticate]
-  }, updateMealPlanItem);
-  fastify.delete<{ Params: { id: string } }>('/items/:id', {
-    preHandler: [fastify.authenticate]
-  }, deleteMealPlanItem);
-} 
+  fastify.post<{ Params: { planId: string }; Body: CreateMealPlanItemRequest }>(
+    "/:planId/items",
+    { preHandler: [fastify.authenticate] },
+    addMealPlanItem
+  );
+  fastify.put<{ Params: { id: string }; Body: UpdateMealPlanItemRequest }>(
+    "/items/:id",
+    { preHandler: [fastify.authenticate] },
+    updateMealPlanItem
+  );
+  fastify.delete<{ Params: { id: string } }>(
+    "/items/:id",
+    { preHandler: [fastify.authenticate] },
+    deleteMealPlanItem
+  );
+  // Sharing route
+  fastify.get<{ Params: { id: string } }>(
+    "/:id/share",
+    { preHandler: [] },
+    getSharedPlan
+  );
+
+  fastify.post<{ Params: { planId: string }; Body: OrderRequest }>(
+    "/:planId/orders",
+    { preHandler: [fastify.authenticate] },
+    submitOrder
+  );
+}
+
+interface OrderRequest {
+  planId: string;
+  user: any;
+  selectedItems: string[];
+}
+
+async function submitOrder(
+  request: FastifyRequest<{ Params: { planId: string }; Body: OrderRequest }>,
+  reply: FastifyReply
+) {
+  try {
+    const { planId, user: orderUser, selectedItems } = request.body;
+    const userId = (request.user as any)?.openid;
+
+    console.log('user', request.user);
+
+    if (!userId) {
+      return reply.code(401).send({ message: "Unauthorized" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { openid: userId },
+    });
+
+    if (!user) {
+      return reply.code(404).send({ message: "User not found" });
+    }
+
+    const plan = await prisma.plan.findUnique({
+      where: { id: planId },
+    });
+
+    if (!plan) {
+      return reply.code(404).send({ message: "Plan not found" });
+    }
+
+    // Validate that selectedItems contains valid recipe IDs
+    if (!selectedItems || selectedItems.length === 0) {
+      return reply.code(400).send({ message: "No items selected" });
+    }
+
+    // Verify all recipes exist
+    const recipes = await prisma.recipe.findMany({
+      where: {
+        id: { in: selectedItems },
+      },
+    });
+
+    if (recipes.length !== selectedItems.length) {
+      return reply.code(400).send({ message: "Some recipes not found" });
+    }
+
+    // Create meal plan items for each selected recipe
+    const mealPlanItems = await Promise.all(
+      selectedItems.map(async (recipeId, index) => {
+        const recipe = recipes.find(r => r.id === recipeId);
+        if (!recipe) {
+          throw new Error(`Recipe ${recipeId} not found`);
+        }
+
+        return prisma.mealPlanItem.create({
+          data: {
+            title: recipe.title,
+            cookTime: recipe.cookingTime ? `${recipe.cookingTime}分钟` : "30分钟",
+            order: index + 1,
+            planId: plan.id,
+            recipeId: recipe.id,
+          },
+        });
+      })
+    );
+
+    return reply.code(201).send({
+      message: "Order submitted successfully",
+      mealPlanItems,
+    });
+  } catch (error) {
+    request.log.error(error);
+    return reply.code(500).send({ message: "Internal server error" });
+  }
+}
