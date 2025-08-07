@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Prisma } from '@prisma/client';
 import { parseMarkdownRecipe } from '@nowbites/parse-markdown-recipe';
 import { prisma } from '../../utils/prisma';
+import favoriteRecipe, { FavoriteRecipeParams } from './favorite';
 
 // Recipe creation request interface
 interface CreateRecipeRequest {
@@ -547,6 +548,14 @@ export default async function recipeRoutes(fastify: FastifyInstance) {
     },
     getUserRecipes
   );
+
+  fastify.post<{ Params: FavoriteRecipeParams }>('/:id/favorite', {
+    preHandler: [fastify.authenticate],
+    schema: {
+      description: 'Favorite a recipe',
+      tags: ['recipes']
+    }
+  }, favoriteRecipe);
 
 
 

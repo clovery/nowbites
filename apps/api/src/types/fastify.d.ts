@@ -3,6 +3,7 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 declare module 'fastify' {
   interface FastifyRequest {
     user?: {
+      id: string
       openid: string;
       nickName?: string;
     };

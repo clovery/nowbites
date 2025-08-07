@@ -89,6 +89,9 @@ jobs:
             mkdir -p ${{ secrets.WORK_DIR }}
             cd ${{ secrets.WORK_DIR }}
 
+            # Clean existing files before extraction
+            rm -rf *
+
             # Extract the new package
             tar -xzf /tmp/nowbites-api.tar.gz -C .
 

@@ -30,6 +30,7 @@ model User {
   recipes Recipe[]
   plans    Plan[]
   mealPlanItems MealPlanItem[]
+  favorites UserFavorite[]
 
   @@map("users")
 }
@@ -56,6 +57,7 @@ model Recipe {
   userId String?
   user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   mealPlanItems MealPlanItem[]
+  favorites UserFavorite[]
 
   @@map("recipes")
 }
@@ -96,4 +98,19 @@ model MealPlanItem {
   recipe   Recipe? @relation(fields: [recipeId], references: [id], onDelete: SetNull)
 
   @@map("meal_plan_items")
+}
+
+model UserFavorite {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  recipeId String
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recipeId])
+  @@map("user_favorites")
 }

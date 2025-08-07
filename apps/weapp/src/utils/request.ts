@@ -49,8 +49,6 @@ const request = (options: RequestOptions) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           resolve(res.data);
         } else if (res.statusCode === 401) {
-          // 未授权，清除token并提示用户登录
-          Taro.removeStorageSync('token');
           Taro.showToast({
             title: '登录已过期，请重新登录',
             icon: 'none'

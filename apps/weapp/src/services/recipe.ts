@@ -88,6 +88,19 @@ class RecipeService extends BaseService {
 
     return response.data
   }
+
+  // 收藏菜谱
+  async favoriteRecipe(id: string) {
+    const response = await this.request<Recipe>(`/recipes/${id}/favorite`, {
+      method: "POST",
+    })
+
+    if (response.statusCode !== 200) {
+      throw new Error("收藏菜谱失败")
+    }
+
+    return response.data
+  }
 }
 
 export const recipeService = new RecipeService()

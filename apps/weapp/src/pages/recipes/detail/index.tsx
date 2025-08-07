@@ -2,8 +2,9 @@ import { Component } from "react";
 import { View, Text, ScrollView, Button } from "@tarojs/components";
 import { AtTag } from "taro-ui";
 import Taro from "@tarojs/taro";
+import { Recipe } from "@nowbites/types";
 
-import { apiService, Recipe } from "../../../utils/api";
+import { apiService, recipeService } from "../../../utils/api";
 import styles from "./index.module.scss";
 
 interface State {
@@ -93,6 +94,17 @@ export default class RecipeDetail extends Component<{}, State> {
 
         this.saveMealPlan(recipe, targetDate);
       },
+    });
+  };
+
+  addToFavorites = async () => {
+    const { recipe } = this.state;
+    if (!recipe) return;
+    await recipeService.favoriteRecipe(recipe.id);
+
+    Taro.showToast({
+      title: "已收藏",
+      icon: "success",
     });
   };
 
@@ -406,13 +418,19 @@ export default class RecipeDetail extends Component<{}, State> {
             className={`${styles.actionBtn} ${styles.secondary}`}
             onClick={this.shareRecipe}
           >
-            分享菜谱
+            分享
           </Button>
           <Button
             className={`${styles.actionBtn} ${styles.primary}`}
             onClick={this.addToMealPlan}
           >
             加入计划
+          </Button>
+          <Button
+            className={`${styles.actionBtn}`}
+            onClick={this.addToFavorites}
+          >
+            收藏
           </Button>
         </View>
       </View>

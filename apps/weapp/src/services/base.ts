@@ -22,7 +22,7 @@ export class BaseService {
       header?: any
     } = {}
   ): Promise<ApiResponse<T>> {
-    const { method = "GET", data, header = {} } = options
+    const { method = "GET", data = {}, header = {} } = options
 
     // 添加认证token到请求头
     const token = Taro.getStorageSync("token")
