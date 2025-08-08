@@ -206,7 +206,7 @@ DELETE /api/recipes/:id
 #### 获取用户食谱（需要认证）
 
 ```
-GET /api/recipes/my
+GET /api/my/recipes
 ```
 
 ## 生产环境部署

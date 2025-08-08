@@ -25,5 +25,5 @@ export default async function favoriteRecipe(request: FastifyRequest<{ Params: F
         }
     });
 
-    return reply.status(200).send(recipe);
+    return reply.status(200).send(favorite);
 }

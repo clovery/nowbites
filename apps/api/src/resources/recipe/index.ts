@@ -557,6 +557,49 @@ export default async function recipeRoutes(fastify: FastifyInstance) {
     }
   }, favoriteRecipe);
 
+  // Remove favorite recipe
+  fastify.delete<{ Params: FavoriteRecipeParams }>('/:id/favorite', {
+    preHandler: [fastify.authenticate],
+    schema: {
+      description: 'Remove recipe from favorites',
+      tags: ['recipes']
+    }
+  }, async (request, reply) => {
+    try {
+      const { id } = request.params;
+      const { id: userId } = request.user as { id: string };
+
+      // Check if the favorite exists
+      const existingFavorite = await prisma.userFavorite.findUnique({
+        where: {
+          userId_recipeId: {
+            userId: userId,
+            recipeId: id
+          }
+        }
+      });
+
+      if (!existingFavorite) {
+        return reply.status(404).send({ error: 'Favorite not found' });
+      }
+
+      // Delete the favorite
+      await prisma.userFavorite.delete({
+        where: {
+          userId_recipeId: {
+            userId: userId,
+            recipeId: id
+          }
+        }
+      });
+
+      return reply.status(200).send({ message: 'Favorite removed successfully' });
+    } catch (error) {
+      request.log.error(error);
+      return reply.status(500).send({ error: 'Internal server error' });
+    }
+  });
+
 
 
   // Parse markdown recipe (authenticated)

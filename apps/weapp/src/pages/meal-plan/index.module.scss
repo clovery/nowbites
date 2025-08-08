@@ -1,62 +1,65 @@
 .mealPlan {
-  background-color: #f5f5f5;
+  background-color: #f2f2f7;
   min-height: 100vh;
 }
 
 .header {
-  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
-  padding: 60rpx 32rpx 40rpx;
+  background: #ffffff;
+  padding: 60rpx 32rpx 24rpx;
   text-align: center;
+  border-bottom: 2rpx solid #e5e5ea;
 }
 
 .title {
-  font-size: 48rpx;
-  font-weight: bold;
-  color: white;
-  margin-bottom: 16rpx;
+  font-size: 56rpx;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 12rpx;
   display: block;
+  letter-spacing: -1rpx;
 }
 
 .subtitle {
   font-size: 28rpx;
-  color: rgba(255, 255, 255, 0.8);
+  color: #8e8e93;
   display: block;
+  font-weight: 400;
 }
 
 .dateSelector {
   background: white;
-  padding: 24rpx 0;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #e5e5ea;
 }
 
 .dateScroll {
   white-space: nowrap;
-  padding: 0 16px;
+  padding: 0 32rpx;
+  box-sizing: border-box;
 }
 
 .dateItem {
   display: inline-block;
-  padding: 20rpx 32rpx;
+  padding: 16rpx 28rpx;
   margin: 0 8rpx;
-  padding: 8px 16px;
-  margin-right: 8px;
-  background: white;
-  border-radius: 20px;
+  background: #f2f2f7;
+  border-radius: 32rpx;
   text-align: center;
   position: relative;
   transition: all 0.2s ease;
-  border: 1rpx solid #e0e0e0;
-  min-width: 60px;
+  border: none;
+  min-width: 120rpx;
 }
 
 .dateItem:last-child {
-  margin-right: 16px;
+  margin-right: 24rpx;
 }
 
 .dateText {
-  font-size: 28rpx;
-  color: #333;
+  font-size: 26rpx;
+  color: #3a3a3c;
   white-space: nowrap;
+  font-weight: 500;
 }
 
 .dateItem.active .dateText {
@@ -64,31 +67,30 @@
 }
 
 .dateItem.active {
-  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  background: #007aff;
 }
 
 .dateItem.today {
-  border: 1rpx solid #4ecdc4;
+
 }
 
 .mealCount {
   position: absolute;
-  top: -8rpx;
-  right: -8rpx;
-  background: #ff6b6b;
+  top: 0rpx;
+  right: 0rpx;
+  background: #ff3b30;
   color: white;
-  border-radius: 50%;
-  width: 32rpx;
-  height: 32rpx;
+  border-radius: 12rpx;
+  width: 40rpx;
+  padding: 4rpx 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20rpx;
-  font-weight: bold;
+  font-size: 16rpx;
 }
 
 .planContent {
-  padding: 32rpx;
+  padding: 24rpx;
 }
 
 .planHeader {
@@ -96,32 +98,34 @@
 }
 
 .planTitle {
-  font-size: 40rpx;
-  font-weight: bold;
-  color: #333;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #000000;
   display: block;
+  letter-spacing: -1rpx;
+  padding-bottom: 16rpx;
 }
 
 .planStats {
-  font-size: 24rpx;
-  color: #2e7d32;
-  background: #e8f5e8;
-  padding: 12rpx 20rpx;
-  border-radius: 16rpx;
+  font-size: 26rpx;
+  color: #34c759;
+  background: #f0fff4;
+  border-radius: 24rpx;
   display: inline-block;
+  font-weight: 600;
 }
 
 .statsText {
-  font-size: 24rpx;
-  color: #2e7d32;
+  font-size: 26rpx;
+  color: #34c759;
 }
 
 .emptyPlan {
   background: white;
   border-radius: 24rpx;
-  padding: 80rpx 40rpx;
+  padding: 32rpx 24rpx;
   text-align: center;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 
 .emptyIcon {
@@ -131,27 +135,30 @@
 
 .emptyTitle {
   font-size: 36rpx;
-  font-weight: bold;
-  color: #333;
+  font-weight: 600;
+  color: #000000;
+  padding-bottom: 16rpx;
   margin-bottom: 16rpx;
   display: block;
+  letter-spacing: -0.6rpx;
 }
 
 .emptyDesc {
   font-size: 28rpx;
-  color: #666;
+  color: #8e8e93;
   margin-bottom: 48rpx;
   display: block;
+  line-height: 1.4;
 }
 
 .addBtn {
-  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  background: #007aff;
   color: white;
   border: none;
-  border-radius: 50rpx;
-  padding: 24rpx 48rpx;
-  font-size: 32rpx;
-  font-weight: bold;
+  border-radius: 24rpx;
+  padding: 8rpx 24rpx;
+  font-size: 28rpx;
+  font-weight: 600;
 }
 
 .addBtn::after {
@@ -160,41 +167,43 @@
 
 .loadingState {
   background: white;
-  border-radius: 24rpx;
-  padding: 80rpx 40rpx;
+  border-radius: 32rpx;
+  padding: 120rpx 64rpx;
   text-align: center;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  margin: 40rpx;
 }
 
 .loadingText {
-  font-size: 28rpx;
-  color: #666;
+  font-size: 34rpx;
+  color: #8e8e93;
 }
 
 .mealList {
-  padding: 0 32rpx 32rpx;
+  padding: 0 24rpx 24rpx;
 }
 
 .mealItem {
   background: white;
-  border-radius: 24rpx;
-  padding: 32rpx;
-  margin-bottom: 16rpx;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 12rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.04);
   transition: all 0.2s ease;
+  border: 2rpx solid #e5e5ea;
 }
 
 .mealItem.completed {
   background: #f8f9fa;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .mealItem.completed .mealTitle {
   text-decoration: line-through;
-  color: #999;
+  color: #8e8e93;
 }
 
 .mealInfo {
@@ -206,14 +215,14 @@
 .mealNumber {
   width: 48rpx;
   height: 48rpx;
-  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  background: #007aff;
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24rpx;
-  font-weight: bold;
+  font-weight: 600;
   margin-right: 24rpx;
   flex-shrink: 0;
 }
@@ -223,16 +232,17 @@
 }
 
 .mealTitle {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 8rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 6rpx;
   display: block;
+  letter-spacing: -0.4rpx;
 }
 
 .mealTime {
   font-size: 24rpx;
-  color: #666;
+  color: #8e8e93;
   display: block;
 }
 
@@ -252,37 +262,38 @@
 }
 
 .completeBtn {
-  background: #e0e0e0;
-  color: #666;
+  background: #e5e5ea;
+  color: #8e8e93;
 }
 
 .completeBtn.completed {
-  background: #4caf50;
+  background: #34c759;
   color: white;
 }
 
 .removeBtn {
   background: #ffebee;
-  color: #f44336;
+  color: #ff3b30;
 }
 
 .actionText {
-  font-size: 32rpx;
-  font-weight: bold;
+  font-size: 26rpx;
+  font-weight: 600;
 }
 
 .addMore {
-  padding: 32rpx 0;
+  padding: 24rpx 0;
   text-align: center;
 }
 
 .addMoreBtn {
-  background: #f0f0f0;
-  color: #666;
-  border: 2rpx dashed #ccc;
-  border-radius: 24rpx;
+  background: #f2f2f7;
+  color: #007aff;
+  border: 2rpx dashed #c7c7cc;
+  border-radius: 20rpx;
   padding: 24rpx 48rpx;
   font-size: 28rpx;
+  font-weight: 600;
 }
 
 .addMoreBtn::after {
@@ -291,31 +302,31 @@
 
 /* 计划列表样式 */
 .plansSection {
-  margin: 24rpx;
+  margin: 20rpx;
   background: white;
-  border-radius: 20rpx;
+  border-radius: 24rpx;
   overflow: hidden;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 
 .plansHeader {
-  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
-  padding: 20rpx 24rpx;
+  background: #007aff;
+  padding: 24rpx 32rpx;
 }
 
 .plansTitle {
-  font-size: 32rpx;
-  font-weight: bold;
+  font-size: 28rpx;
+  font-weight: 600;
   color: white;
 }
 
 .plansList {
-  max-height: calc(100vh - 400rpx);
+  max-height: calc(100vh - 600rpx);
 }
 
 .planItem {
-  padding: 20rpx 24rpx;
-  border-bottom: 1rpx solid #f0f0f0;
+  padding: 24rpx 32rpx;
+  border-bottom: 2rpx solid #e5e5ea;
   transition: background-color 0.2s ease;
 }
 
@@ -324,31 +335,32 @@
 }
 
 .planItem:active {
-  background: #f8f9fa;
+  background: #f2f2f7;
 }
 
 .planInfo {
-  padding: 24rpx;
-  border-bottom: 1rpx solid #f0f0f0;
+  padding: 32rpx;
+  border-bottom: 2rpx solid #e5e5ea;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .planInfo:active {
-  background-color: #f8f9fa;
+  background-color: #f2f2f7;
 }
 
 .planName {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 8rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 12rpx;
   display: block;
+  letter-spacing: -0.6rpx;
 }
 
 .planDescription {
   font-size: 26rpx;
-  color: #666;
+  color: #8e8e93;
   margin-bottom: 16rpx;
   display: block;
   line-height: 1.4;
@@ -356,62 +368,63 @@
 
 .planDate {
   font-size: 22rpx;
-  color: #999;
+  color: #8e8e93;
 }
 
 /* 新的计划显示样式 */
 .planSection {
   background: white;
-  border-radius: 20rpx;
+  border-radius: 24rpx;
   margin-bottom: 20rpx;
   overflow: hidden;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 
 .planHeader {
-  border-bottom: 1rpx solid #f0f0f0;
+  border-bottom: 2rpx solid #e5e5ea;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .planHeader:active {
-  background-color: #f8f9fa;
+  background-color: #f2f2f7;
 }
 
 .planTitleRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8rpx;
+  margin-bottom: 12rpx;
 }
 
 .planName {
   font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
+  font-weight: 600;
+  color: #000000;
   flex: 1;
+  letter-spacing: -0.6rpx;
 }
 
 .planDescription {
-  font-size: 24rpx;
-  color: #666;
-  margin-bottom: 8rpx;
+  font-size: 26rpx;
+  color: #8e8e93;
+  margin-bottom: 12rpx;
   display: block;
-  line-height: 1.3;
+  line-height: 1.4;
 }
 
 .planStats {
   font-size: 22rpx;
-  color: #2e7d32;
-  background: #e8f5e8;
+  color: #34c759;
+  background: #f0fff4;
   padding: 6rpx 12rpx;
   border-radius: 12rpx;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .planTime {
   font-size: 22rpx;
-  color: #666;
+  color: #8e8e93;
   display: block;
 }
 
@@ -422,19 +435,19 @@
 
 .emptyMealsText {
   font-size: 26rpx;
-  color: #999;
-  margin-bottom: 20rpx;
+  color: #8e8e93;
+  margin-bottom: 24rpx;
   display: block;
 }
 
 .addMealBtn {
-  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  background: #007aff;
   color: white;
   border: none;
-  border-radius: 40rpx;
+  border-radius: 12rpx;
   padding: 12rpx 24rpx;
   font-size: 26rpx;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .addMealBtn::after {
@@ -442,36 +455,36 @@
 }
 
 .addMealSection {
-  padding: 20rpx 24rpx;
-  border-top: 1rpx solid #f0f0f0;
+  padding: 24rpx 32rpx;
+  border-top: 2rpx solid #e5e5ea;
   text-align: center;
 }
 
 .mealList {
-  padding: 0 24rpx 20rpx;
+  padding: 0 24rpx 24rpx;
 }
 
 .mealItem {
   background: white;
-  border-radius: 16rpx;
-  padding: 20rpx;
+  border-radius: 20rpx;
+  padding: 24rpx;
   margin-bottom: 12rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.04);
   transition: all 0.2s ease;
-  border: 1rpx solid #f0f0f0;
+  border: 2rpx solid #e5e5ea;
 }
 
 .mealItem.completed {
   background: #f8f9fa;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .mealItem.completed .mealTitle {
   text-decoration: line-through;
-  color: #999;
+  color: #8e8e93;
 }
 
 .mealInfo {
@@ -481,17 +494,17 @@
 }
 
 .mealNumber {
-  width: 40rpx;
-  height: 40rpx;
-  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  width: 48rpx;
+  height: 48rpx;
+  background: #007aff;
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22rpx;
-  font-weight: bold;
-  margin-right: 16rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  margin-right: 24rpx;
   flex-shrink: 0;
 }
 
@@ -501,26 +514,27 @@
 
 .mealTitle {
   font-size: 28rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 4rpx;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 6rpx;
   display: block;
+  letter-spacing: -0.4rpx;
 }
 
 .mealTime {
-  font-size: 22rpx;
-  color: #666;
+  font-size: 24rpx;
+  color: #8e8e93;
   display: block;
 }
 
 .mealActions {
   display: flex;
-  gap: 12rpx;
+  gap: 16rpx;
 }
 
 .actionBtn {
-  width: 48rpx;
-  height: 48rpx;
+  width: 56rpx;
+  height: 56rpx;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -529,21 +543,21 @@
 }
 
 .completeBtn {
-  background: #e0e0e0;
-  color: #666;
+  background: #e5e5ea;
+  color: #8e8e93;
 }
 
 .completeBtn.completed {
-  background: #4caf50;
+  background: #34c759;
   color: white;
 }
 
 .removeBtn {
   background: #ffebee;
-  color: #f44336;
+  color: #ff3b30;
 }
 
 .actionText {
-  font-size: 28rpx;
-  font-weight: bold;
+  font-size: 26rpx;
+  font-weight: 600;
 } 

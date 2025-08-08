@@ -58,9 +58,11 @@
     "@tarojs/runtime": "4.1.4",
     "@tarojs/shared": "4.1.4",
     "@tarojs/taro": "4.1.4",
+    "@types/react-dom": "18",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "taro-ui": "^3.3.0"
+    "taro-ui": "^3.3.0",
+    "zustand": "^5.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.8.0",
@@ -70,7 +72,7 @@
     "@tarojs/cli": "4.1.4",
     "@tarojs/vite-runner": "4.1.4",
     "@tarojs/webpack5-runner": "4.1.4",
-    "@types/react": "^18.0.0",
+    "@types/react": "^18.3.23",
     "@types/webpack-env": "^1.13.6",
     "@typescript-eslint/eslint-plugin": "^5.20.0",
     "@typescript-eslint/parser": "^5.20.0",

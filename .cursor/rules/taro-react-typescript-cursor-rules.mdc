@@ -1,0 +1,67 @@
+---
+description: Taro React TypeScript Cursor Rules for WeChat Mini Programs
+globs:
+  alwaysApply: false
+---
+
+You are an expert in Taro, TypeScript, React, Zustand, Tailwind CSS, and WeChat Mini Programs.
+
+Code Style and Structure
+- Write concise, modular TypeScript code with accurate and platform-specific examples.
+- Use functional and declarative programming patterns; avoid classes and inheritance.
+- Organize code by features: components, pages, stores, utils, types.
+- Prefer composition and reusability over duplication.
+- Use descriptive camelCase variable names with auxiliary verbs (e.g., isVisible, hasJoined).
+- Structure files: component, subcomponents, composables, helpers, types.
+
+Naming Conventions
+- Use lowercase with dashes for directories (e.g., components/meal-plan).
+- Use PascalCase for components and camelCase for hooks, stores, and functions.
+- Favor named exports for components and utils.
+
+TypeScript Usage
+- Use TypeScript everywhere.
+- Prefer interfaces over types; avoid enums, use union types or config maps instead.
+- Define props and return types explicitly.
+- Use optional chaining and nullish coalescing.
+
+Syntax and Formatting
+- Use the "function" keyword for all functions and hooks.
+- Keep conditionals concise; omit unnecessary blocks or returns.
+- Use declarative JSX syntax, clear prop naming, and default values.
+
+UI and Styling
+- Use Tailwind CSS with custom theme config.
+- Encapsulate reusable UI logic into atomic components.
+- Prefer `View`, `Text`, `Image` over raw HTML tags.
+- Follow mobile-first design; ensure all UI is responsive and touch-friendly.
+- Use `classNames` helper for dynamic styling.
+- Use `rpx` use css property default unit.
+
+State Management
+- Use Zustand for global state; colocate local state inside components.
+- Prefer composables and custom hooks for shared logic.
+- Avoid global state unless necessary (e.g., user info, auth, theme).
+
+Performance Optimization
+- Minimize side effects and unnecessary re-renders.
+- Debounce or throttle expensive operations (e.g., search, scroll).
+- Use lazy loading for images and heavy components.
+- Use static assets over network resources whenever possible.
+- Use `Taro.memo`, `useMemo`, and `useCallback` wisely.
+
+Platform Conventions
+- Use `@tarojs/taro` API only in client components.
+- Avoid direct DOM access; use refs and built-in Taro APIs.
+- Use `useReady`, `useDidShow`, and `useReachBottom` lifecycle hooks.
+- Respect WeChat Mini Program constraints (size, permissions, tabBar limits).
+
+Routing and Navigation
+- Use `Taro.navigateTo`, `redirectTo`, `switchTab` for page transitions.
+- Maintain routing logic in a centralized helper if dynamic navigation is required.
+- Avoid hardcoded paths; use constants or route configs.
+
+Others
+- Handle login, auth, and permission checks globally.
+- Write clean, testable, and maintainable logic with proper separation of concerns.
+- Follow official Taro and WeChat Mini Program best practices and documentation.

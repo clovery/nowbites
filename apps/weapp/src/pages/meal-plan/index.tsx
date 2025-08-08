@@ -9,6 +9,7 @@ import mealPlanService, {
 } from "../../services/meal-plan";
 import { withAuth } from "../../components/with-auth";
 import styles from "./index.module.scss";
+import { AtIcon } from "taro-ui";
 
 interface State {
   currentDate: string;
@@ -180,8 +181,26 @@ class MealPlan extends Component<{}, State> {
         duration: 1000,
       });
 
-      // 重新加载计划数据
-      await this.loadPlans();
+      // 更新内部状态而不是重新加载所有计划
+      this.setState((prevState) => ({
+        plans: prevState.plans.map((plan) => {
+          if (plan.id === planId) {
+            return {
+              ...plan,
+              mealPlanItems: plan.mealPlanItems.map((item) => {
+                if (item.id === mealId) {
+                  return {
+                    ...item,
+                    completed: !item.completed,
+                  };
+                }
+                return item;
+              }),
+            };
+          }
+          return plan;
+        }),
+      }));
     } catch (error) {
       console.error("更新完成状态失败:", error);
       Taro.showToast({
@@ -205,8 +224,18 @@ class MealPlan extends Component<{}, State> {
               icon: "success",
             });
 
-            // 重新加载计划数据
-            await this.loadPlans();
+            // 更新内部状态而不是重新加载所有计划
+            this.setState((prevState) => ({
+              plans: prevState.plans.map((plan) => {
+                if (plan.id === planId) {
+                  return {
+                    ...plan,
+                    mealPlanItems: plan.mealPlanItems.filter((item) => item.id !== mealId),
+                  };
+                }
+                return plan;
+              }),
+            }));
           } catch (error) {
             console.error("移除菜谱失败:", error);
             Taro.showToast({
@@ -292,7 +321,9 @@ class MealPlan extends Component<{}, State> {
                   className={`${styles.dateItem} ${selectedDate === date ? styles.active : ""} ${date === currentDate ? styles.today : ""}`}
                   onClick={() => this.selectDate(date)}
                 >
-                  <Text className={styles.dateText}>{this.formatDate(date)}</Text>
+                  <Text className={styles.dateText}>
+                    {this.formatDate(date)}
+                  </Text>
                   {count > 0 && (
                     <View className={styles.mealCount}>
                       {count > 99 ? "99+" : count}
@@ -319,7 +350,9 @@ class MealPlan extends Component<{}, State> {
             <View className={styles.emptyPlan}>
               <View className={styles.emptyIcon}>📅</View>
               <Text className={styles.emptyTitle}>今天还没有创建计划</Text>
-              <Text className={styles.emptyDesc}>创建一个计划来安排今天的菜谱吧</Text>
+              <Text className={styles.emptyDesc}>
+                创建一个计划来安排今天的菜谱吧
+              </Text>
               <Button className={styles.addBtn} onClick={this.createNewPlan}>
                 创建计划
               </Button>
@@ -334,28 +367,47 @@ class MealPlan extends Component<{}, State> {
 
                 return (
                   <View key={plan.id} className={styles.planSection}>
-                    <View 
+                    <View
                       className="py-2 px-4 border-b border-gray-200"
                       onClick={() => this.viewPlanDetail(plan.id)}
                     >
                       <View className={styles.planTitleRow}>
-                        <Text className={styles.planName}>{plan.name}</Text>
-                        {planMeals.length > 0 && (
-                          <Text className={styles.planStats}>
-                            {completedCount}/{planMeals.length}
-                          </Text>
-                        )}
+                        <View className="flex items-center gap-2">
+                          <Text className={styles.planName}>{plan.name}</Text>
+                        </View>
+                        <View className="flex items-center gap-2">
+                          <View
+                            className="w-6 h-6 inline-flex items-center justify-center"
+                            onClick={() => this.addMealToPlan(plan.id)}
+                          >
+                            <AtIcon value="add-circle" size={16} />
+                          </View>
+                        </View>
                       </View>
                       {plan.description && (
                         <Text className={styles.planDescription}>
                           {plan.description}
                         </Text>
                       )}
-                      {planMeals.length > 0 && (
-                        <Text className={styles.planTime}>
-                          ⏱ {this.getTotalCookTime(planMeals)}
-                        </Text>
-                      )}
+                      <View className="flex items-center justify-between">
+                        <View className="flex items-center gap-2">
+                          {planMeals.length > 0 && (
+                            <Text className={styles.planTime}>
+                              <AtIcon
+                                value="clock"
+                                size={16}
+                                className="mr-2"
+                              />
+                              {this.getTotalCookTime(planMeals)}
+                            </Text>
+                          )}
+                        </View>
+                        {planMeals.length > 0 && (
+                          <Text className={styles.planStats}>
+                            {completedCount}/{planMeals.length}
+                          </Text>
+                        )}
+                      </View>
                     </View>
 
                     {planMeals.length === 0 ? (
@@ -363,56 +415,59 @@ class MealPlan extends Component<{}, State> {
                         <Text className={styles.emptyMealsText}>暂无菜谱</Text>
                       </View>
                     ) : (
-                      <View>
+                      <View className="py-2 px-4">
                         {planMeals.map((meal: MealPlanItem, index: number) => (
                           <View
                             key={meal.id}
-                            className={`flex items-center justify-between p-2 ${meal.completed ? styles.completed : ""}`}
+                            className={`flex items-center justify-between ${meal.completed ? styles.completed : ""}`}
                           >
                             <View
                               className={styles.mealInfo}
-                              onClick={() => this.viewRecipeDetail(meal.recipeId!)}
+                              onClick={() =>
+                                this.viewRecipeDetail(meal.recipeId!)
+                              }
                             >
-                              <View className={styles.mealNumber}>{index + 1}</View>
+                              <View className={styles.mealNumber}>
+                                {index + 1}
+                              </View>
                               <View className={styles.mealDetails}>
-                                <Text className={styles.mealTitle}>{meal.title}</Text>
-                                <Text className={styles.mealTime}> {meal.cookTime}</Text>
+                                <Text className={styles.mealTitle}>
+                                  {meal.title}
+                                </Text>
+                                <Text className={styles.mealTime}>
+                                  {meal.cookTime}
+                                </Text>
                               </View>
                             </View>
 
-                            <View className={styles.mealActions}>
+                            <View
+                              className={`${styles.mealActions} flex items-center gap-2`}
+                            >
                               <View
-                                className={`${styles.actionBtn} ${styles.completeBtn} ${meal.completed ? styles.completed : ""}`}
                                 onClick={() =>
                                   this.toggleMealCompletion(plan.id, meal.id)
                                 }
                               >
-                                <Text className={styles.actionText}>
-                                  {meal.completed ? "✓" : "○"}
-                                </Text>
+                                {meal.completed ? (
+                                  <AtIcon value="check-circle" size={16} />
+                                ) : (
+                                  <AtIcon value="check-circle" size={16} />
+                                )}
                               </View>
-                              <View
-                                className={`${styles.actionBtn} ${styles.removeBtn}`}
-                                onClick={() =>
-                                  this.removeMealFromPlan(plan.id, meal.id)
-                                }
-                              >
-                                <Text className={styles.actionText}>×</Text>
-                              </View>
+                              {!meal.completed && (
+                                <View
+                                  onClick={() =>
+                                    this.removeMealFromPlan(plan.id, meal.id)
+                                  }
+                                >
+                                  <AtIcon value="close-circle" size={16} />
+                                </View>
+                              )}
                             </View>
                           </View>
                         ))}
                       </View>
                     )}
-
-                    <View className={styles.addMealSection}>
-                      <Button
-                        className={styles.addMealBtn}
-                        onClick={() => this.addMealToPlan(plan.id)}
-                      >
-                        + 添加菜谱
-                      </Button>
-                    </View>
                   </View>
                 );
               })}
@@ -422,7 +477,10 @@ class MealPlan extends Component<{}, State> {
           {/* 当有计划时显示创建计划按钮 */}
           {datePlans.length > 0 && (
             <View className={styles.addMore}>
-              <Button className={styles.addMoreBtn} onClick={this.createNewPlan}>
+              <Button
+                className={styles.addMoreBtn}
+                onClick={this.createNewPlan}
+              >
                 + 创建计划
               </Button>
             </View>

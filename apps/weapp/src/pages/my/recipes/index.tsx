@@ -1,7 +1,8 @@
 import { Component } from 'react'
 import { View, Text, ScrollView, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
-import { apiService, Recipe } from '../../../utils/api'
+import { Recipe } from '@nowbites/types'
+import { apiService } from '../../../utils/api'
 
 interface State {
   recipes: Recipe[]

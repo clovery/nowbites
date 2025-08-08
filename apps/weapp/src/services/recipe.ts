@@ -55,7 +55,7 @@ class RecipeService extends BaseService {
 
   // 获取用户自己的菜谱
   async getUserRecipes(): Promise<Recipe[]> {
-    const response = await this.request<Recipe[]>("/recipes/my")
+    const response = await this.request<Recipe[]>("/my/recipes")
 
     if (response.statusCode !== 200) {
       throw new Error("获取用户菜谱失败")

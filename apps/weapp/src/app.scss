@@ -94,3 +94,13 @@ page {
   background: #f8f8f8;
   color: #ccc;
 }
+
+@layer base {
+  :root {
+    --border: 240 5.9% 90%;
+  }
+}
+
+view, text, ::before, ::after {
+  border-color: hsl(var(--border));
+}

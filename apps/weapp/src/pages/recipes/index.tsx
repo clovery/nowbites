@@ -1,7 +1,8 @@
 import { Component } from 'react'
 import { View, Text, ScrollView, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
-import { apiService, Recipe } from '../../utils/api'
+import { apiService } from '../../utils/api'
+import { Recipe } from '@nowbites/types'
 import CustomNavigation from '../../components/custom-navigation'
 import styles from './index.module.scss'
 
@@ -253,7 +254,7 @@ export default class RecipeList extends Component<{}, State> {
                       <View className={styles.recipeImageContainer}>
                         <Image
                           className={`${styles.recipeImage} ${styles.single}`}
-                          src={recipe.coverImage || recipe.imageUrl || 'https://via.placeholder.com/300x200/f0f0f0/999?text=Recipe'}
+                          src={recipe.coverImage || recipe.imageUrl || require("@/assets/cover-image.png")}
                           mode='aspectFill'
                         />
                         {isAdded && (

@@ -10,6 +10,7 @@ export default defineAppConfig({
     'pages/plan-create/index',
     'pages/my/index',
     'pages/my/recipes/index',
+    'pages/my/favorites/index',
     'pages/tools/index',
     'pages/tailwind-demo/index',
     'pages/login/index'

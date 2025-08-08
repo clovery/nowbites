@@ -1,20 +1,21 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { prisma } from '../../utils/prisma';
+import favoriteRoutes from './favorites';
 
-// Get user's recipes
-export const getUserRecipes = async (
+// Get my recipes
+export const getMyRecipes = async (
   request: FastifyRequest,
   reply: FastifyReply
 ) => {
   try {
-    const userId = (request.user as any)?.openid;
+    const userId = (request.user as any)?.id;
 
     if (!userId) {
       return reply.code(401).send({ error: 'Unauthorized' });
     }
 
     const user = await prisma.user.findUnique({
-      where: { openid: userId }
+      where: { id: userId }
     });
 
     if (!user) {
@@ -55,6 +56,9 @@ export default async function myRoutes(fastify: FastifyInstance) {
         tags: ['my']
       }
     },
-    getUserRecipes
+    getMyRecipes
   );
+
+  // Register favorite routes
+  await fastify.register(favoriteRoutes);
 }

@@ -123,7 +123,7 @@ export default class MyPage extends Component<{}, State> {
             <View className='arrow'>›</View>
           </View>
           
-          <View className='function-item'>
+          <View className='function-item' onClick={() => Taro.navigateTo({ url: '/pages/my/favorites/index' })}>
             <View className='function-icon favorites-icon'>📦</View>
             <Text className='function-text'>我的收藏</Text>
             <View className='arrow'>›</View>

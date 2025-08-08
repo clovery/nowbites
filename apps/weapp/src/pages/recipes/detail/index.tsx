@@ -1,6 +1,6 @@
 import { Component } from "react";
-import { View, Text, ScrollView, Button } from "@tarojs/components";
-import { AtTag } from "taro-ui";
+import { View, Text, ScrollView, Button, Image } from "@tarojs/components";
+import { AtIcon, AtTag } from "taro-ui";
 import Taro from "@tarojs/taro";
 import { Recipe } from "@nowbites/types";
 
@@ -108,6 +108,13 @@ export default class RecipeDetail extends Component<{}, State> {
     });
   };
 
+  uploadWork = () => {
+    Taro.showToast({
+      title: "功能开发中",
+      icon: "none",
+    });
+  };
+
   showDatePicker = () => {
     const { recipe } = this.state;
     if (!recipe) return;
@@ -129,12 +136,6 @@ export default class RecipeDetail extends Component<{}, State> {
   saveMealPlan = (recipe: Recipe, date: Date) => {
     const dateStr = date.toISOString().split("T")[0];
     const mealPlans = Taro.getStorageSync("mealPlans") || {};
-
-    console.log("添加菜谱到计划:", {
-      recipe: recipe.title,
-      date: dateStr,
-      existingPlans: mealPlans,
-    });
 
     if (!mealPlans[dateStr]) {
       mealPlans[dateStr] = [];
@@ -180,7 +181,11 @@ export default class RecipeDetail extends Component<{}, State> {
   // 处理食材显示
   renderIngredient = (ingredient: any, index: number) => {
     if (typeof ingredient === "string") {
-      return <AtTag key={index} type="primary">{ingredient}</AtTag>;
+      return (
+        <AtTag key={index} type="primary">
+          {ingredient}
+        </AtTag>
+      );
     }
 
     if (ingredient && typeof ingredient === "object") {
@@ -190,12 +195,24 @@ export default class RecipeDetail extends Component<{}, State> {
         if (note) {
           text += ` (${note})`;
         }
-        return <AtTag key={index} type="primary">{text}</AtTag>;
+        return (
+          <AtTag key={index} type="primary">
+            {text}
+          </AtTag>
+        );
       }
-      return <AtTag key={index} type="primary">{name || "未知食材"}</AtTag>;
+      return (
+        <AtTag key={index} type="primary">
+          {name || "未知食材"}
+        </AtTag>
+      );
     }
 
-    return <AtTag key={index} type="primary">未知食材</AtTag>;
+    return (
+      <AtTag key={index} type="primary">
+        未知食材
+      </AtTag>
+    );
   };
 
   // 处理主要食材
@@ -235,9 +252,11 @@ export default class RecipeDetail extends Component<{}, State> {
 
     return (
       <View className={styles.ingredientGroup}>
-        <Text className={styles.ingredientGroupTitle}>调料</Text>
+        <Text className={styles.sectionTitle}>🥘 调料</Text>
         <View className={styles.sauceTags}>
-          {sauce.map((ingredient, index) => this.renderIngredient(ingredient, index))}
+          {sauce.map((ingredient, index) =>
+            this.renderIngredient(ingredient, index)
+          )}
         </View>
       </View>
     );
@@ -290,11 +309,11 @@ export default class RecipeDetail extends Component<{}, State> {
           {Array.isArray(content) ? (
             content.map((contentItem: string, contentIndex: number) => (
               <Text key={contentIndex} className={styles.stepText}>
-                • {contentItem}
+                {contentItem}
               </Text>
             ))
           ) : (
-            <Text className={styles.stepText}>• {content}</Text>
+            <Text className={styles.stepText}>{content}</Text>
           )}
         </View>
       </View>
@@ -307,7 +326,7 @@ export default class RecipeDetail extends Component<{}, State> {
       return (
         <View>
           <Text key={index} className={styles.tipText}>
-            • {tip}
+            {tip}
           </Text>
         </View>
       );
@@ -317,7 +336,7 @@ export default class RecipeDetail extends Component<{}, State> {
       return (
         <View>
           <Text key={index} className={styles.tipText}>
-            • {tip.content}
+            {tip.content}
           </Text>
         </View>
       );
@@ -348,6 +367,12 @@ export default class RecipeDetail extends Component<{}, State> {
     return (
       <View className={styles.recipeDetail}>
         <ScrollView className={styles.content} scrollY>
+          <View>
+            <Image
+              src={recipe.coverImage || require("@/assets/cover-image.png")}
+              className="w-full"
+            />
+          </View>
           <View className={styles.header}>
             <Text className={styles.title}>{recipe.title}</Text>
             <Text className={styles.description}>{recipe.description}</Text>
@@ -355,7 +380,10 @@ export default class RecipeDetail extends Component<{}, State> {
             <View className={styles.metaInfo}>
               {recipe.cookingTime && (
                 <View className={styles.metaItem}>
-                  <Text className={styles.metaLabel}>⏱ 烹饪时间</Text>
+                  <View className="inline-flex gap-1 items-center">
+                    <AtIcon value="clock" size={14} />
+                    <Text>烹饪时间</Text>
+                  </View>
                   <Text className={styles.metaValue}>
                     {recipe.cookingTime}分钟
                   </Text>
@@ -363,13 +391,19 @@ export default class RecipeDetail extends Component<{}, State> {
               )}
               {recipe.difficulty && (
                 <View className={styles.metaItem}>
-                  <Text className={styles.metaLabel}>🔥 难度</Text>
+                  <View className="inline-flex gap-1 items-center">
+                    <AtIcon value="clock" size={14} />
+                    <Text>烹饪时间</Text>
+                  </View>
                   <Text className={styles.metaValue}>{recipe.difficulty}</Text>
                 </View>
               )}
               {recipe.servings && (
                 <View className={styles.metaItem}>
-                  <Text className={styles.metaLabel}>👥 份量</Text>
+                  <View className="inline-flex gap-1 items-center">
+                    <AtIcon value="user" size={14} />
+                    <Text>份量</Text>
+                  </View>
                   <Text className={styles.metaValue}>
                     {recipe.servings}人份
                   </Text>
@@ -395,7 +429,7 @@ export default class RecipeDetail extends Component<{}, State> {
 
           {this.renderSauce(recipe.sauce)}
 
-          <View className={styles.section}>
+          <View className={`${styles.section} border-t`}>
             <Text className={styles.sectionTitle}>👩‍🍳 制作步骤</Text>
             <View className={styles.steps}>
               {Array.isArray(recipe.steps) &&
@@ -413,25 +447,34 @@ export default class RecipeDetail extends Component<{}, State> {
           )}
         </ScrollView>
 
-        <View className={styles.actions}>
-          <Button
-            className={`${styles.actionBtn} ${styles.secondary}`}
-            onClick={this.shareRecipe}
-          >
-            分享
-          </Button>
-          <Button
-            className={`${styles.actionBtn} ${styles.primary}`}
-            onClick={this.addToMealPlan}
-          >
-            加入计划
-          </Button>
-          <Button
-            className={`${styles.actionBtn}`}
+        <View className="grid grid-cols-3 bg-white border-t fixed bottom-6 left-0 right-0 z-50">
+          <View
+            className="flex items-center justify-center gap-2 bg-transparent min-w-30 transition-all duration-200 text-gray-500 text-sm font-medium active:opacity-70 active:scale-95 py-4"
             onClick={this.addToFavorites}
           >
-            收藏
-          </Button>
+            <AtIcon value="star" size={24} color="#666" />
+            <Text className="text-sm text-gray-500 font-medium text-center">
+              收藏
+            </Text>
+          </View>
+          <View
+            className="flex items-center justify-center gap-2 bg-transparent min-w-30 transition-all duration-200 text-gray-500 text-sm font-medium active:opacity-70 active:scale-95 py-4"
+            onClick={this.uploadWork}
+          >
+            <AtIcon value="camera" size={24} color="#666" />
+            <Text className="text-sm text-gray-500 font-medium text-center">
+              传作品
+            </Text>
+          </View>
+          <View
+            className="flex items-center justify-center gap-2 bg-transparent min-w-30 transition-all duration-200 text-gray-500 text-sm font-medium active:opacity-70 active:scale-95 py-4"
+            onClick={this.shareRecipe}
+          >
+            <AtIcon value="share" size={24} color="#666" />
+            <Text className="text-sm text-gray-500 font-medium text-center">
+              分享
+            </Text>
+          </View>
         </View>
       </View>
     );
