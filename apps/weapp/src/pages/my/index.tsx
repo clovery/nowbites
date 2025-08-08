@@ -1,19 +1,8 @@
 import { Component } from 'react'
 import { View, Text, ScrollView, Button, Input, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
-import { apiService, LoginResponse } from '../../utils/api'
+import LoginService, { UserInfo } from '../../services/login'
 import './index.scss'
-
-interface UserInfo {
-  openid?: string;
-  nickName?: string;
-  avatarUrl?: string;
-  gender?: number;
-  country?: string;
-  province?: string;
-  city?: string;
-  language?: string;
-}
 
 interface State {
   userInfo: UserInfo | null
@@ -37,110 +26,51 @@ export default class MyPage extends Component<{}, State> {
   }
 
   checkLoginStatus = async () => {
-    // 检查本地存储中是否有用户信息和token
-    const userInfo = Taro.getStorageSync('userInfo')
-    const token = Taro.getStorageSync('token')
-    
-    if (userInfo && token) {
-      // 验证token是否有效
-      const isValid = await apiService.verifyToken()
-      if (isValid) {
-        this.setState({ 
-          userInfo,
-          isLogin: true
-        })
-      } else {
-        // token无效，清除本地存储
-        Taro.removeStorageSync('userInfo')
-        Taro.removeStorageSync('token')
-      }
-    }
+    const { isLogin, userInfo } = await LoginService.checkLoginStatus()
+    this.setState({ 
+      userInfo,
+      isLogin
+    })
   }
 
   handleGetUserInfo = async () => {
-    this.setState({ isLoading: true })
-    
-    try {
-      // 第一步：先获取用户信息（必须由点击直接触发）
-      const userProfileRes = await Taro.getUserProfile({
-        desc: '用于完善会员资料'
-      })
-      const userInfo = userProfileRes.userInfo
-
-      // 第二步：获取微信登录code
-      const loginRes = await Taro.login()
-      if (!loginRes.code) {
-        throw new Error('获取微信登录code失败')
-      }
-
-      // 第三步：发送到后端API
-      const loginResponse = await apiService.wechatLogin({
-        code: loginRes.code,
-        userInfo: userInfo
-      })
-
-      Taro.setStorageSync('token', loginResponse.token)
-      Taro.setStorageSync('userInfo', loginResponse.userInfo)
-
-      this.setState({
-        userInfo: loginResponse.userInfo,
-        isLogin: true,
-        isLoading: false
-      })
-
-      Taro.showToast({ title: '登录成功', icon: 'success' })
-
-    } catch (error: any) {
-      this.setState({ isLoading: false })
-      Taro.showToast({
-        title: error.message || '登录失败: ' + apiService.baseUrl +  ' ' + error.errMsg,
-        icon: 'none'
-      })
-    }
+    await LoginService.wechatLogin({
+      onStart: () => {
+        this.setState({ isLoading: true })
+      },
+      onSuccess: (userInfo) => {
+        this.setState({
+          userInfo,
+          isLogin: true
+        })
+      },
+      onFinally: () => {
+        this.setState({ isLoading: false })
+      },
+      showSuccessToast: true,
+      autoNavigateBack: false
+    })
   }
 
   handleLogout = () => {
-    Taro.showModal({
-      title: '确认退出',
-      content: '确定要退出登录吗？',
-      success: (res) => {
-        if (res.confirm) {
-          // 清除本地存储
-          Taro.removeStorageSync('userInfo')
-          Taro.removeStorageSync('token')
-          
-          this.setState({
-            userInfo: null,
-            isLogin: false
-          })
-          
-          Taro.showToast({
-            title: '已退出登录',
-            icon: 'success'
-          })
-        }
+    LoginService.logout({
+      showConfirm: true,
+      onSuccess: () => {
+        this.setState({
+          userInfo: null,
+          isLogin: false
+        })
       }
     })
   }
 
-  navigateToRecipeUpload = () => {
-    if (!this.state.isLogin) {
-      Taro.showModal({
-        title: '提示',
-        content: '请先登录后再上传菜谱',
-        confirmText: '去登录',
-        success: (res) => {
-          if (res.confirm) {
-            this.handleGetUserInfo()
-          }
-        }
+  navigateToRecipeUpload = async () => {
+    const hasLogin = await LoginService.requireLogin('请先登录后再上传菜谱', false)
+    if (hasLogin) {
+      Taro.navigateTo({
+        url: '/pages/recipe-upload/index'
       })
-      return
     }
-    
-    Taro.navigateTo({
-      url: '/pages/recipe-upload/index'
-    })
   }
 
   render() {

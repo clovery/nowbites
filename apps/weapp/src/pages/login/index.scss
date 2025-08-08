@@ -1,0 +1,57 @@
+/* 自定义动画和样式补充 - 配合 Tailwind CSS 使用 */
+
+/* 确保按钮的激活状态在小程序中正常工作 */
+Button[disabled] {
+  pointer-events: none;
+}
+
+/* 微信登录按钮的按下效果 */
+.wechat-login-btn:active:not([disabled]) {
+  transform: translateY(1px);
+}
+
+/* 加载状态的图标旋转动画 */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 为不支持 Tailwind animate-spin 的环境提供备用方案 */
+.custom-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* 背景渐变色备用方案（如果 Tailwind 渐变不生效） */
+.gradient-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 毛玻璃效果备用方案 */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 阴影效果增强 */
+.enhanced-shadow {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* 响应式调整 */
+@media (max-height: 600px) {
+  .responsive-margin {
+    margin-top: 2rem !important;
+    margin-bottom: 2rem !important;
+  }
+  
+  .responsive-padding {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+}

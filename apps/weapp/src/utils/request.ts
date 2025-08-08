@@ -27,8 +27,6 @@ const request = (options: RequestOptions) => {
     if (token) {
       requestHeader['Authorization'] = `Bearer ${token}`;
     } else {
-      // 如果需要token但没有token，可能需要重新登录
-      console.warn('需要登录权限但未找到token');
       Taro.showToast({
         title: '请先登录',
         icon: 'none'

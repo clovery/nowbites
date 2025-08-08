@@ -7,6 +7,7 @@ import mealPlanService, {
   MealPlanItem,
   PlanSummary,
 } from "../../services/meal-plan";
+import { withAuth } from "../../components/with-auth";
 import styles from "./index.module.scss";
 
 interface State {
@@ -18,7 +19,7 @@ interface State {
   loading: boolean;
 }
 
-export default class MealPlan extends Component<{}, State> {
+class MealPlan extends Component<{}, State> {
   constructor(props: any) {
     super(props);
 
@@ -431,3 +432,5 @@ export default class MealPlan extends Component<{}, State> {
     );
   }
 }
+
+export default withAuth(MealPlan);

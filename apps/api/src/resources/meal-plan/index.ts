@@ -40,15 +40,10 @@ export const createPlan = async (
 ) => {
   try {
     const planData = request.body;
-    const userId = (request.user as any)?.openid;
+    const userId = (request.user as any)?.id;
 
-    if (!userId) {
-      return reply.code(401).send({ message: "Unauthorized" });
-    }
-
-    // Find user by openid
     const user = await prisma.user.findUnique({
-      where: { openid: userId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -89,14 +84,14 @@ export const getPlans = async (
 ) => {
   try {
     console.log("getPlans", request.user);
-    const userId = (request.user as any)?.openid;
+    const userId = (request.user as any)?.id;
 
     if (!userId) {
       return reply.code(401).send({ message: "Unauthorized" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { openid: userId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -168,14 +163,14 @@ export const getPlan = async (
   reply: FastifyReply
 ) => {
   try {
-    const userId = (request.user as any)?.openid;
+    const userId = (request.user as any)?.id;
 
     if (!userId) {
       return reply.code(401).send({ message: "Unauthorized" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { openid: userId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -225,14 +220,10 @@ export const updatePlan = async (
   reply: FastifyReply
 ) => {
   try {
-    const userId = (request.user as any)?.openid;
-
-    if (!userId) {
-      return reply.code(401).send({ message: "Unauthorized" });
-    }
+    const userId = (request.user as any)?.id;
 
     const user = await prisma.user.findUnique({
-      where: { openid: userId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -283,14 +274,14 @@ export const deletePlan = async (
   reply: FastifyReply
 ) => {
   try {
-    const userId = (request.user as any)?.openid;
+    const userId = (request.user as any)?.id;
 
     if (!userId) {
       return reply.code(401).send({ message: "Unauthorized" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { openid: userId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -324,14 +315,14 @@ export const addMealPlanItem = async (
   reply: FastifyReply
 ) => {
   try {
-    const userId = (request.user as any)?.openid;
+    const userId = (request.user as any)?.id;
 
     if (!userId) {
       return reply.code(401).send({ message: "Unauthorized" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { openid: userId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -394,14 +385,14 @@ export const updateMealPlanItem = async (
   reply: FastifyReply
 ) => {
   try {
-    const userId = (request.user as any)?.openid;
+    const userId = (request.user as any)?.id;
 
     if (!userId) {
       return reply.code(401).send({ message: "Unauthorized" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { openid: userId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -465,14 +456,14 @@ export const getPlanSummaries = async (
   reply: FastifyReply
 ) => {
   try {
-    const userId = (request.user as any)?.openid;
+    const userId = (request.user as any)?.id;
 
     if (!userId) {
       return reply.code(401).send({ message: "Unauthorized" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { openid: userId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -534,14 +525,14 @@ export const deleteMealPlanItem = async (
   reply: FastifyReply
 ) => {
   try {
-    const userId = (request.user as any)?.openid;
+    const userId = (request.user as any)?.id;
 
     if (!userId) {
       return reply.code(401).send({ message: "Unauthorized" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { openid: userId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -711,7 +702,7 @@ async function submitOrder(
 ) {
   try {
     const { planId, user: orderUser, selectedItems } = request.body;
-    const userId = (request.user as any)?.openid;
+    const userId = (request.user as any)?.id;
 
     console.log('user', request.user);
 
@@ -720,7 +711,7 @@ async function submitOrder(
     }
 
     const user = await prisma.user.findUnique({
-      where: { openid: userId },
+      where: { id: userId },
     });
 
     if (!user) {

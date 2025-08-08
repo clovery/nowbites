@@ -11,7 +11,8 @@ export default defineAppConfig({
     'pages/my/index',
     'pages/my/recipes/index',
     'pages/tools/index',
-    'pages/tailwind-demo/index'
+    'pages/tailwind-demo/index',
+    'pages/login/index'
   ],
   window: {
     backgroundTextStyle: 'light',
