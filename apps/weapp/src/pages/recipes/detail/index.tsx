@@ -1,6 +1,6 @@
 import { Component } from "react";
-import { View, Text, ScrollView, Button, Image } from "@tarojs/components";
-import { AtIcon, AtTag } from "taro-ui";
+import { View, Text, ScrollView, Image } from "@tarojs/components";
+import { AtIcon } from "taro-ui";
 import Taro from "@tarojs/taro";
 import { Recipe } from "@nowbites/types";
 
@@ -109,9 +109,8 @@ export default class RecipeDetail extends Component<{}, State> {
   };
 
   uploadWork = () => {
-    Taro.showToast({
-      title: "功能开发中",
-      icon: "none",
+    Taro.navigateTo({
+      url: "/pages/recipes/new/index",
     });
   };
 
@@ -182,37 +181,27 @@ export default class RecipeDetail extends Component<{}, State> {
   renderIngredient = (ingredient: any, index: number) => {
     if (typeof ingredient === "string") {
       return (
-        <AtTag key={index} type="primary">
+        <View key={index} className="text-ellipsis overflow-hidden inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300">
           {ingredient}
-        </AtTag>
+        </View>
       );
     }
 
     if (ingredient && typeof ingredient === "object") {
+      let text = "未知食材";
       const { name, amount, unit, note } = ingredient;
       if (name && amount) {
-        let text = `${name} ${amount}${unit || ""}`;
+        text = `${name} ${amount}${unit || ""}`;
         if (note) {
           text += ` (${note})`;
         }
-        return (
-          <AtTag key={index} type="primary">
-            {text}
-          </AtTag>
-        );
       }
       return (
-        <AtTag key={index} type="primary">
-          {name || "未知食材"}
-        </AtTag>
+        <View key={index} className="text-ellipsis overflow-hidden inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300">
+          {text}
+        </View>
       );
     }
-
-    return (
-      <AtTag key={index} type="primary">
-        未知食材
-      </AtTag>
-    );
   };
 
   // 处理主要食材
@@ -393,7 +382,7 @@ export default class RecipeDetail extends Component<{}, State> {
                 <View className={styles.metaItem}>
                   <View className="inline-flex gap-1 items-center">
                     <AtIcon value="clock" size={14} />
-                    <Text>烹饪时间</Text>
+                    <Text>难度</Text>
                   </View>
                   <Text className={styles.metaValue}>{recipe.difficulty}</Text>
                 </View>

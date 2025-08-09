@@ -64,6 +64,34 @@ class RecipeService extends BaseService {
     return response.data
   }
 
+  // 创建菜谱
+  async createRecipe(recipeData: {
+    title: string
+    description?: string
+    ingredients: any[]
+    sauce: any[]
+    steps: any[]
+    tips: any[]
+    cookingTime?: number
+    servings?: number
+    difficulty?: string
+    imageUrl?: string
+    coverImage?: string
+    tags?: string[]
+    isPublic?: boolean
+  }): Promise<Recipe> {
+    const response = await this.request<Recipe>("/recipes", {
+      method: "POST",
+      data: recipeData,
+    })
+
+    if (response.statusCode !== 201) {
+      throw new Error("创建菜谱失败")
+    }
+
+    return response.data
+  }
+
   // 解析Markdown菜谱
   async parseMarkdownRecipe(markdown: string): Promise<{
     success: boolean

@@ -4,6 +4,7 @@ export default defineAppConfig({
     'pages/index/index',
     'pages/kitchen/index',
     'pages/recipes/detail/index',
+    'pages/recipes/new/index',
     'pages/recipe-upload/index',
     'pages/meal-plan/index',
     'pages/meal-plan/detail/index',
