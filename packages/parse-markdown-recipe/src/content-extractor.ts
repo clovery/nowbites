@@ -1,10 +1,12 @@
+import type { Ingredient } from './types';
+
 /**
  * Extract ingredients from recipe content
  * @param content - The recipe content
  * @returns Array of ingredients
  */
-export function extractIngredients(content: string): string[] {
-  const ingredients: string[] = [];
+export function extractIngredients(content: string): Ingredient[] {
+  const ingredients: Ingredient[] = [];
   
   // Look for table format ingredients (Chinese recipe format)
   const lines = content.split('\n');
@@ -42,8 +44,26 @@ export function extractIngredients(content: string): string[] {
       
       // Process actual ingredient rows
       if (parts.length >= 2) {
-        const ingredient = `${parts[0]} ${parts[1]}`;
-        ingredients.push(ingredient);
+        const name = parts[0];
+        const amountWithUnit = parts[1];
+        
+        if (name && amountWithUnit) {
+          // Parse amount and unit from the amount field
+          const unitMatch = amountWithUnit.match(/^(\d+(?:\.\d+)?)([a-zA-Z\u4e00-\u9fa5]+)$/);
+          let unit = '';
+          let cleanAmount = amountWithUnit;
+          
+          if (unitMatch && unitMatch[1] && unitMatch[2]) {
+            cleanAmount = unitMatch[1];
+            unit = unitMatch[2];
+          }
+          
+          ingredients.push({
+            name: name.trim(),
+            amount: cleanAmount,
+            unit: unit
+          });
+        }
       }
     }
   }
@@ -221,8 +241,8 @@ export function extractDescriptionFromContent(content: string): string | undefin
     
     // If we found the title, collect description lines until we hit a section
     if (foundTitle) {
-      // Stop when we hit a section marker
-      if (trimmed.startsWith('##') || trimmed.startsWith('---')) {
+      // Stop when we hit a ## section marker (but continue through --- separators)
+      if (trimmed.startsWith('##')) {
         break;
       }
       
@@ -249,8 +269,8 @@ export function extractMainIngredientsSection(content: string): string {
   for (const line of lines) {
     const trimmed = line.trim();
     
-    // Look for main ingredients section headers (Chinese)
-    if (trimmed.startsWith('##') && (trimmed.includes('主料') || trimmed.includes('主要食材'))) {
+    // Look for main ingredients section headers (Chinese) - both ## and ###
+    if ((trimmed.startsWith('##') || trimmed.startsWith('###')) && (trimmed.includes('主料') || trimmed.includes('主要食材'))) {
       inMainIngredients = true;
       continue;
     }
@@ -282,8 +302,8 @@ export function extractAuxiliaryIngredientsSection(content: string): string {
   for (const line of lines) {
     const trimmed = line.trim();
     
-    // Look for auxiliary ingredients section headers (Chinese)
-    if (trimmed.startsWith('##') && (trimmed.includes('辅料') || trimmed.includes('辅助食材'))) {
+    // Look for auxiliary ingredients section headers (Chinese) - both ## and ###
+    if ((trimmed.startsWith('##') || trimmed.startsWith('###')) && (trimmed.includes('辅料') || trimmed.includes('辅助食材'))) {
       inAuxiliaryIngredients = true;
       continue;
     }
@@ -315,14 +335,14 @@ export function extractSauceSection(content: string): string {
   for (const line of lines) {
     const trimmed = line.trim();
     
-    // Look for sauce section headers (Chinese)
-    if (trimmed.startsWith('##') && (trimmed.includes('调味汁') || trimmed.includes('调味料') || trimmed.includes('酱料'))) {
+    // Look for sauce section headers (Chinese) - both ## and ###
+    if ((trimmed.startsWith('##') || trimmed.startsWith('###')) && (trimmed.includes('调味汁') || trimmed.includes('调味料') || trimmed.includes('酱料'))) {
       inSauce = true;
       continue;
     }
     
-    // Stop when we hit another section
-    if (inSauce && (trimmed.startsWith('##') || trimmed.startsWith('---'))) {
+    // Stop when we hit another ## section (but continue through ### and ---)
+    if (inSauce && trimmed.startsWith('##') && !trimmed.includes('调味汁') && !trimmed.includes('调味料') && !trimmed.includes('酱料')) {
       break;
     }
     

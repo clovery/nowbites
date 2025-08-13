@@ -1,10 +1,69 @@
 {
   "title": "辣子鸡",
   "ingredients": {
-    "main": [],
-    "auxiliary": []
+    "main": [
+      {
+        "name": "鸡腿肉",
+        "amount": "去骨，切成小块",
+        "unit": ""
+      }
+    ],
+    "auxiliary": [
+      {
+        "name": "干辣椒段",
+        "amount": "100",
+        "unit": "g",
+        "note": "根据口味增减"
+      },
+      {
+        "name": "花椒适量",
+        "amount": "推荐汉源花椒或青花椒",
+        "unit": ""
+      },
+      {
+        "name": "姜片",
+        "amount": "",
+        "unit": ""
+      },
+      {
+        "name": "蒜片",
+        "amount": "",
+        "unit": ""
+      },
+      {
+        "name": "小葱段",
+        "amount": "可选",
+        "unit": ""
+      },
+      {
+        "name": "白芝麻",
+        "amount": "撒面用",
+        "unit": ""
+      }
+    ]
   },
-  "sauce": [],
+  "sauce": [
+    {
+      "name": "生抽",
+      "amount": "10",
+      "unit": "g"
+    },
+    {
+      "name": "老抽 5g",
+      "amount": "可选上色",
+      "unit": ""
+    },
+    {
+      "name": "白糖",
+      "amount": "3",
+      "unit": "g"
+    },
+    {
+      "name": "鸡精或味精适量",
+      "amount": "",
+      "unit": ""
+    }
+  ],
   "steps": [
     {
       "title": "步骤 1",

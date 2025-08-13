@@ -1,31 +1,31 @@
 {
   "title": "乌发养生豆浆食谱",
-  "description": "一款适合日常养发、补肾养血的健康饮品，选用黑色食材与坚果搭配，营养丰富，口感香浓。",
+  "description": "一款适合日常养发、补肾养血的健康饮品，选用黑色食材与坚果搭配，营养丰富，口感香浓。 ---",
   "ingredients": {
     "main": [
       {
         "name": "黑豆",
-        "amount": "10g",
+        "amount": "10",
         "unit": "g"
       },
       {
         "name": "黑芝麻",
-        "amount": "5g",
+        "amount": "5",
         "unit": "g"
       },
       {
         "name": "花生",
-        "amount": "10g",
+        "amount": "10",
         "unit": "g"
       },
       {
         "name": "红枣",
-        "amount": "2颗",
+        "amount": "2",
         "unit": "颗"
       },
       {
         "name": "清水",
-        "amount": "300ml",
+        "amount": "300",
         "unit": "ml"
       }
     ],

@@ -1,0 +1,69 @@
+{
+  "title": "锅塌里脊",
+  "ingredients": {
+    "main": [
+      {
+        "name": "通脊",
+        "amount": "",
+        "unit": ""
+      }
+    ],
+    "auxiliary": [
+      {
+        "name": "葱姜末",
+        "amount": "",
+        "unit": ""
+      },
+      {
+        "name": "香菜叶",
+        "amount": "",
+        "unit": ""
+      },
+      {
+        "name": "鸡蛋",
+        "amount": "2",
+        "unit": "个"
+      },
+      {
+        "name": "面粉",
+        "amount": "",
+        "unit": ""
+      },
+      {
+        "name": "水淀粉",
+        "amount": "",
+        "unit": ""
+      }
+    ]
+  },
+  "sauce": [
+    {
+      "name": "盐",
+      "amount": "",
+      "unit": ""
+    },
+    {
+      "name": "黄酒",
+      "amount": "",
+      "unit": ""
+    },
+    {
+      "name": "香油",
+      "amount": "",
+      "unit": ""
+    },
+    {
+      "name": "味精",
+      "amount": "",
+      "unit": ""
+    },
+    {
+      "name": "清汤或水",
+      "amount": "",
+      "unit": ""
+    }
+  ],
+  "steps": [],
+  "tips": [],
+  "tags": []
+}

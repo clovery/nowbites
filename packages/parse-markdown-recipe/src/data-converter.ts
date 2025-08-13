@@ -38,25 +38,9 @@ export function convertToRecipeFormat(
     // Fall back to the original extractIngredients function for general ingredients sections
     const ingredients = extractIngredients(contentWithoutFrontmatter);
     
-    // Convert ingredients to Recipe format using the original approach
-    const recipeIngredientsList: Ingredient[] = ingredients.map(ingredient => {
-      // Parse ingredient string like "黑豆 10g" or "红枣 2颗"
-      const match = ingredient.match(/^(.+?)\s+(\d+[^\s]*)$/);
-      if (match && match[1] && match[2]) {
-        return {
-          name: match[1].trim(),
-          amount: match[2].trim(),
-          unit: extractUnit(match[2])
-        };
-      }
-      return {
-        name: ingredient,
-        amount: "适量"
-      };
-    });
-    
+    // Since extractIngredients now returns Ingredient[] objects, we can use them directly
     recipeIngredients = {
-      main: recipeIngredientsList,
+      main: ingredients,
       auxiliary: []
     };
   }

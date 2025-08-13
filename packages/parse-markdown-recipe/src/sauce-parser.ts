@@ -11,7 +11,11 @@ export function parseSauce(content: string): Sauce[] {
   
   for (const line of lines) {
     const trimmed = line.trim();
-    if (trimmed.startsWith('-') || trimmed.startsWith('•')) {
+    // Skip separator lines
+    if (trimmed === '---' || trimmed === '--') {
+      continue;
+    }
+    if (trimmed.startsWith('-') || trimmed.startsWith('•') || trimmed.startsWith('*')) {
       const sauceText = trimmed.substring(1).trim();
       const sauce = parseSauceIngredient(sauceText);
       if (sauce) {
@@ -29,6 +33,33 @@ export function parseSauce(content: string): Sauce[] {
  * @returns parsed sauce object
  */
 function parseSauceIngredient(text: string): Sauce | null {
+  // Handle em dash separator (—) first
+  if (text.includes('—')) {
+    const parts = text.split('—').map(part => part.trim());
+    if (parts.length >= 2) {
+      const name = parts[0];
+      const amountWithUnit = parts[1];
+      
+      if (name && amountWithUnit) {
+        // Extract unit from amount if present (support Chinese characters)
+        const unitMatch = amountWithUnit.match(/^(\d+(?:\.\d+)?)([a-zA-Z\u4e00-\u9fa5]+)$/);
+        let unit = '';
+        let cleanAmount = amountWithUnit;
+        
+        if (unitMatch && unitMatch[1] && unitMatch[2]) {
+          cleanAmount = unitMatch[1];
+          unit = unitMatch[2];
+        }
+        
+        return {
+          name: name.trim(),
+          amount: cleanAmount,
+          unit
+        };
+      }
+    }
+  }
+  
   // Handle ingredients with descriptive amounts in parentheses
   const descriptiveRegex = /^(.+?)（(.+?)）$/;
   const descriptiveMatch = text.match(descriptiveRegex);

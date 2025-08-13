@@ -228,5 +228,84 @@ describe('Ingredients Parser', () => {
         note: undefined
       });
     });
+
+    it('should handle ingredients with em dash separator and complex notes', () => {
+      const mainIngredients = `
+- 陈皮 — 3 片
+- 大葱段 — 适量（去腥 5 段 + 炒制适量）
+- 姜片 — 适量（去腥 3 片 + 炒制适量）
+- 蒜 — 3 粒
+- 山萘 — 5 粒
+- 草果（去籽） — 1 粒
+- 白芷 — 5 粒
+- 桂皮 — 1 段
+- 八角 — 3 颗
+- 干辣椒 — 3 个
+`;
+
+      const result = parseIngredients(mainIngredients, '');
+
+      expect(result.main[0]).toEqual({
+        name: '陈皮',
+        amount: '3',
+        unit: '片'
+      });
+
+      expect(result.main[1]).toEqual({
+        name: '大葱段',
+        amount: '适量',
+        unit: '',
+        note: '去腥 5 段 + 炒制适量'
+      });
+
+      expect(result.main[2]).toEqual({
+        name: '姜片',
+        amount: '适量',
+        unit: '',
+        note: '去腥 3 片 + 炒制适量'
+      });
+
+      expect(result.main[3]).toEqual({
+        name: '蒜',
+        amount: '3',
+        unit: '粒'
+      });
+
+      expect(result.main[4]).toEqual({
+        name: '山萘',
+        amount: '5',
+        unit: '粒'
+      });
+
+      expect(result.main[5]).toEqual({
+        name: '草果（去籽）',
+        amount: '1',
+        unit: '粒'
+      });
+
+      expect(result.main[6]).toEqual({
+        name: '白芷',
+        amount: '5',
+        unit: '粒'
+      });
+
+      expect(result.main[7]).toEqual({
+        name: '桂皮',
+        amount: '1',
+        unit: '段'
+      });
+
+      expect(result.main[8]).toEqual({
+        name: '八角',
+        amount: '3',
+        unit: '颗'
+      });
+
+      expect(result.main[9]).toEqual({
+        name: '干辣椒',
+        amount: '3',
+        unit: '个'
+      });
+    });
   });
 }); 
