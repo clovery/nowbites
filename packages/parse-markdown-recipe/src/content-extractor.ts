@@ -80,7 +80,9 @@ export function extractInstructions(content: string): string[] {
   const lines = content.split('\n');
   const instructions: string[] = [];
   let inInstructions = false;
-  let currentInstruction = '';
+  let currentStepTitle = '';
+  let currentStepContent: string[] = [];
+  let hasStepHeaders = false;
   
   for (const line of lines) {
     const trimmed = line.trim();
@@ -112,53 +114,63 @@ export function extractInstructions(content: string): string[] {
         // This is a separator within instructions, continue processing
         // Continue processing
       } else {
-        // Add the last instruction if we have one
-        if (currentInstruction.trim()) {
-          instructions.push(currentInstruction.trim());
-          currentInstruction = ''; // Clear to avoid duplication
+        // Save the current step if we have one
+        if (currentStepTitle && currentStepContent.length > 0) {
+          const fullInstruction = currentStepTitle + '\n' + currentStepContent.join('\n');
+          instructions.push(fullInstruction.trim());
         }
         break;
       }
     }
     
     if (inInstructions && trimmed) {
-      // Handle emoji step headers like "### 🥢 第一步：处理带鱼（00:18）"
+      // Handle step headers like "### 第一步：焯水去腥"
       if (trimmed.startsWith('###') && (trimmed.includes('第') || trimmed.includes('步'))) {
-        // If we have a previous instruction, save it
-        if (currentInstruction.trim()) {
-          instructions.push(currentInstruction.trim());
+        hasStepHeaders = true;
+        // Save the previous step if we have one
+        if (currentStepTitle && currentStepContent.length > 0) {
+          const fullInstruction = currentStepTitle + '\n' + currentStepContent.join('\n');
+          instructions.push(fullInstruction.trim());
         }
-        // Start new instruction from step title
-        const stepTitle = trimmed.replace(/^###\s*[^\s]+\s*/, '').replace(/（[^）]+）$/, '');
-        currentInstruction = stepTitle;
+        
+        // Start new step
+        currentStepTitle = trimmed.replace(/^###\s*/, '');
+        currentStepContent = [];
       } else if (trimmed.match(/^\d+\./)) {
-        // If we have a previous instruction, save it
-        if (currentInstruction.trim()) {
-          instructions.push(currentInstruction.trim());
-        }
-        // Start new numbered instruction
-        currentInstruction = trimmed.replace(/^\d+\.\s*/, '');
-      } else if ((trimmed.startsWith('-') || trimmed.startsWith('*')) && !trimmed.startsWith('---')) {
-        // Add bullet point to current instruction
-        if (currentInstruction) {
-          currentInstruction += ' ' + trimmed.substring(1).trim();
+        if (hasStepHeaders) {
+          // Add numbered sub-step to current step content
+          const subStep = trimmed.replace(/^\d+\.\s*/, '');
+          currentStepContent.push(subStep);
         } else {
-          // Standalone bullet point - skip this as it might be from other sections
-          // instructions.push(trimmed.substring(1).trim());
+          // Original format: numbered list directly under section
+          // If we have a previous instruction, save it
+          if (currentStepContent.length > 0) {
+            instructions.push(currentStepContent.join('\n').trim());
+            currentStepContent = [];
+          }
+          // Start new numbered instruction
+          currentStepContent.push(trimmed.replace(/^\d+\.\s*/, ''));
         }
+      } else if ((trimmed.startsWith('-') || trimmed.startsWith('*')) && !trimmed.startsWith('---')) {
+        // Add bullet point to current step content
+        const bulletPoint = trimmed.substring(1).trim();
+        currentStepContent.push(bulletPoint);
       } else if (trimmed && !trimmed.startsWith('**') && !trimmed.startsWith('---')) {
-        // Add regular text to current instruction
-        if (currentInstruction) {
-          currentInstruction += ' ' + trimmed;
+        // Add regular text to current step content (if we have a step title or are in original format)
+        if (currentStepTitle || !hasStepHeaders) {
+          currentStepContent.push(trimmed);
         }
       }
     }
   }
   
-  // Add the last instruction if we have one
-  if (currentInstruction.trim()) {
-    instructions.push(currentInstruction.trim());
-    currentInstruction = ''; // Clear to avoid duplication
+  // Save the last step if we have one
+  if (currentStepTitle && currentStepContent.length > 0) {
+    const fullInstruction = currentStepTitle + '\n' + currentStepContent.join('\n');
+    instructions.push(fullInstruction.trim());
+  } else if (currentStepContent.length > 0 && !hasStepHeaders) {
+    // For original format without step headers
+    instructions.push(currentStepContent.join('\n').trim());
   }
   
   return instructions;
@@ -241,9 +253,14 @@ export function extractDescriptionFromContent(content: string): string | undefin
     
     // If we found the title, collect description lines until we hit a section
     if (foundTitle) {
-      // Stop when we hit a ## section marker (but continue through --- separators)
+      // Stop when we hit a ## section marker
       if (trimmed.startsWith('##')) {
         break;
+      }
+      
+      // Skip separator lines (---)
+      if (trimmed === '---') {
+        continue;
       }
       
       // Add non-empty lines to description

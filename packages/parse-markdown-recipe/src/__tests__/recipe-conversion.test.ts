@@ -102,7 +102,7 @@ describe('Recipe Format Conversion', () => {
       expect(firstIngredient).toBeDefined();
       if (firstIngredient) {
         expect(firstIngredient.name).toBe('黑豆');
-        expect(firstIngredient.amount).toBe('10g');
+        expect(firstIngredient.amount).toBe('10');
         expect(firstIngredient.unit).toBe('g');
       }
     });

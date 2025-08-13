@@ -97,11 +97,33 @@ describe('Chinese Recipe Parsing', () => {
       const contentWithoutFrontmatter = getContentWithoutFrontmatter(chineseRecipeMarkdown);
       const ingredients = extractIngredients(contentWithoutFrontmatter);
       
-      expect(ingredients).toContain('黑豆 10g');
-      expect(ingredients).toContain('黑芝麻 5g');
-      expect(ingredients).toContain('花生 10g');
-      expect(ingredients).toContain('红枣 2颗');
-      expect(ingredients).toContain('清水 300ml');
+      // Check that ingredients are extracted as structured objects
+      expect(ingredients).toHaveLength(5);
+      
+      const blackBean = ingredients.find(ing => ing.name === '黑豆');
+      expect(blackBean).toBeDefined();
+      expect(blackBean?.amount).toBe('10');
+      expect(blackBean?.unit).toBe('g');
+      
+      const blackSesame = ingredients.find(ing => ing.name === '黑芝麻');
+      expect(blackSesame).toBeDefined();
+      expect(blackSesame?.amount).toBe('5');
+      expect(blackSesame?.unit).toBe('g');
+      
+      const peanut = ingredients.find(ing => ing.name === '花生');
+      expect(peanut).toBeDefined();
+      expect(peanut?.amount).toBe('10');
+      expect(peanut?.unit).toBe('g');
+      
+      const redDate = ingredients.find(ing => ing.name === '红枣');
+      expect(redDate).toBeDefined();
+      expect(redDate?.amount).toBe('2');
+      expect(redDate?.unit).toBe('颗');
+      
+      const water = ingredients.find(ing => ing.name === '清水');
+      expect(water).toBeDefined();
+      expect(water?.amount).toBe('300');
+      expect(water?.unit).toBe('ml');
     });
   });
 
