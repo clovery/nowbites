@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint --max-warnings 0",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test": "echo 'No tests configured for docs package'",
+    "test:watch": "echo 'No tests configured for docs package'"
   },
   "dependencies": {
     "@nowbites/ui": "workspace:*",

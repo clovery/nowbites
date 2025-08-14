@@ -15,7 +15,9 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
-    "convert-recipes": "tsx scripts/convert-recipes.ts"
+    "convert-recipes": "tsx scripts/convert-recipes.ts",
+    "test": "echo 'No tests configured for api package'",
+    "test:watch": "echo 'No tests configured for api package'"
   },
   "dependencies": {
     "@fastify/cors": "^9.0.0",

@@ -32,7 +32,9 @@
     "build": "npm run build:weapp",
     "prepublish:weapp": "npm run build",
     "publish:weapp": "tsx scripts/publish-weapp.ts",
-    "postinstall": "weapp-tw patch"
+    "postinstall": "weapp-tw patch",
+    "test": "echo 'No tests configured for weapp package'",
+    "test:watch": "echo 'No tests configured for weapp package'"
   },
   "browserslist": [
     "last 3 versions",
