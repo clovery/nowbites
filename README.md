@@ -1,150 +1,127 @@
 # NowBites
 
-A modern monorepo project built with Turborepo.
+A monorepo for recipe management with WeChat Mini Program, web app, and API.
 
-## Getting Started
+## Features
 
-Clone the repository and install dependencies:
+- 🍳 Recipe management and parsing
+- 📱 WeChat Mini Program (Taro + React)
+- 🌐 Web application (Next.js)
+- 🔌 RESTful API (Fastify)
+- 📚 Documentation site
+- 🧪 Comprehensive testing with pre-commit hooks
 
-```sh
-git clone https://github.com/clovery/nowbites.git
-cd nowbites
+## Pre-commit Hooks
+
+This project uses pre-commit hooks to ensure code quality and prevent commits when tests fail.
+
+### How it works
+
+Every time you try to commit code, the following checks run automatically:
+
+1. **Lint-staged**: Formats and lints only the staged files
+2. **Tests**: Runs all tests across the monorepo
+3. **Commit**: Only proceeds if all checks pass
+
+### What happens if tests fail?
+
+If any tests fail, the commit will be blocked with an error message:
+
+```
+❌ Tests failed! Please fix the issues before committing.
+```
+
+You must fix the failing tests before you can commit your changes.
+
+### Manual testing
+
+You can run tests manually at any time:
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests in watch mode
+pnpm test:watch
+
+# Run tests for a specific package
+pnpm --filter <package-name> test
+```
+
+### Skipping hooks (emergency only)
+
+If you absolutely need to skip the pre-commit hooks (not recommended), you can use:
+
+```bash
+git commit --no-verify -m "your message"
+```
+
+## Development
+
+### Prerequisites
+
+- Node.js >= 18
+- pnpm >= 9.0.0
+
+### Setup
+
+```bash
+# Install dependencies
 pnpm install
+
+# The pre-commit hooks are automatically installed
 ```
 
-## What's Inside?
+### Available Scripts
 
-This monorepo includes the following packages/apps:
+```bash
+# Development
+pnpm dev          # Start all dev servers
+pnpm build        # Build all packages
+pnpm lint         # Lint all packages
+pnpm test         # Run all tests
+pnpm test:watch   # Run tests in watch mode
 
-### Apps
-
-- `docs`: a [Next.js](https://nextjs.org/) app for documentation
-- `web`: a [Next.js](https://nextjs.org/) app for the main web application
-- `weapp`: a WeChat Mini Program application
-
-### Packages
-
-- `ui`: a React component library shared by both `web` and `docs` applications
-- `eslint-config`: `eslint` configurations used throughout the monorepo
-- `typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This project has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-- [Turborepo](https://turborepo.org/) for monorepo management
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```sh
-# Using pnpm (recommended)
-pnpm build
-
-# Or using Turborepo directly
-pnpm exec turbo build
-```
-
-You can build a specific app or package by using a filter:
-
-```sh
-# Build only the web app
-pnpm build --filter=web
-
-# Build only the docs app
-pnpm build --filter=docs
-
-# Build only the weapp
-pnpm build --filter=weapp
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```sh
-# Using pnpm (recommended)
-pnpm dev
-
-# Or using Turborepo directly
-pnpm exec turbo dev
-```
-
-You can develop a specific app by using a filter:
-
-```sh
-# Develop only the web app
-pnpm dev --filter=web
-
-# Develop only the docs app
-pnpm dev --filter=docs
-
-# Develop only the weapp
-pnpm dev --filter=weapp
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-To enable Remote Caching:
-
-1. Create a Vercel account if you don't have one already
-2. Authenticate with Vercel:
-
-```sh
-pnpm exec turbo login
-```
-
-3. Link your project to Remote Cache:
-
-```sh
-pnpm exec turbo link
+# Package-specific commands
+pnpm --filter weapp dev     # Start weapp dev server
+pnpm --filter web dev       # Start web dev server
+pnpm --filter api dev       # Start API dev server
 ```
 
 ## Project Structure
 
 ```
+nowbites/
 ├── apps/
-│   ├── docs/         # Documentation site
-│   ├── web/          # Main web application
-│   └── weapp/        # WeChat Mini Program
-└── packages/
-    ├── eslint-config/    # Shared ESLint configurations
-    ├── typescript-config/ # Shared TypeScript configurations
-    └── ui/               # Shared UI components
+│   ├── weapp/          # WeChat Mini Program
+│   ├── web/            # Web application
+│   ├── api/            # API server
+│   └── docs/           # Documentation site
+├── packages/
+│   ├── parse-markdown-recipe/  # Recipe parsing library
+│   ├── types/                  # Shared TypeScript types
+│   ├── ui/                     # Shared UI components
+│   └── eslint-config/          # Shared ESLint configuration
+├── .husky/             # Git hooks configuration
+└── docs/               # Project documentation
 ```
 
-## Useful Links
+## Testing
 
-Learn more about the power of Turborepo:
+The project includes comprehensive testing:
 
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+- **parse-markdown-recipe**: 98 tests covering recipe parsing functionality
+- **Other packages**: Placeholder test scripts (can be expanded as needed)
+
+Tests are automatically run before each commit to ensure code quality.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. Make your changes
+2. Ensure tests pass: `pnpm test`
+3. Commit your changes (tests will run automatically)
+4. If tests fail, fix the issues and try again
 
 ## License
 
-This project is licensed under the terms of the license included in the repository.
+MIT
