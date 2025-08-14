@@ -15,15 +15,20 @@ interface State {
   userInfo: UserInfo | null;
   isLogin: boolean;
   isLoading: boolean;
+  isHiddenSectionVisible: boolean;
 }
 
 export default class MyPage extends Component<{}, State> {
+  private touchStartY: number = 0;
+  private touchStartTime: number = 0;
+
   constructor(props: {}) {
     super(props);
     this.state = {
       userInfo: null,
       isLogin: false,
       isLoading: false,
+      isHiddenSectionVisible: false,
     };
   }
 
@@ -82,11 +87,49 @@ export default class MyPage extends Component<{}, State> {
     }
   };
 
+  handleTouchStart = (e: any) => {
+    const touch = e.touches[0];
+    this.touchStartY = touch.clientY;
+    this.touchStartTime = Date.now();
+  };
+
+  handleTouchMove = (e: any) => {
+    // Prevent default to avoid page scrolling during gesture
+    e.preventDefault();
+  };
+
+  handleTouchEnd = (e: any) => {
+    const touch = e.changedTouches[0];
+    const touchEndY = touch.clientY;
+    const touchEndTime = Date.now();
+
+    const deltaY = this.touchStartY - touchEndY;
+    const deltaTime = touchEndTime - this.touchStartTime;
+
+    // Check for upward swipe: deltaY > 50 (minimum distance) and deltaTime < 500ms (maximum duration)
+    if (deltaY > 50 && deltaTime < 500) {
+      // Only show hidden section if it's not already visible
+      if (!this.state.isHiddenSectionVisible) {
+        this.setState({ isHiddenSectionVisible: true });
+      }
+    }
+
+    // Check for downward swipe to hide the section
+    if (deltaY < -50 && deltaTime < 500 && this.state.isHiddenSectionVisible) {
+      this.setState({ isHiddenSectionVisible: false });
+    }
+  };
+
   render() {
-    const { userInfo, isLogin, isLoading } = this.state;
+    const { userInfo, isLogin, isLoading, isHiddenSectionVisible } = this.state;
 
     return (
-      <View className="my-page">
+      <View
+        className="my-page"
+        onTouchStart={this.handleTouchStart}
+        onTouchMove={this.handleTouchMove}
+        onTouchEnd={this.handleTouchEnd}
+      >
         {/* Profile Header Section */}
         <View className="profile-header">
           {isLogin ? (
@@ -191,6 +234,41 @@ export default class MyPage extends Component<{}, State> {
             </Button>
           </View>
         )}
+
+        {/* Hidden Section - Revealed by Swipe Up */}
+        <View
+          className={`hidden-section ${isHiddenSectionVisible ? "visible" : "hidden"}`}
+        >
+          <View className="hidden-section-content">
+            <View className="section-header">
+              <Text className="section-title">高级设置</Text>
+              <Text className="section-subtitle">向上滑动显示更多选项</Text>
+            </View>
+            <View className="advanced-options">
+              <View className="option-item">
+                <View className="option-icon">🔔</View>
+                <Text className="option-text">消息通知设置</Text>
+                <View className="arrow">›</View>
+              </View>
+              <View className="option-item">
+                <View className="option-icon">🔒</View>
+                <Text className="option-text">隐私设置</Text>
+                <View className="arrow">›</View>
+              </View>
+              <View className="option-item">
+                <View className="option-icon">🌙</View>
+                <Text className="option-text">夜间模式</Text>
+                <View className="arrow">›</View>
+              </View>
+              <View className="option-item">
+                <View className="option-icon">📊</View>
+                <Text className="option-text">使用统计</Text>
+                <View className="arrow">›</View>
+              </View>
+            </View>
+          </View>
+        </View>
+
         <View className="git-info-section">
           <Text className="git-info-text">Git SHA: {GIT_SHA || "unknown"}</Text>
         </View>

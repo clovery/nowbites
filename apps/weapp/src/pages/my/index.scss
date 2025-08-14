@@ -266,3 +266,96 @@
 .git-info-text:last-child {
   margin-bottom: 0;
 }
+
+/* Hidden Section - Swipe Up Feature */
+.hidden-section {
+  background-color: #fff;
+  margin: 0.75rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top;
+}
+
+.hidden-section.hidden {
+  height: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  opacity: 0;
+  transform: scaleY(0);
+}
+
+.hidden-section.visible {
+  height: auto;
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.hidden-section-content {
+  padding: 1.5rem 1.25rem;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+  font-size: 0.875rem;
+  color: #999;
+  display: block;
+}
+
+.advanced-options {
+  display: flex;
+  flex-direction: column;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.option-item:last-child {
+  border-bottom: none;
+}
+
+.option-item:hover {
+  background-color: #f8f8f8;
+}
+
+.option-icon {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  font-size: 1.25rem;
+}
+
+.option-text {
+  flex: 1;
+  font-size: 1rem;
+  color: #333;
+}
+
+.option-item .arrow {
+  font-size: 1.25rem;
+  color: #ccc;
+  font-weight: 300;
+}
