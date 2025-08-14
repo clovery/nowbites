@@ -243,3 +243,26 @@
   border: none;
   width: 80%;
 }
+
+/* Git Info Section */
+.git-info-section {
+  background-color: #fff;
+  padding: 1rem 1.25rem;
+  margin-top: 0.75rem;
+  border-radius: 0.5rem;
+  margin-left: 0.75rem;
+  margin-right: 0.75rem;
+}
+
+.git-info-text {
+  display: block;
+  font-size: 0.875rem;
+  color: #999;
+  text-align: center;
+  margin-bottom: 0.25rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.git-info-text:last-child {
+  margin-bottom: 0;
+}
