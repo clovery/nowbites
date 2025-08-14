@@ -16,6 +16,7 @@ const config = {
     '@tarojs/plugin-framework-react'
   ],
   defineConstants: {
+    GIT_SHA: `""`
   },
   copy: {
     patterns: [
@@ -54,7 +55,7 @@ const config = {
       // Add path alias configuration
       chain.resolve.alias
         .set('@', path.resolve(__dirname, '../src'))
-      
+
       chain.merge({
         plugin: {
           install: {

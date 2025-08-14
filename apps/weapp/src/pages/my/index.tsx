@@ -191,8 +191,8 @@ export default class MyPage extends Component<{}, State> {
             </Button>
           </View>
         )}
-        <View className="git-info-section">
-          <Text className="git-info-text">Git SHA: {GIT_SHA || "unknown"}</Text>
+        <View className="w-full fixed -bottom-4 flex justify-center items-center">
+          <Text>Git SHA: {GIT_SHA || "unknown"}</Text>
         </View>
       </View>
     );
