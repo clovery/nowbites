@@ -370,4 +370,6 @@ export function extractSauceSection(content: string): string {
   }
   
   return sauceLines.join('\n');
-} 
+}
+
+ 

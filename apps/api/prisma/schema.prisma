@@ -43,6 +43,7 @@ model Recipe {
   sauce       Json     // 调味汁，结构化存储
   steps       Json     // 步骤，含 title、time、content[]
   tips        Json     // 小贴士数组
+  references  Json     // 参考资料数组
   description String?
   cookingTime Int?     // in minutes
   servings    Int?     // 份数

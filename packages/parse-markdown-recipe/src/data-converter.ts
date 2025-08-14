@@ -10,6 +10,8 @@ import {
   extractAuxiliaryIngredientsSection,
   extractSauceSection
 } from "./content-extractor";
+
+import { extractReferences } from "./references-extractor";
 import { parseCookingTime, parseServings, extractUnit } from "./utils";
 import { parseIngredients } from "./ingredients-parser";
 import { parseSauce } from "./sauce-parser";

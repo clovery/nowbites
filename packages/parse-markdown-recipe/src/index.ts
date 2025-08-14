@@ -45,6 +45,12 @@ export {
   extractSauceSection
 } from "./content-extractor";
 
+// Export references extraction functions
+export {
+  extractReferences,
+  extractReferencesWithMetadata
+} from "./references-extractor";
+
 // Export data conversion functions
 export {
   convertToRecipeFormat

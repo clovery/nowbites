@@ -1,4 +1,4 @@
-import { parseMarkdownRecipe, extractIngredients, extractInstructions, getContentWithoutFrontmatter } from '../index';
+import { parseMarkdownRecipe, extractIngredients, extractInstructions, extractReferences, getContentWithoutFrontmatter } from '../index';
 
 describe('Chinese Recipe Parsing', () => {
   const chineseRecipeMarkdown = `# 乌发养生豆浆食谱
@@ -138,4 +138,6 @@ describe('Chinese Recipe Parsing', () => {
       expect(instructions[0]).toContain('红枣去核备用。');
     });
   });
+
+
 }); 

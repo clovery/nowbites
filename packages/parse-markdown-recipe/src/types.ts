@@ -63,4 +63,17 @@ export interface Step {
 
 export interface Tip {
   content: string;
+}
+
+// Reference interfaces
+export interface Reference {
+  title: string;
+  url?: string;
+  description?: string;
+  type?: string;
+}
+
+export interface ReferenceWithMetadata extends Reference {
+  domain?: string;
+  isExternal: boolean;
 } 
