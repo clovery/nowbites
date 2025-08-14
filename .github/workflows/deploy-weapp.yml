@@ -1,0 +1,62 @@
+name: Deploy WeChat Mini Program
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "apps/weapp/**"
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Production – weapp
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: |
+          pnpm install
+
+      - name: Build WeChat Mini Program
+        working-directory: apps/weapp
+        run: |
+          pnpm build:weapp
+
+      - name: Create private key file
+        working-directory: apps/weapp
+        run: |
+          echo "${{ secrets.WECHAT_PRIVATE_KEY }}" > private.key
+
+      - name: Create environment file
+        working-directory: apps/weapp
+        run: |
+          cat > .env << 'EOF'
+          WECHAT_APPID=${{ secrets.WECHAT_APPID }}
+          EOF
+
+      - name: Deploy to WeChat Mini Program
+        working-directory: apps/weapp
+        run: |
+          pnpm publish:weapp
+
+      - name: Cleanup
+        working-directory: apps/weapp
+        run: |
+          rm -f private.key
+          rm -f .env

@@ -9,6 +9,7 @@
     "check-types": "turbo run check-types",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
+    "lint-staged": "lint-staged",
     "prepare": "husky install"
   },
   "devDependencies": {

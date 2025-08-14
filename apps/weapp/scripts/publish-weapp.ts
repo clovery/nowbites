@@ -1,9 +1,14 @@
-import * as ci from "miniprogram-ci"
-import * as path from "path"
-import * as fs from "fs"
-import * as dotenv from "dotenv"
+import * as ci from "miniprogram-ci";
+import * as path from "path";
+import * as fs from "fs";
+import * as dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
+
+// Read version from package.json
+const packageJsonPath = path.resolve(__dirname, "../package.json");
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+const version = packageJson.version;
 
 const project = new ci.Project({
   appid: process.env.WECHAT_APPID!,
@@ -11,19 +16,22 @@ const project = new ci.Project({
   projectPath: path.resolve(__dirname, "../out/weapp"), // 项目路径
   privateKeyPath: path.resolve(__dirname, "../private.key"),
   ignores: ["node_modules/**/*"],
-})
+});
 
 ci.upload({
   project,
-  version: "0.0.2",
-  desc: "CI 自动上传",
+  version,
+  desc: `CI 自动上传 - ${new Date().toISOString()}`,
   setting: {
     minify: true,
-  }
+  },
 })
   .then((res) => {
-    console.log("上传成功", res)
+    console.log("上传成功", res);
+    console.log(`版本: ${version}`);
+    process.exit(0);
   })
   .catch((err) => {
-    console.error("上传失败", err)
-  })
+    console.error("上传失败", err);
+    process.exit(1);
+  });

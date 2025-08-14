@@ -2,18 +2,58 @@
 
 echo "🔍 Running pre-commit checks..."
 
+# Ensure we're in the right directory and have access to node_modules
+cd "$(dirname "$0")/.."
+
+# Function to find and run a command
+run_command() {
+    local cmd_name="$1"
+    local fallback_cmd="$2"
+    
+    # Try direct binary first
+    if [ -f "node_modules/.bin/$cmd_name" ]; then
+        echo "Using direct binary: $cmd_name"
+        ./node_modules/.bin/$cmd_name
+        return $?
+    fi
+    
+    # Try pnpm from PATH (global installation)
+    if command -v pnpm >/dev/null 2>&1; then
+        echo "Using global pnpm: $cmd_name"
+        pnpm $cmd_name
+        return $?
+    fi
+    
+    # Try npm from PATH
+    if command -v npm >/dev/null 2>&1; then
+        echo "Using global npm: $fallback_cmd"
+        npm $fallback_cmd
+        return $?
+    fi
+    
+    # Try yarn from PATH
+    if command -v yarn >/dev/null 2>&1; then
+        echo "Using global yarn: $cmd_name"
+        yarn $cmd_name
+        return $?
+    fi
+    
+    echo "❌ No package manager found in PATH or node_modules/.bin"
+    return 1
+}
+
 # Run lint-staged to format and lint staged files
 echo "📝 Running lint-staged..."
-npx lint-staged
+if ! run_command "lint-staged" "run lint-staged"; then
+    echo "❌ Failed to run lint-staged"
+    exit 1
+fi
 
 # Run tests to ensure code quality
 echo "🧪 Running tests..."
-pnpm test
-
-# Check if tests passed
-if [ $? -eq 0 ]; then
-    echo "✅ All tests passed! Proceeding with commit..."
-else
-    echo "❌ Tests failed! Please fix the issues before committing."
+if ! run_command "test" "test"; then
+    echo "❌ Failed to run tests"
     exit 1
 fi
+
+echo "✅ All pre-commit checks passed! Proceeding with commit..."
